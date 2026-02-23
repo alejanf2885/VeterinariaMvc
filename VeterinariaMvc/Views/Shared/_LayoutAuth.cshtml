@@ -1,0 +1,26 @@
+﻿@* Views/Shared/_LayoutAuth.cshtml *@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - VeterinariaMvc</title>
+    <!-- Tailwind CSS -->
+    <link rel="stylesheet" href="~/css/hopsersmerk.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/VeterinariaMvc.styles.css" asp-append-version="true" />
+</head>
+<body class="bg-slate-100 min-h-screen flex items-center justify-center">
+    <div class="w-full max-w-md p-6 bg-white rounded-xl shadow-lg">
+        <h1 class="text-2xl font-bold text-slate-800 mb-4 text-center">
+            @ViewData["Title"]
+        </h1>
+        @RenderBody()
+    </div>
+
+    <!-- JS opcional -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

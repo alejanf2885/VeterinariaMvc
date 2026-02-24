@@ -13,7 +13,20 @@ namespace VeterinariaMvc.Repositories.UsuarioRepository
         {
             this.context = context;
         }
-        
+
+        public async Task<bool> ExisteEmailAsync(string email)
+        {
+
+            var consulta = from datos in this.context.Usuarios
+                           where datos.Email.Equals(email)
+                           select datos;
+
+            bool existe = await consulta.AnyAsync();
+
+            return existe;
+
+        }
+
         public async Task<Usuario?> ObtenerPorEmailAsync(string email)
         {
 

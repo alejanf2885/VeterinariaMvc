@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
 using VeterinariaMvc.Data;
 using VeterinariaMvc.Models;
 

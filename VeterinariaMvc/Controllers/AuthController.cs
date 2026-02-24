@@ -2,17 +2,18 @@
 using System.Threading.Tasks;
 using VeterinariaMvc.Dtos.Auth;
 using VeterinariaMvc.Models;
+using VeterinariaMvc.Services.Auth;
 using VeterinariaMvc.Services.UsuarioService;
 
 namespace VeterinariaMvc.Controllers
 {
     public class AuthController : Controller
     {
-        private IUsuarioService usuarioService;
+        private IAuthService authService;
 
-        public AuthController(IUsuarioService usuarioService)
+        public AuthController(IAuthService authService)
         {
-            this.usuarioService = usuarioService;
+            this.authService = authService;
         }
 
         public IActionResult Login()
@@ -23,8 +24,8 @@ namespace VeterinariaMvc.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginDto request)
         {
-            Usuario usuario = await this.usuarioService
-                .ValidarYObtenerUsuarioAsync(request.Email, request.Password);
+            Usuario usuario = await this.authService
+                .LoginAsync(request.Email, request.Password);
 
             if(usuario != null)
             {

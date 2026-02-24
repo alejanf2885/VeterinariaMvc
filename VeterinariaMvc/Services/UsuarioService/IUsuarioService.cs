@@ -4,6 +4,6 @@ namespace VeterinariaMvc.Services.UsuarioService
 {
     public interface IUsuarioService
     {
-        Task<Usuario?> ValidarYObtenerUsuarioAsync(string email, string password);
+        Task<Usuario?> ObtenerPorEmailAsync(string email);
     }
 }

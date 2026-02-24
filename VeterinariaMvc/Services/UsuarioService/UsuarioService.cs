@@ -13,16 +13,12 @@ namespace VeterinariaMvc.Services.UsuarioService
             this.repo = repo;
         }
 
-        public async Task<Usuario?> ValidarYObtenerUsuarioAsync(string email, string password)
+        public async Task<Usuario?> ObtenerPorEmailAsync(string email)
         {
-
             Usuario usuario = await this.repo.ObtenerPorEmailAsync(email);
 
-            if (usuario != null && usuario.Password == password)
-            {
-                return usuario;
-            }
-            return null;
+            return usuario;
+
         }
     }
 }

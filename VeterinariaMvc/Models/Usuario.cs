@@ -34,11 +34,14 @@ namespace VeterinariaMvc.Models
         public bool Activo { get; set; } = true;
 
         [Column("FECHA_CREACION")]
-        public DateTime FechaCreacion { get; set; } = DateTime.Now;
+        public DateTime FechaCreacion { get; set; }
 
         [Column("ID_ROL")]
         public int IdRol { get; set; }
 
-       
+        [MaxLength(255)]
+        [Column("IMAGEN")]
+        public string? Imagen { get; set; }
+
     }
 }

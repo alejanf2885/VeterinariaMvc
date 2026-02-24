@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using VeterinariaMvc.Data;
 using VeterinariaMvc.Repositories.UsuarioRepository;
+using VeterinariaMvc.Services.Auth;
+using VeterinariaMvc.Services.Criptografia;
 using VeterinariaMvc.Services.UsuarioService;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,6 +24,10 @@ builder.Services.AddTransient<IUsuarioRepository, UsuarioRepository>();
 // Servicios
 
 builder.Services.AddTransient<IUsuarioService, UsuarioService>();
+builder.Services.AddTransient<IPasswordHasher, CriptografiaService>();
+builder.Services.AddTransient<IAuthService, AuthService>();
+
+
 
 
 //

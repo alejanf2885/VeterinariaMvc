@@ -12,13 +12,17 @@ namespace VeterinariaMvc.Controllers
     public class AuthController : Controller
     {
         private IAuthService authService;
+        private IUsuarioService usuarioService;
         private IEstadoUsuarioService estadoUsuarioService;
 
         public AuthController
-            (IAuthService authService, IEstadoUsuarioService estadoUsuarioService)
+            (IAuthService authService,
+            IEstadoUsuarioService estadoUsuarioService,
+            IUsuarioService usuarioService)
         {
             this.authService = authService;
             this.estadoUsuarioService = estadoUsuarioService;
+            this.usuarioService = usuarioService;
         }
 
         public IActionResult Login()
@@ -45,6 +49,36 @@ namespace VeterinariaMvc.Controllers
             {
                 ViewData["MENSAJE"] = "ERROR";
             }
+
+            return View();
+        }
+
+        public IActionResult Register()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Register(RegisterDto registerDto)
+        {
+
+            if (!ModelState.IsValid)
+            {
+                return View(registerDto);
+            }
+
+            //Comprobar que no exista email
+            if(await this.usuarioService.ExisteEmailAsync(registerDto.Email))
+            {
+                ViewData["ERROR"] = "El correo electronico ya está en uso";
+                return View(registerDto);
+            }
+
+            //Comprobar si existe imagen -> existe guardar y asignar ruta de la imagen
+
+            //Crear usuario nuevo
+
+            //Guardar usuario en IEstadoUsuario y loguearle
 
             return View();
         }

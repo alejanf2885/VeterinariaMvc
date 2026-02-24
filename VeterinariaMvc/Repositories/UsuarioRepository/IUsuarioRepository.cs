@@ -5,5 +5,6 @@ namespace VeterinariaMvc.Repositories.UsuarioRepository
     public interface IUsuarioRepository
     {
         Task<Usuario?> ObtenerPorEmailAsync(string email);
+        Task<bool> ExisteEmailAsync(string email);
     }
 }

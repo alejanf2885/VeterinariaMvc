@@ -30,5 +30,11 @@ namespace VeterinariaMvc.Services.Auth
             return valido ? usuario : null;
 
         }
+
+        public async Task<Usuario?> RegisterAsync
+            (string email, string password, string nombre, string telefono, string Imagen)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

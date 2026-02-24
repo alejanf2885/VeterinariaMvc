@@ -3,6 +3,7 @@ using VeterinariaMvc.Data;
 using VeterinariaMvc.Repositories.UsuarioRepository;
 using VeterinariaMvc.Services.Auth;
 using VeterinariaMvc.Services.Criptografia;
+using VeterinariaMvc.Services.Estado;
 using VeterinariaMvc.Services.UsuarioService;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,6 +27,7 @@ builder.Services.AddTransient<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddTransient<IUsuarioService, UsuarioService>();
 builder.Services.AddTransient<IPasswordHasher, CriptografiaService>();
 builder.Services.AddTransient<IAuthService, AuthService>();
+builder.Services.AddTransient<IEstadoUsuarioService, SessionUsuarioService>();
 
 
 
@@ -46,6 +48,20 @@ builder.Services.AddDbContext<Context>
     (options => options.UseSqlServer(connectionString));
 
 
+
+builder.Services.AddHttpContextAccessor();
+
+//Cache
+builder.Services.AddDistributedMemoryCache();
+
+//CREAMOS UN SERVICIO DE SESSION
+builder.Services.AddSession(options =>
+{
+
+    options.IdleTimeout = TimeSpan.FromHours(1);
+
+});
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
@@ -61,6 +77,10 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapStaticAssets();
+
+//HABILITAMOS SESSION
+app.UseSession();
+
 
 app.MapControllerRoute(
     name: "default",

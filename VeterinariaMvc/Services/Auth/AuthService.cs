@@ -1,4 +1,6 @@
 ﻿using VeterinariaMvc.Models;
+using VeterinariaMvc.Models.Auth;
+using VeterinariaMvc.Repositories.Auth;
 using VeterinariaMvc.Services.Criptografia;
 using VeterinariaMvc.Services.UsuarioService;
 
@@ -6,28 +8,37 @@ namespace VeterinariaMvc.Services.Auth
 {
     public class AuthService : IAuthService
     {
-
-        private IUsuarioService usuarioService;
+        private IAuthUsuarioRepository authUsuarioRepository;
         private IPasswordHasher passwordHasher;
+        private IUsuarioService usuarioService;
 
-        public AuthService(IUsuarioService usuarioService, IPasswordHasher passwordHasher)
+        public AuthService
+            (IAuthUsuarioRepository authUsuarioRepository,
+            IPasswordHasher passwordHasher,
+            IUsuarioService usuarioService)
         {
-            this.usuarioService = usuarioService;
+            this.authUsuarioRepository = authUsuarioRepository;
             this.passwordHasher = passwordHasher;
+            this.usuarioService = usuarioService;
         }
 
         public async Task<Usuario?> LoginAsync(string email, string password)
         {
 
-            Usuario usuario = await this.usuarioService.ObtenerPorEmailAsync(email);
+            AuthUsuario usuario = await this.authUsuarioRepository.ObtenerPorEmailAsync(email);
 
             if (usuario == null) return null;
             if (usuario.Activo == false) return null;
 
-            bool valido = this.passwordHasher.VerificarPassword(password, usuario.Password);
+            bool valido = this.passwordHasher.VerificarPassword(password, usuario.PasswordHash);
 
+            if (valido)
+            {
+                Usuario usuarioFinal = await this.usuarioService.ObtenerPorEmailAsync(email);
+                return usuarioFinal;
+            }
 
-            return valido ? usuario : null;
+            return null;
 
         }
 

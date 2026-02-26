@@ -1,5 +1,4 @@
 ﻿using VeterinariaMvc.Models;
-using VeterinariaMvc.Models.Auth;
 
 namespace VeterinariaMvc.Services.Auth
 {
@@ -8,8 +7,7 @@ namespace VeterinariaMvc.Services.Auth
 
         Task<Usuario?> LoginAsync(string email, string password);
         Task<Usuario?> RegisterAsync
-            (string email, string password,
-            string nombre, string telefono,
-            string Imagen);
+                (string email, string password, string nombre, string? telefono, IFormFile Imagen);
+
     }
 }

@@ -2,9 +2,13 @@ using Microsoft.EntityFrameworkCore;
 using VeterinariaMvc.Data;
 using VeterinariaMvc.Repositories.Auth;
 using VeterinariaMvc.Repositories.UsuarioRepository;
+using VeterinariaMvc.Services.Archivos;
 using VeterinariaMvc.Services.Auth;
 using VeterinariaMvc.Services.Criptografia;
 using VeterinariaMvc.Services.Estado;
+using VeterinariaMvc.Services.FileStorage;
+using VeterinariaMvc.Services.Imagenes;
+using VeterinariaMvc.Services.SaneadorFotos;
 using VeterinariaMvc.Services.UsuarioService;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,6 +34,10 @@ builder.Services.AddTransient<IUsuarioService, UsuarioService>();
 builder.Services.AddTransient<IPasswordHasher, CriptografiaService>();
 builder.Services.AddTransient<IAuthService, AuthService>();
 builder.Services.AddTransient<IEstadoUsuarioService, SessionUsuarioService>();
+builder.Services.AddTransient<INombreArchivoService, NombreArchivoService>();
+builder.Services.AddTransient<IProcesadorImagenService, ProcesadorImagenService>();
+builder.Services.AddTransient<IFileStorageService, FileStorageService>();
+builder.Services.AddTransient<IImagenService, ImagenService>();
 
 
 

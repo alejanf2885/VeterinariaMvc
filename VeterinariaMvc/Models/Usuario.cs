@@ -17,18 +17,13 @@ namespace VeterinariaMvc.Models
         public string Email { get; set; }
 
         [Required]
-        [MaxLength(255)]
-        [Column("PASSWORD")]
-        public string Password { get; set; }
-
-        [Required]
         [MaxLength(100)]
         [Column("NOMBRE")]
         public string Nombre { get; set; }
 
         [MaxLength(20)]
         [Column("TELEFONO")]
-        public string Telefono { get; set; }
+        public string? Telefono { get; set; }
 
         [Column("ACTIVO")]
         public bool Activo { get; set; } = true;

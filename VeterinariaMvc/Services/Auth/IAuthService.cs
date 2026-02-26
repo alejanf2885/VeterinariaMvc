@@ -1,4 +1,5 @@
 ﻿using VeterinariaMvc.Models;
+using VeterinariaMvc.Models.Auth;
 
 namespace VeterinariaMvc.Services.Auth
 {

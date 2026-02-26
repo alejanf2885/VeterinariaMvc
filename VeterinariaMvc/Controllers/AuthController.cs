@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using VeterinariaMvc.Dtos.Auth;
 using VeterinariaMvc.Mappers;
 using VeterinariaMvc.Models;
+using VeterinariaMvc.Models.Auth;
 using VeterinariaMvc.Services.Auth;
 using VeterinariaMvc.Services.Estado;
 using VeterinariaMvc.Services.UsuarioService;
@@ -39,6 +40,7 @@ namespace VeterinariaMvc.Controllers
             if (usuario != null)
             {
 
+           
                 //Guardar usuario IEstadoUsuario
                 await this.estadoUsuarioService.GuardarSesionAsync(usuario.ToSessionDto());
 

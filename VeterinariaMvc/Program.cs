@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using VeterinariaMvc.Data;
+using VeterinariaMvc.Repositories.Auth;
 using VeterinariaMvc.Repositories.UsuarioRepository;
 using VeterinariaMvc.Services.Auth;
 using VeterinariaMvc.Services.Criptografia;
@@ -18,6 +19,7 @@ builder.Services.AddControllersWithViews();
 // Repositories
 
 builder.Services.AddTransient<IUsuarioRepository, UsuarioRepository>();
+builder.Services.AddTransient<IAuthUsuarioRepository, AuthUsuarioRepository>();
 
 //
 

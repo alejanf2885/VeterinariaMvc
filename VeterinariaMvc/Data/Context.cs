@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VeterinariaMvc.Models;
+using VeterinariaMvc.Models.Auth;
 
 namespace VeterinariaMvc.Data
 {
@@ -9,6 +10,8 @@ namespace VeterinariaMvc.Data
             : base(options) { }
 
         public DbSet<Usuario> Usuarios { get; set; }
+        public DbSet<AuthUsuario> AuthUsuarios { get; set; }
+
 
     }
 }

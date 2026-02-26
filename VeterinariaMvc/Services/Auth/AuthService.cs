@@ -1,4 +1,6 @@
-﻿using VeterinariaMvc.Models;
+﻿using VeterinariaMvc.Dtos.Auth;
+using VeterinariaMvc.Enums;
+using VeterinariaMvc.Models;
 using VeterinariaMvc.Models.Auth;
 using VeterinariaMvc.Repositories.Auth;
 using VeterinariaMvc.Services.Criptografia;
@@ -63,8 +65,11 @@ namespace VeterinariaMvc.Services.Auth
             string rutaFoto = "/images/usuarios/default-avatar.png";
             if(imagen != null)
             {
+                 rutaFoto = await this.imagenService.SubirImagenAsync(imagen, CarpetaDestino.Usuarios);
 
             }
+
+            Usuario usuario;
 
 
             return null;

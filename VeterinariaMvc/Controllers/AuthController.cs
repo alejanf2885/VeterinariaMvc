@@ -89,9 +89,8 @@ namespace VeterinariaMvc.Controllers
                 ViewData["MENSAJE"] = "SE SUBIO LA FOTO" + imagen;
             }
 
-            //Encriptacion Contraseña
-
             //Crear usuario nuevo
+           
 
             //Guardar usuario en IEstadoUsuario y loguearle
 

@@ -2,6 +2,7 @@
 using VeterinariaMvc.Models.Auth;
 using VeterinariaMvc.Repositories.Auth;
 using VeterinariaMvc.Services.Criptografia;
+using VeterinariaMvc.Services.Imagenes;
 using VeterinariaMvc.Services.UsuarioService;
 
 namespace VeterinariaMvc.Services.Auth
@@ -11,15 +12,20 @@ namespace VeterinariaMvc.Services.Auth
         private IAuthUsuarioRepository authUsuarioRepository;
         private IPasswordHasher passwordHasher;
         private IUsuarioService usuarioService;
+        private IImagenService imagenService;
+
+
 
         public AuthService
             (IAuthUsuarioRepository authUsuarioRepository,
             IPasswordHasher passwordHasher,
-            IUsuarioService usuarioService)
+            IUsuarioService usuarioService,
+            IImagenService imagenService)
         {
             this.authUsuarioRepository = authUsuarioRepository;
             this.passwordHasher = passwordHasher;
             this.usuarioService = usuarioService;
+            this.imagenService = imagenService;
         }
 
         public async Task<Usuario?> LoginAsync(string email, string password)
@@ -43,9 +49,25 @@ namespace VeterinariaMvc.Services.Auth
         }
 
         public async Task<Usuario?> RegisterAsync
-            (string email, string password, string nombre, string telefono, string Imagen)
+            (string email, string password, string nombre, string? telefono, IFormFile imagen)
         {
-            throw new NotImplementedException();
+
+            //Existe ya el email a registrarse
+            bool existe = await this.usuarioService.ExisteEmailAsync(email);
+
+            if (!existe)
+            {
+                throw new InvalidOperationException("El email ya esta registrado.");
+            }
+
+            string rutaFoto = "/images/usuarios/default-avatar.png";
+            if(imagen != null)
+            {
+
+            }
+
+
+            return null;
         }
     }
 }

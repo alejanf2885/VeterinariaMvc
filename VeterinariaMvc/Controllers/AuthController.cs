@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using VeterinariaMvc.Dtos.Auth;
+using VeterinariaMvc.Enums;
 using VeterinariaMvc.Mappers;
 using VeterinariaMvc.Models;
-using VeterinariaMvc.Models.Auth;
 using VeterinariaMvc.Services.Auth;
 using VeterinariaMvc.Services.Estado;
+using VeterinariaMvc.Services.Imagenes;
 using VeterinariaMvc.Services.UsuarioService;
 
 namespace VeterinariaMvc.Controllers
@@ -15,15 +16,18 @@ namespace VeterinariaMvc.Controllers
         private IAuthService authService;
         private IUsuarioService usuarioService;
         private IEstadoUsuarioService estadoUsuarioService;
+        private IImagenService imagenService;
 
         public AuthController
             (IAuthService authService,
             IEstadoUsuarioService estadoUsuarioService,
-            IUsuarioService usuarioService)
+            IUsuarioService usuarioService,
+            IImagenService imagenService)
         {
             this.authService = authService;
             this.estadoUsuarioService = estadoUsuarioService;
             this.usuarioService = usuarioService;
+            this.imagenService = imagenService;
         }
 
         public IActionResult Login()
@@ -77,6 +81,15 @@ namespace VeterinariaMvc.Controllers
             }
 
             //Comprobar si existe imagen -> existe guardar y asignar ruta de la imagen
+            string imagen;
+
+            if(registerDto.Imagen != null)
+            {
+                imagen = await this.imagenService.SubirImagenAsync(registerDto.Imagen, CarpetaDestino.Usuarios);
+                ViewData["MENSAJE"] = "SE SUBIO LA FOTO" + imagen;
+            }
+
+            //Encriptacion Contraseña
 
             //Crear usuario nuevo
 

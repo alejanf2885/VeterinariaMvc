@@ -6,5 +6,6 @@ namespace VeterinariaMvc.Services.UsuarioService
     {
         Task<Usuario?> ObtenerPorEmailAsync(string email);
         Task<bool> ExisteEmailAsync(string email);
+
     }
 }

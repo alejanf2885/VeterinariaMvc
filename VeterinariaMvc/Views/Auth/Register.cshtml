@@ -25,19 +25,19 @@
 
 <form class="space-y-4" asp-action="Register" asp-controller="Auth" method="POST" enctype="multipart/form-data">
 
-    <!-- Nombre -->
     <div>
         <label asp-for="Nombre" class="block text-sm font-medium text-slate-700 mb-1">Nombre completo</label>
         <input asp-for="Nombre" type="text" autocomplete="name"
+               placeholder="Ej: John Pork"
                class="block w-full px-4 py-2.5 border border-slate-300 rounded-lg shadow-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 sm:text-sm">
         <span asp-validation-for="Nombre" class="text-xs text-red-500 mt-1 block"></span>
     </div>
 
-    <!-- Email + Teléfono -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
             <label asp-for="Email" class="block text-sm font-medium text-slate-700 mb-1">Correo electrónico</label>
             <input asp-for="Email" type="email" autocomplete="email"
+                   placeholder="ejemplo@correo.com"
                    class="block w-full px-4 py-2.5 border border-slate-300 rounded-lg shadow-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 sm:text-sm">
             <span asp-validation-for="Email" class="text-xs text-red-500 mt-1 block"></span>
         </div>
@@ -47,16 +47,17 @@
                 Teléfono <span class="text-slate-400 font-normal">(Opcional)</span>
             </label>
             <input asp-for="Telefono" type="tel" autocomplete="tel"
+                   placeholder="+34 600 000 000"
                    class="block w-full px-4 py-2.5 border border-slate-300 rounded-lg shadow-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 sm:text-sm">
             <span asp-validation-for="Telefono" class="text-xs text-red-500 mt-1 block"></span>
         </div>
     </div>
 
-    <!-- Password -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
             <label asp-for="Password" class="block text-sm font-medium text-slate-700 mb-1">Contraseña</label>
             <input asp-for="Password" type="password" autocomplete="new-password"
+                   placeholder="••••••••"
                    class="block w-full px-4 py-2.5 border border-slate-300 rounded-lg shadow-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 sm:text-sm">
             <span asp-validation-for="Password" class="text-xs text-red-500 mt-1 block"></span>
         </div>
@@ -64,12 +65,12 @@
         <div>
             <label asp-for="ConfirmarPassword" class="block text-sm font-medium text-slate-700 mb-1">Confirmar contraseña</label>
             <input asp-for="ConfirmarPassword" type="password" autocomplete="new-password"
+                   placeholder="••••••••"
                    class="block w-full px-4 py-2.5 border border-slate-300 rounded-lg shadow-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 sm:text-sm">
             <span asp-validation-for="ConfirmarPassword" class="text-xs text-red-500 mt-1 block"></span>
         </div>
     </div>
 
-    <!-- FOTO PERFIL COMPACTA -->
     <div>
         <label class="block text-sm font-medium text-slate-700 mb-2">
             Foto de perfil <span class="text-slate-400 font-normal">(Opcional)</span>
@@ -78,42 +79,31 @@
         <div id="dropzone"
              class="flex items-center gap-4 p-4 border-2 border-dashed border-slate-300 rounded-xl hover:border-teal-500 transition-all duration-200 cursor-pointer group">
 
-            <!-- Avatar circular -->
-            <div class="h-20 w-20 rounded-full border border-slate-200 shadow-sm bg-slate-100 flex items-center justify-center overflow-hidden">
-                <img id="preview" src="" class="h-full w-full object-cover rounded-full hidden" />
+            <div class="h-20 w-20 shrink-0 rounded-full border border-slate-200 shadow-sm bg-slate-100 flex items-center justify-center overflow-hidden">
+                <img id="preview" src="" class="h-full w-full object-cover hidden" />
                 <div id="cameraIcon" class="text-slate-400 group-hover:text-teal-500 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         class="h-8 w-8"
-                         fill="none"
-                         viewBox="0 0 24 24"
-                         stroke="currentColor">
-                        <path stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="1.8"
-                              d="M3 7h3l2-2h8l2 2h3v12H3V7z" />
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 7h3l2-2h8l2 2h3v12H3V7z" />
                         <circle cx="12" cy="13" r="4" stroke-width="1.8" />
                     </svg>
                 </div>
             </div>
 
-            <!-- Texto informativo -->
-            <div class="flex flex-col text-sm text-slate-600">
+            <div class="flex flex-col text-sm text-slate-600 overflow-hidden w-full">
                 <span class="font-medium text-teal-600 group-hover:text-teal-500">Subir imagen</span>
                 <span class="text-xs text-slate-400">Arrastra o haz clic</span>
-                <span id="file-name" class="text-xs text-slate-400 mt-1"></span>
+                <span id="file-name" class="text-xs text-slate-400 mt-1 truncate">Ningún archivo seleccionado</span>
             </div>
 
-            <!-- Input oculto -->
             <input asp-for="Imagen" id="Imagen" type="file" accept="image/*" class="hidden">
         </div>
 
         <span asp-validation-for="Imagen" class="text-xs text-red-500 mt-1 block"></span>
     </div>
 
-    <!-- Botón -->
     <div class="pt-4">
         <button type="submit"
-                class="w-full py-3 rounded-lg shadow-md text-sm font-bold text-white bg-teal-600 hover:bg-teal-700 focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition uppercase tracking-wider">
+                class="w-full hover:cursor-pointer py-3 rounded-lg shadow-md text-sm font-bold text-white bg-teal-600 hover:bg-teal-700 focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition uppercase tracking-wider">
             Crear cuenta
         </button>
     </div>
@@ -126,14 +116,16 @@
     </a>
 </div>
 
-<h1>
-    @ViewData["MENSAJE"]
-</h1>
+@if (ViewData["MENSAJE"] != null)
+{
+    <h1 class="text-center text-teal-700 mt-4 font-semibold">
+        @ViewData["MENSAJE"]
+    </h1>
+}
 
 @section Scripts {
-@{
+    @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
-
     }
     <script>
         const dropzone = document.getElementById('dropzone');
@@ -142,20 +134,17 @@
         const cameraIcon = document.getElementById('cameraIcon');
         const fileNameDisplay = document.getElementById('file-name');
 
-        // Evitar comportamiento por defecto en drag & drop
-        ['dragenter','dragover','dragleave','drop'].forEach(ev => {
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(ev => {
             dropzone.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); });
         });
 
-        // Cambios visuales al arrastrar
-        ['dragenter','dragover'].forEach(ev => {
-            dropzone.addEventListener(ev, () => dropzone.classList.add('border-teal-500','bg-teal-50'));
+        ['dragenter', 'dragover'].forEach(ev => {
+            dropzone.addEventListener(ev, () => dropzone.classList.add('border-teal-500', 'bg-teal-50'));
         });
-        ['dragleave','drop'].forEach(ev => {
-            dropzone.addEventListener(ev, () => dropzone.classList.remove('border-teal-500','bg-teal-50'));
+        ['dragleave', 'drop'].forEach(ev => {
+            dropzone.addEventListener(ev, () => dropzone.classList.remove('border-teal-500', 'bg-teal-50'));
         });
 
-        // Drag & drop
         dropzone.addEventListener('drop', (e) => {
             const files = e.dataTransfer.files;
             if (files.length > 0) {
@@ -164,18 +153,16 @@
             }
         });
 
-        // Solo abrir selector al clicar en el dropzone
         dropzone.addEventListener('click', () => fileInput.click());
 
-        // Cambio del input
-        fileInput.addEventListener('change', function() {
+        fileInput.addEventListener('change', function () {
             if (this.files.length > 0) updatePreview(this.files[0]);
         });
 
         function updatePreview(file) {
             fileNameDisplay.textContent = file.name;
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 preview.src = e.target.result;
                 preview.classList.remove('hidden');
                 preview.style.display = 'block';

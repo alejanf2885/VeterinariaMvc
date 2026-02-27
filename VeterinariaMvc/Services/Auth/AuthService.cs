@@ -1,6 +1,9 @@
-﻿using VeterinariaMvc.Models;
+﻿using VeterinariaMvc.Dtos.Auth;
+using VeterinariaMvc.Enums;
+using VeterinariaMvc.Models;
 using VeterinariaMvc.Models.Auth;
 using VeterinariaMvc.Repositories.Auth;
+using VeterinariaMvc.Repositories.UsuarioRepository;
 using VeterinariaMvc.Services.Criptografia;
 using VeterinariaMvc.Services.Imagenes;
 using VeterinariaMvc.Services.UsuarioService;
@@ -13,6 +16,7 @@ namespace VeterinariaMvc.Services.Auth
         private IPasswordHasher passwordHasher;
         private IUsuarioService usuarioService;
         private IImagenService imagenService;
+        private IUsuarioRepository usuarioRepository; 
 
 
 
@@ -20,12 +24,14 @@ namespace VeterinariaMvc.Services.Auth
             (IAuthUsuarioRepository authUsuarioRepository,
             IPasswordHasher passwordHasher,
             IUsuarioService usuarioService,
-            IImagenService imagenService)
+            IImagenService imagenService,
+            IUsuarioRepository usuarioRepository)
         {
             this.authUsuarioRepository = authUsuarioRepository;
             this.passwordHasher = passwordHasher;
             this.usuarioService = usuarioService;
             this.imagenService = imagenService;
+            this.usuarioRepository = usuarioRepository;
         }
 
         public async Task<Usuario?> LoginAsync(string email, string password)
@@ -55,19 +61,25 @@ namespace VeterinariaMvc.Services.Auth
             //Existe ya el email a registrarse
             bool existe = await this.usuarioService.ExisteEmailAsync(email);
 
-            if (!existe)
+            if (existe)
             {
                 throw new InvalidOperationException("El email ya esta registrado.");
             }
 
             string rutaFoto = "/images/usuarios/default-avatar.png";
-            if(imagen != null)
+            if(imagen != null && imagen.Length > 0)
             {
+                 rutaFoto = await this.imagenService.SubirImagenAsync(imagen, CarpetaDestino.Usuarios);
 
             }
 
+            string passwordHash = this.passwordHasher.HashearPassword(password);
 
-            return null;
+            Usuario usuario = await this.usuarioRepository.RegistrarUsuarioAsync
+                (email, nombre, telefono, rutaFoto, TipoCredencial.PASSWORD, passwordHash);
+
+
+            return usuario;
         }
     }
 }

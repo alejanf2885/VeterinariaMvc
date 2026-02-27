@@ -83,17 +83,15 @@ namespace VeterinariaMvc.Controllers
             //Comprobar si existe imagen -> existe guardar y asignar ruta de la imagen
             string imagen;
 
-            if(registerDto.Imagen != null)
-            {
-                imagen = await this.imagenService.SubirImagenAsync(registerDto.Imagen, CarpetaDestino.Usuarios);
-                ViewData["MENSAJE"] = "SE SUBIO LA FOTO" + imagen;
-            }
-
-            //Encriptacion Contraseña
-
             //Crear usuario nuevo
+            Usuario usuario = await this.authService.RegisterAsync
+                 (registerDto.Email, registerDto.Password, registerDto.Nombre, registerDto.Telefono, registerDto.Imagen);
 
             //Guardar usuario en IEstadoUsuario y loguearle
+
+            await this.estadoUsuarioService.GuardarSesionAsync(usuario.ToSessionDto());
+
+            ViewData["MENSAJE"] = "USUARIO CREADO";
 
             return View();
         }

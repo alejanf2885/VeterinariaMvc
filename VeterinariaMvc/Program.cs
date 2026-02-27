@@ -31,7 +31,7 @@ builder.Services.AddTransient<IAuthUsuarioRepository, AuthUsuarioRepository>();
 // Servicios
 
 builder.Services.AddTransient<IUsuarioService, UsuarioService>();
-builder.Services.AddTransient<IPasswordHasher, CriptografiaService>();
+builder.Services.AddTransient<IPasswordHasher, BCryptPasswordHasher>();
 builder.Services.AddTransient<IAuthService, AuthService>();
 builder.Services.AddTransient<IEstadoUsuarioService, SessionUsuarioService>();
 builder.Services.AddTransient<INombreArchivoService, NombreArchivoService>();

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Data;
 using VeterinariaMvc.Data;
+using VeterinariaMvc.Enums;
 using VeterinariaMvc.Models;
 using VeterinariaMvc.Models.Enums;
 using static Azure.Core.HttpHeader;
@@ -86,7 +87,7 @@ namespace VeterinariaMvc.Repositories.UsuarioRepository
         }
 
         public async Task<Usuario?> RegistrarUsuarioAsync
-          (string email, string nombre, string telefono, string rutaImagen, string tipoAuth, string passwordHash)
+          (string email, string nombre, string telefono, string rutaImagen, TipoCredencial tipoAuth, string passwordHash)
         {
             string sql = "EXEC SP_REGISTRARUSUARIO @Email, @Nombre, @Telefono, @Imagen, @IdRol, @TipoAuth, @PasswordHash, @NewID OUTPUT";
 
@@ -94,7 +95,7 @@ namespace VeterinariaMvc.Repositories.UsuarioRepository
             SqlParameter pamNombre = new SqlParameter("@Nombre", nombre);
             SqlParameter pamTelefono = new SqlParameter("@Telefono", telefono ?? (object)DBNull.Value);
             SqlParameter pamImagen = new SqlParameter("@Imagen", rutaImagen ?? (object)DBNull.Value);
-            SqlParameter pamIdRol = new SqlParameter("@IdRol", (int)Roles.Usuario);
+            SqlParameter pamIdRol = new SqlParameter("@IdRol", Roles.Usuario);
             SqlParameter pamTipoAuth = new SqlParameter("@TipoAuth", tipoAuth);
             SqlParameter pamPasswordHash = new SqlParameter("@PasswordHash", passwordHash);
 

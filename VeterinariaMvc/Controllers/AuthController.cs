@@ -90,9 +90,14 @@ namespace VeterinariaMvc.Controllers
             }
 
             //Crear usuario nuevo
-           
+            Usuario usuario = await this.authService.RegisterAsync
+                 (registerDto.Email, registerDto.Password, registerDto.Nombre, registerDto.Telefono, registerDto.Imagen);
 
             //Guardar usuario en IEstadoUsuario y loguearle
+
+            await this.estadoUsuarioService.GuardarSesionAsync(usuario.ToSessionDto());
+
+            ViewData["MENSAJE"] = "USUARIO CREADO";
 
             return View();
         }

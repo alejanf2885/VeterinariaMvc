@@ -1,4 +1,5 @@
-﻿using VeterinariaMvc.Models;
+﻿using VeterinariaMvc.Enums;
+using VeterinariaMvc.Models;
 
 namespace VeterinariaMvc.Repositories.UsuarioRepository
 {
@@ -9,7 +10,7 @@ namespace VeterinariaMvc.Repositories.UsuarioRepository
 
         Task<Usuario?> RegistrarUsuarioAsync
             (string email, string nombre, string telefono,
-            string rutaImagen, string tipoAuth, string passwordHash);
+            string rutaImagen, TipoCredencial tipoAuth, string passwordHash);
 
         Task<Usuario?> ObtenerPorIdAsync(int id);
     }

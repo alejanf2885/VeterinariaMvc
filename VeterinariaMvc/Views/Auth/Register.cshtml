@@ -116,10 +116,10 @@
     </a>
 </div>
 
-@if (ViewData["MENSAJE"] != null)
+@if (ViewData["ERROR"] != null)
 {
-    <h1 class="text-center text-teal-700 mt-4 font-semibold">
-        @ViewData["MENSAJE"]
+    <h1 class="text-center text-red-500 mt-4 font-semibold">
+        @ViewData["ERROR"]
     </h1>
 }
 

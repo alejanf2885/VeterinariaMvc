@@ -56,7 +56,7 @@ namespace VeterinariaMvc.Controllers
                 ViewData["MENSAJE"] = "ERROR";
             }
 
-            return View();
+            return RedirectToAction("Index", "Home");
         }
 
         public IActionResult Register()
@@ -93,7 +93,7 @@ namespace VeterinariaMvc.Controllers
 
             ViewData["MENSAJE"] = "USUARIO CREADO";
 
-            return View();
+            return RedirectToAction("Index", "Home");
         }
     }
 }

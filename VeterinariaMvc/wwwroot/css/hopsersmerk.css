@@ -901,6 +901,9 @@
   .bg-red-50 {
     background-color: var(--color-red-50);
   }
+  .bg-sky-50 {
+    background-color: var(--color-sky-50);
+  }
   .bg-sky-50\/60 {
     background-color: color-mix(in srgb, oklch(97.7% 0.013 236.62) 60%, transparent);
     @supports (color: color-mix(in lab, red, red)) {

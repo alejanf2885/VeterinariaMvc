@@ -12,7 +12,9 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 #region STORED PROCEDURE
 
-//CREATE or alter PROCEDURE SP_REGISTRARUSUARIO
+
+
+//CREATE OR ALTER PROCEDURE SP_REGISTRARUSUARIO
 //    @Email nvarchar(200),
 //    @Nombre nvarchar(200),
 //    @Telefono nvarchar(40),
@@ -25,15 +27,23 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 //BEGIN
 //    SET NOCOUNT ON;
 //BEGIN TRANSACTION
+//        -- 1. Insertar el Usuario
 //        INSERT INTO USUARIO(EMAIL, NOMBRE, TELEFONO, IMAGEN, ID_ROL, ACTIVO, FECHA_CREACION)
 //        VALUES (@Email, @Nombre, @Telefono, @Imagen, @IdRol, 1, GETDATE());
 
-//SET @NewID = SCOPE_IDENTITY(); -- < ---ASIGNAR A LA VARIABLE DE SALIDA
+//SET @NewID = SCOPE_IDENTITY(); --Asignar a la variable de salida
 
+//        -- 2. Insertar la Credencial
 //        INSERT INTO CREDENCIAL(ID_USUARIO, TIPO, PASSWORD_HASH, FECHA_ACTUALIZACION)
 //        VALUES (@NewID, @TipoAuth, @PasswordHash, GETDATE());
+
+//--3: Insertar automáticamente en la tabla CLIENTE
+//        INSERT INTO CLIENTE(ID_USUARIO)
+//        VALUES (@NewID);
+
 //COMMIT TRANSACTION
 //END
+//GO
 
 #endregion
 

@@ -43,20 +43,15 @@ namespace VeterinariaMvc.Controllers
 
             if (usuario != null)
             {
-
-           
                 //Guardar usuario IEstadoUsuario
                 await this.estadoUsuarioService.GuardarSesionAsync(usuario.ToSessionDto());
-
-                ViewData["MENSAJE"] = "LOGIN CORRECTO";
-
+                return RedirectToAction("Index", "Home");   
             }
             else
             {
-                ViewData["MENSAJE"] = "ERROR";
+                ViewData["MENSAJE"] = "Credenciales incorrectas";
+                return View(request);
             }
-
-            return RedirectToAction("Index", "Home");
         }
 
         public IActionResult Register()
@@ -80,20 +75,28 @@ namespace VeterinariaMvc.Controllers
                 return View(registerDto);
             }
 
-            //Comprobar si existe imagen -> existe guardar y asignar ruta de la imagen
-            string imagen;
+         
 
             //Crear usuario nuevo
             Usuario usuario = await this.authService.RegisterAsync
                  (registerDto.Email, registerDto.Password, registerDto.Nombre, registerDto.Telefono, registerDto.Imagen);
 
-            //Guardar usuario en IEstadoUsuario y loguearle
 
-            await this.estadoUsuarioService.GuardarSesionAsync(usuario.ToSessionDto());
+            if (usuario != null)
+            {
+                await this.estadoUsuarioService.GuardarSesionAsync(usuario.ToSessionDto());
+                return RedirectToAction("Index", "Home");
+            }
 
-            ViewData["MENSAJE"] = "USUARIO CREADO";
+            ViewData["ERROR"] = "No se pudo crear la cuenta. Inténtalo de nuevo.";
+            return View(registerDto);
+        }
 
-            return RedirectToAction("Index", "Home");
+        [HttpPost]
+        public async Task<IActionResult> Logout()
+        {
+            await this.estadoUsuarioService.DestruirSesionAsync();
+            return RedirectToAction("Index", "Home", new { area = "" });
         }
     }
 }

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using VeterinariaMvc.Data;
 using VeterinariaMvc.Repositories.Auth;
+using VeterinariaMvc.Repositories.MascotasRepository;
 using VeterinariaMvc.Repositories.UsuarioRepository;
 using VeterinariaMvc.Services.Archivos;
 using VeterinariaMvc.Services.Auth;
@@ -8,6 +9,7 @@ using VeterinariaMvc.Services.Criptografia;
 using VeterinariaMvc.Services.Estado;
 using VeterinariaMvc.Services.FileStorage;
 using VeterinariaMvc.Services.Imagenes;
+using VeterinariaMvc.Services.Mascotas;
 using VeterinariaMvc.Services.SaneadorFotos;
 using VeterinariaMvc.Services.UsuarioService;
 
@@ -24,6 +26,7 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddTransient<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddTransient<IAuthUsuarioRepository, AuthUsuarioRepository>();
+builder.Services.AddTransient<IMascotasRepository, MascotasRepository>();
 
 //
 
@@ -38,18 +41,13 @@ builder.Services.AddTransient<INombreArchivoService, NombreArchivoService>();
 builder.Services.AddTransient<IProcesadorImagenService, ProcesadorImagenService>();
 builder.Services.AddTransient<IFileStorageService, FileStorageService>();
 builder.Services.AddTransient<IImagenService, ImagenService>();
+builder.Services.AddTransient<IMascotasService, MascotasService>();
 
 
 
 
 //
 
-
-// Controladores
-
-
-
-//
 
 // Conexion BBDD 
 string connectionString =
@@ -90,6 +88,11 @@ app.MapStaticAssets();
 
 //HABILITAMOS SESSION
 app.UseSession();
+
+
+app.MapControllerRoute(
+    name: "areas",
+    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
 
 
 app.MapControllerRoute(

@@ -1,0 +1,86 @@
+﻿@using VeterinariaMvc.Areas.Cliente.Models
+@model DashboardViewModel
+
+@{
+    ViewData["Title"] = "Mi Panel";
+}
+
+<div class="space-y-8">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <h2 class="text-3xl font-bold text-slate-800">¡Hola, @Model.usuario.Nombre! 👋</h2>
+            <p class="text-slate-500">Bienvenido al panel de control de tus mascotas.</p>
+        </div>
+
+        <a asp-controller="Mascotas" asp-action="Registrar"
+           class="inline-flex items-center justify-center px-6 py-3 bg-teal-600 text-white font-bold rounded-xl shadow-lg hover:bg-teal-700 transition-all transform hover:-translate-y-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4" />
+            </svg>
+            Añadir Nueva Mascota
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4">
+            <div class="p-3 bg-teal-100 text-teal-600 rounded-xl">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+            </div>
+            <div>
+                <p class="text-sm text-slate-500 font-medium">Mascotas Registradas</p>
+                <p class="text-2xl font-bold text-slate-800">@Model.Mascotas.Count</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+        <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+            <h3 class="text-lg font-bold text-slate-800">Mis Mascotas</h3>
+            <span class="text-xs font-semibold px-3 py-1 bg-slate-100 text-slate-500 rounded-full">Actualizado hoy</span>
+        </div>
+
+        @if (Model.Mascotas.Any())
+        {
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+                @foreach (var mascota in Model.Mascotas)
+                {
+                    <div class="border border-slate-100 rounded-xl p-5 flex flex-col items-center hover:shadow-md transition-shadow relative">
+
+                        <div class="absolute top-4 right-4">
+                            @if (mascota.Sexo?.ToLower() == "macho")
+                            {
+                                <span class="bg-blue-100 text-blue-600 text-[10px] font-bold px-2 py-1 rounded-lg uppercase tracking-wider">♂ Macho</span>
+                            }
+                            else if (mascota.Sexo?.ToLower() == "hembra")
+                            {
+                                <span class="bg-pink-100 text-pink-600 text-[10px] font-bold px-2 py-1 rounded-lg uppercase tracking-wider">♀ Hembra</span>
+                            }
+                        </div>
+
+                        <img src="@(!string.IsNullOrEmpty(mascota.Imagen) ? mascota.Imagen : "/img/default-pet.png")"
+                             alt="@mascota.Nombre"
+                             class="w-24 h-24 object-cover rounded-full mb-4 shadow-sm border-4 border-slate-50" />
+
+                        <h4 class="font-bold text-slate-800 text-lg">@mascota.Nombre</h4>
+
+                        <p class="text-xs text-slate-500 font-medium bg-slate-100 px-3 py-1 rounded-full mt-2 text-center">
+                            @mascota.Especie <br /> <span class="text-slate-400 font-normal">@mascota.Raza</span>
+                        </p>
+
+                        <a asp-controller="Mascotas" asp-action="Detalles" asp-route-id="@mascota.Id"
+                           class="mt-6 w-full text-center py-2.5 bg-teal-50 text-teal-600 font-semibold rounded-lg hover:bg-teal-600 hover:text-white transition-colors">
+                            Ver Ficha Médica
+                        </a>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="p-12 text-center">
+            </div>
+        }
+    </div>
+</div>

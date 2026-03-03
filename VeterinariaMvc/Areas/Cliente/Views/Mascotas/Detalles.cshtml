@@ -1,0 +1,132 @@
+﻿@model VeterinariaMvc.Dtos.Mascota.MascotaDetalleDto
+
+@{
+    ViewData["Title"] = "Ficha de " + Model.NombreMascota;
+}
+
+<div class="space-y-8 max-w-5xl mx-auto">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <h2 class="text-3xl font-bold text-slate-800">Ficha Médica 📋</h2>
+            <p class="text-slate-500">Consulta la información detallada y el historial de tu mascota.</p>
+        </div>
+
+        <a asp-area="Cliente" asp-controller="Home" asp-action="Index"
+           class="inline-flex items-center text-slate-500 hover:text-slate-800 font-semibold transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Volver al Panel
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="lg:col-span-2 space-y-6">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <div class="p-8 flex flex-col md:flex-row gap-8 items-center md:items-start">
+                    <div class="h-48 w-48 shrink-0 rounded-3xl border-4 border-slate-50 shadow-md overflow-hidden bg-slate-100">
+                        <img src="@(string.IsNullOrEmpty(Model.ImagenMascota) ? "/images/mascotas/default-avatar.png" : Model.ImagenMascota)"
+                             class="h-full w-full object-cover"
+                             alt="@Model.NombreMascota" />
+                    </div>
+
+                    <div class="flex-1 space-y-4 text-center md:text-left">
+                        <div>
+                            <span class="px-3 py-1 bg-teal-100 text-teal-700 text-xs font-bold rounded-full uppercase tracking-wider">
+                                @Model.Especie
+                            </span>
+                            <h1 class="text-4xl font-black text-slate-800 mt-2">@Model.NombreMascota</h1>
+                            <p class="text-xl text-slate-500">@Model.Raza</p>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 pt-4">
+                            <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                <p class="text-xs font-bold text-slate-400 uppercase">Peso Actual</p>
+                                <p class="text-xl font-bold text-slate-800">@(Model.Peso?.ToString("N2") ?? "---") <span class="text-sm font-medium">kg</span></p>
+                            </div>
+                            <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                <p class="text-xs font-bold text-slate-400 uppercase">Estado Salud</p>
+                                <p class="text-xl font-bold text-teal-600">@(Model.EstadoEnClinica ?? "Estable")</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 px-8 py-4 border-t border-slate-100 flex justify-center md:justify-end gap-3">
+                    <button class="px-4 py-2 text-sm font-bold text-teal-600 hover:bg-teal-100 rounded-lg transition-colors">
+                        Editar Perfil
+                    </button>
+                    <button class="px-4 py-2 text-sm font-bold bg-teal-600 text-white rounded-lg shadow-md hover:bg-teal-700 transition-all">
+                        Solicitar Cita
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+                <h3 class="text-lg font-bold text-slate-800 mb-4">Últimas Actividades</h3>
+                <div class="text-center py-8">
+                    <div class="bg-slate-50 rounded-full h-16 w-16 flex items-center justify-center mx-auto mb-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                    </div>
+                    <p class="text-slate-400 text-sm">No hay consultas recientes registradas.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-6">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <div class="p-6 bg-slate-800 text-white">
+                    <h3 class="font-bold flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-10V4m0 10V4m-4 14h.01" />
+                        </svg>
+                        Centro Veterinario
+                    </h3>
+                </div>
+                <div class="p-6 space-y-4">
+                    @if (!string.IsNullOrEmpty(Model.NombreClinica))
+                    {
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Nombre</p>
+                            <p class="text-slate-700 font-semibold">@Model.NombreClinica</p>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Dirección</p>
+                            <p class="text-slate-600 text-sm italic">@Model.DireccionClinica</p>
+                        </div>
+                        <div class="pt-2">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-blue-50 text-blue-700 border border-blue-100">
+                                <svg class="-ml-0.5 mr-1.5 h-2 w-2 text-blue-400" fill="currentColor" viewBox="0 0 8 8">
+                                    <circle cx="4" cy="4" r="3" />
+                                </svg>
+                                Paciente @Model.EstadoEnClinica
+                            </span>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <p class="text-slate-400 text-sm">Mascota no vinculada a ninguna clínica actualmente.</p>
+                            <button class="mt-3 text-teal-600 text-sm font-bold hover:underline">Vincular ahora</button>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="bg-teal-600 rounded-2xl p-6 text-white shadow-lg shadow-teal-100">
+                <h4 class="font-bold mb-2 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    ¿Necesitas ayuda?
+                </h4>
+                <p class="text-teal-100 text-sm mb-4">Si los datos no son correctos, contacta con tu centro veterinario asignado.</p>
+                <a href="#" class="block w-full text-center py-2 bg-white text-teal-600 font-bold rounded-lg text-sm hover:bg-teal-50 transition-colors">
+                    Contactar Soporte
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

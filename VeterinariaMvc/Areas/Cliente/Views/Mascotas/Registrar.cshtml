@@ -106,7 +106,7 @@
                                 <span id="file-name-mascota" class="text-xs text-slate-400 mt-1 truncate">Ningún archivo seleccionado</span>
                             </div>
 
-                            <input id="ImagenArchivo" name="ImagenArchivo" type="file" accept="image/*" class="hidden">
+                            <input id="Imagen" name="Formulario.Imagen" asp-for="Formulario.Imagen" type="file" accept="image/*" class="hidden">
                         </div>
 
                         <p class="text-xs text-slate-500 mt-1">PNG, JPG, GIF hasta 5MB</p>
@@ -152,7 +152,7 @@
 
         // Vista previa de imagen 
         const dropzoneMascota = document.getElementById('dropzone-mascota');
-        const fileInputMascota = document.getElementById('ImagenArchivo');
+        const fileInputMascota = document.getElementById('Imagen');
         const previewMascota = document.getElementById('preview-mascota');
         const cameraIconMascota = document.getElementById('cameraIcon-mascota');
         const fileNameMascota = document.getElementById('file-name-mascota');

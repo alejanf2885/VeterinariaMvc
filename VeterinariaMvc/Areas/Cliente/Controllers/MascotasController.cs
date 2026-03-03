@@ -4,6 +4,7 @@ using VeterinariaMvc.Areas.Cliente.Models;
 using VeterinariaMvc.Dtos.Mascota;
 using VeterinariaMvc.Dtos.Session;
 using VeterinariaMvc.Services.Estado;
+using VeterinariaMvc.Services.MascotaCatalogosService;
 using VeterinariaMvc.Services.Mascotas;
 
 namespace VeterinariaMvc.Areas.Cliente.Controllers
@@ -13,30 +14,33 @@ namespace VeterinariaMvc.Areas.Cliente.Controllers
     {
         private IEstadoUsuarioService _estadoUsuario;
         private IMascotasService _mascotasService;
+        private IMascotaCatalogoService _mascotaCatalogoService;
 
-        public MascotasController(IEstadoUsuarioService estadoUsuario, IMascotasService mascotasService)
+        public MascotasController(IEstadoUsuarioService estadoUsuario, IMascotasService mascotasService, IMascotaCatalogoService mascotaCatalogoService)
         {
             this._estadoUsuario = estadoUsuario;
             this._mascotasService = mascotasService;
+            this._mascotaCatalogoService = mascotaCatalogoService;
         }
 
         public async Task<IActionResult> Index()
         {
-            UsuarioSessionDto usuario = await this._estadoUsuario.ObtenerUsuarioActualAsync();
+            CatalogosMascotaViewModels catalogo =
+                await this._mascotaCatalogoService.GetCatalogoMascotasAsync();
 
-            DashboardViewModel model = new DashboardViewModel();
+            RegistrarMascotaViewModel registrarMascotaViewModel = new RegistrarMascotaViewModel();
 
-            List<MascotaResumenDto> mascotas = await this._mascotasService.GetMascotasByUserAsync(usuario.Id);
+            registrarMascotaViewModel.Catalogos = catalogo;
+            registrarMascotaViewModel.Formulario = new MascotaRegisterDto();
 
-            model.Mascotas = mascotas;
 
-            return View(model);
+            return View(registrarMascotaViewModel);
         }
         public async Task<IActionResult> Registrar()
         {
             UsuarioSessionDto usuario = await this._estadoUsuario.ObtenerUsuarioActualAsync();
 
-           
+
 
             return View();
         }

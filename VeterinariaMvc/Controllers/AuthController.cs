@@ -16,18 +16,15 @@ namespace VeterinariaMvc.Controllers
         private IAuthService authService;
         private IUsuarioService usuarioService;
         private IEstadoUsuarioService estadoUsuarioService;
-        private IImagenService imagenService;
 
         public AuthController
             (IAuthService authService,
             IEstadoUsuarioService estadoUsuarioService,
-            IUsuarioService usuarioService,
-            IImagenService imagenService)
+            IUsuarioService usuarioService)
         {
             this.authService = authService;
             this.estadoUsuarioService = estadoUsuarioService;
             this.usuarioService = usuarioService;
-            this.imagenService = imagenService;
         }
 
         public IActionResult Login()

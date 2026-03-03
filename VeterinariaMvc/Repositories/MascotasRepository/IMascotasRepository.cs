@@ -8,6 +8,12 @@ namespace VeterinariaMvc.Repositories.MascotasRepository
 
         Task<List<MascotaResumenDto>> GetMascotaPorUsuario(int idUsuario);
 
+        Task<Mascota?> GetMascotaPorId(int idMascota);
+
+            Task<bool> RegistrarMascota(MascotaRegisterDto mascotaRegistrarDto, int idUsuario);
+    
+            Task<bool> EliminarMascota(int idMascota);
+
 
     }
 }

@@ -15,6 +15,16 @@ namespace VeterinariaMvc.Repositories.MascotasRepository
             this._context = context;
         }
 
+        public Task<bool> EliminarMascota(int idMascota)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Mascota?> GetMascotaPorId(int idMascota)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<List<MascotaResumenDto>> GetMascotaPorUsuario(int idUsuario)
         {
 
@@ -27,6 +37,11 @@ namespace VeterinariaMvc.Repositories.MascotasRepository
 
             return mascotas;
 
+        }
+
+        public Task<bool> RegistrarMascota(MascotaRegisterDto mascotaRegistrarDto, int idUsuario)
+        {
+            throw new NotImplementedException();
         }
     }
 }

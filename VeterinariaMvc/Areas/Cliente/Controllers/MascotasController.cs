@@ -23,7 +23,7 @@ namespace VeterinariaMvc.Areas.Cliente.Controllers
             this._mascotaCatalogoService = mascotaCatalogoService;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Registrar()
         {
             CatalogosMascotaViewModels catalogo =
                 await this._mascotaCatalogoService.GetCatalogoMascotasAsync();
@@ -36,13 +36,32 @@ namespace VeterinariaMvc.Areas.Cliente.Controllers
 
             return View(registrarMascotaViewModel);
         }
-        public async Task<IActionResult> Registrar()
+        [HttpPost]
+        public async Task<IActionResult> Registrar(RegistrarMascotaViewModel model)
         {
             UsuarioSessionDto usuario = await this._estadoUsuario.ObtenerUsuarioActualAsync();
 
+            if (usuario == null) return RedirectToAction("Login", "Auth", new { area = "" });
+
+            int mascotaId = await this._mascotasService.RegistrarMascotaAsync(model.Formulario, usuario.Id);
 
 
-            return View();
+
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        public async Task<IActionResult> Detalles(int id)
+        {
+            UsuarioSessionDto usuario = await this._estadoUsuario.ObtenerUsuarioActualAsync();
+
+            if (usuario == null) return RedirectToAction("Login", "Auth", new { area = "" });
+
+            MascotaDetalleDto mascotaDetalleDto = await this._mascotasService.GetMascotaPorIdAsync(id, usuario);
+
+            if(mascotaDetalleDto == null) return RedirectToAction("Index", "Home");
+
+            return View(mascotaDetalleDto);
         }
     }
 }

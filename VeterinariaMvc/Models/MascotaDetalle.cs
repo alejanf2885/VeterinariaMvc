@@ -17,16 +17,19 @@ namespace VeterinariaMvc.Models
         public string Especie { get; set; }
 
         [Column("RAZA")]
-        public string Raza { get; set; }
+        public string? Raza { get; set; }
 
         [Column("IMAGENMASCOTA")]
         public string? ImagenMascota { get; set; }
 
         [Column("PESO")]
-        public double? Peso { get; set; }
+        public decimal? Peso { get; set; }
 
         [Column("IDUSUARIO")]
         public int IdUsuario { get; set; }
+
+        [Column("IDCLINICA")]
+        public int? IdClinica { get; set; }
 
         [Column("NOMBRECLINICA")]
         public string? NombreClinica { get; set; }

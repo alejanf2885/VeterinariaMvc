@@ -19,6 +19,12 @@ namespace VeterinariaMvc.Dtos.Mascota
 
         [Range(0, 200)]
         public decimal? PesoActual { get; set; }
+
+        // Imagen actual de la mascota (URL)
+        public string? ImagenActual { get; set; }
+
+        // Nueva imagen opcional que el usuario suba en Editar
+        public IFormFile? NuevaImagen { get; set; }
     }
 }
 

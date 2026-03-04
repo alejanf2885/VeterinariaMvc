@@ -85,6 +85,9 @@ namespace VeterinariaMvc.Services.Mascotas
             dto.Sexo = entidad.Sexo;
             dto.FechaNacimiento = entidad.FechaNacimiento;
             dto.PesoActual = entidad.PesoActual;
+            dto.ImagenActual = string.IsNullOrEmpty(entidad.Imagen)
+                ? "/images/mascotas/default-avatar.png"
+                : entidad.Imagen;
 
             return dto;
 
@@ -109,6 +112,16 @@ namespace VeterinariaMvc.Services.Mascotas
             entidad.Sexo = dto.Sexo;
             entidad.FechaNacimiento = dto.FechaNacimiento;
             entidad.PesoActual = dto.PesoActual;
+
+            if (dto.NuevaImagen != null)
+            {
+                string nuevaRuta = await this._imagenService.SubirImagenAsync(
+                    dto.NuevaImagen,
+                    CarpetaDestino.Mascotas,
+                    1000
+                );
+                entidad.Imagen = nuevaRuta;
+            }
 
             return await this._mascotasRepo.ActualizarMascotaAsync(entidad);
         }

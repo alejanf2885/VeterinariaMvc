@@ -39,7 +39,7 @@ namespace VeterinariaMvc.Repositories.MascotasRepository
 
         public async Task<bool> ActualizarMascotaAsync(Mascota mascota)
         {
-            string sql = "EXEC SP_ACTUALIZARMASCOTA @IdMascota, @Nombre, @Sexo, @FechaNacimiento, @PesoActual, @IdEspecie, @IdRaza, @Resultado OUTPUT";
+            string sql = "EXEC SP_ACTUALIZARMASCOTA @IdMascota, @Nombre, @Sexo, @FechaNacimiento, @PesoActual, @IdEspecie, @IdRaza, @Imagen, @Resultado OUTPUT";
 
             SqlParameter pamIdMascota = new SqlParameter("@IdMascota", mascota.Id);
             SqlParameter pamNombre = new SqlParameter("@Nombre", mascota.Nombre);
@@ -48,6 +48,7 @@ namespace VeterinariaMvc.Repositories.MascotasRepository
             SqlParameter pamPeso = new SqlParameter("@PesoActual", (object)mascota.PesoActual ?? DBNull.Value);
             SqlParameter pamEspecie = new SqlParameter("@IdEspecie", (object)mascota.IdEspecie ?? DBNull.Value);
             SqlParameter pamRaza = new SqlParameter("@IdRaza", (object)mascota.IdRaza ?? DBNull.Value);
+            SqlParameter pamImagen = new SqlParameter("@Imagen", (object)mascota.Imagen ?? DBNull.Value);
 
             SqlParameter pamResultado = new SqlParameter();
             pamResultado.ParameterName = "@Resultado";
@@ -56,7 +57,7 @@ namespace VeterinariaMvc.Repositories.MascotasRepository
 
 
             await this._context.Database.ExecuteSqlRawAsync(sql,
-                pamIdMascota, pamNombre, pamSexo, pamFechaNac, pamPeso, pamEspecie, pamRaza, pamResultado
+                pamIdMascota, pamNombre, pamSexo, pamFechaNac, pamPeso, pamEspecie, pamRaza, pamImagen, pamResultado
             );
 
             return (int)pamResultado.Value == 1;

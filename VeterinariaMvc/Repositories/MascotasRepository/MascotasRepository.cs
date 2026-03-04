@@ -120,5 +120,22 @@ namespace VeterinariaMvc.Repositories.MascotasRepository
 
             return (int)pamRes.Value == 1;
         }
+
+        public async Task<bool> AsignarClinicaAMascotaAsync(int idMascota, int idClinica)
+        {
+            string sql = "EXEC SP_ASIGNAR_MASCOTA_A_CLINICA @IdMascota, @IdClinica, @Resultado OUTPUT";
+
+            SqlParameter pamIdMascota = new SqlParameter("@IdMascota", idMascota);
+            SqlParameter pamIdClinica = new SqlParameter("@IdClinica", idClinica);
+
+            SqlParameter pamResultado = new SqlParameter();
+            pamResultado.ParameterName = "@Resultado";
+            pamResultado.SqlDbType = SqlDbType.Int;
+            pamResultado.Direction = ParameterDirection.Output;
+
+            await this._context.Database.ExecuteSqlRawAsync(sql, pamIdMascota, pamIdClinica, pamResultado);
+
+            return (int)pamResultado.Value == 1;
+        }
     }
 }

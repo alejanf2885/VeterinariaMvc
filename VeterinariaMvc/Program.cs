@@ -35,6 +35,7 @@ builder.Services.AddTransient<IMascotasRepository, MascotasRepository>();
 builder.Services.AddTransient<IRazaRepository, RazaRepository>();
 builder.Services.AddTransient<IEspecieRepository, EspecieRepository>();
 builder.Services.AddTransient<IVeterinarioRepository, VeterinarioRepository>();
+builder.Services.AddTransient<IClinicaRepository, ClinicaRepository>();
 
 //
 
@@ -52,6 +53,7 @@ builder.Services.AddTransient<IImagenService, ImagenService>();
 builder.Services.AddTransient<IMascotasService, MascotasService>();
 builder.Services.AddTransient<IMascotaCatalogoService, MascotaCatalogoService>();
 builder.Services.AddTransient<IClinicaService, ClinicaService>();
+
 
 
 

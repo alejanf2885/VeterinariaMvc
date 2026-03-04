@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
- "scripts": {
+"scripts": {
   "build:css": "npx @tailwindcss/cli -i ./VeterinariaMvc/wwwroot/css/tailwind.css -o ./VeterinariaMvc/wwwroot/css/hopsersmerk.css",
   "watch:css": "npx @tailwindcss/cli -i ./VeterinariaMvc/wwwroot/css/tailwind.css -o ./VeterinariaMvc/wwwroot/css/hopsersmerk.css --watch"
- },
+},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/alejanf2885/VeterinariaMvc.git"

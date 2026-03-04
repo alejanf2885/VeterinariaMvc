@@ -23,7 +23,7 @@ namespace VeterinariaMvc.Models
         public DateTime? FechaNacimiento { get; set; }
 
         [Column("PESO_ACTUAL")]
-        public double? PesoActual { get; set; }
+        public decimal? PesoActual { get; set; }
 
         [Column("IMAGEN")]
         public string? Imagen { get; set; }

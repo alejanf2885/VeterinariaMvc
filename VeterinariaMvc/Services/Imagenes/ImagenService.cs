@@ -21,12 +21,22 @@ namespace VeterinariaMvc.Services.Imagenes
             this._storage = storage;
         }
 
+        public async Task BorrarImagenAsync(string rutaRelativa)
+        {
+            await this._storage.BorrarArchivoAsync(rutaRelativa);
+        }
+
         public async Task<string> SubirImagenAsync(IFormFile archivo, CarpetaDestino carpeta, int tamano = 500)
         {
 
-            // 1 Generar nombre unico 
-            string nombreUnico = this._nombreService.GenerarNombreUnico(archivo.FileName, ".webp");
+            //Quitar la extension del nombre del archivo
+            string nombreSinExtension = Path.GetFileNameWithoutExtension(archivo.FileName);
 
+            // 1 Generar nombre unico 
+            string nombreUnico = this._nombreService.GenerarNombreUnico(
+                nombreOriginal: archivo.FileName,
+                extensionDeseada: ".webp"
+            );
             // 2 Procesamiento de la foto
 
             using (var streamLimpio = await this._procesador.SanearYProcesarAsync(archivo, tamano))

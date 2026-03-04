@@ -20,9 +20,9 @@ namespace VeterinariaMvc.Repositories.MascotasRepository
             string imagen,
             int idUsuario);
 
-        Task<bool> EliminarMascota(int idMascota);
-
         Task<Mascota?> GetMascotaEntityPorIdAsync(int idMascota);
         Task<bool> ActualizarMascotaAsync(Mascota mascota);
+
+        Task<bool> EliminarMascotaAsync(int idMascota);
     }
 }

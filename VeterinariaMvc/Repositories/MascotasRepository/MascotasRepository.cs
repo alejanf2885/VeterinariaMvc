@@ -104,6 +104,21 @@ namespace VeterinariaMvc.Repositories.MascotasRepository
             return nuevoId;
         }
 
-    
+        public async Task<bool> EliminarMascotaAsync(int idMascota)
+        {
+            string sql = "EXEC SP_DESACTIVARMASCOTA @IdMascota, @Resultado OUTPUT";
+
+            SqlParameter pamId = new SqlParameter("@IdMascota", idMascota);
+
+            SqlParameter pamRes = new SqlParameter();
+            pamRes.ParameterName = "@Resultado";
+            pamRes.SqlDbType = SqlDbType.Int;
+            pamRes.Direction = ParameterDirection.Output;
+
+
+            await this._context.Database.ExecuteSqlRawAsync(sql, pamId, pamRes);
+
+            return (int)pamRes.Value == 1;
+        }
     }
 }

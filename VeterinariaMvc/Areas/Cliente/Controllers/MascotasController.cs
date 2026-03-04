@@ -104,6 +104,33 @@ namespace VeterinariaMvc.Areas.Cliente.Controllers
         }
 
 
+        [HttpPost]
+        public async Task<IActionResult> Desactivar(int idMascota)
+        {
+            UsuarioSessionDto usuario = await this._estadoUsuario.ObtenerUsuarioActualAsync();
+            if (usuario == null) return RedirectToAction("Login", "Auth", new { area = "" });
+
+            bool ok = await this._mascotasService.DesactivarMascotaAsync(idMascota, usuario);
+
+            // Preparamos el dashboard igual que en HomeController.Index
+            List<MascotaResumenDto> mascotas = await _mascotasService.GetMascotasByUserAsync(usuario.Id);
+            DashboardViewModel model = new DashboardViewModel
+            {
+                usuario = usuario,
+                Mascotas = mascotas
+            };
+
+            // Usamos ViewData para el toast
+            ViewData["ToastMessage"] = ok
+                ? "La mascota ha sido desactivada correctamente."
+                : "No se ha podido desactivar la mascota.";
+            ViewData["ToastType"] = ok ? "success" : "error";
+
+            // Renderizamos directamente la vista de panel del área Cliente
+            return View("~/Areas/Cliente/Views/Home/Index.cshtml", model);
+        }
+
+
 
     }
 }

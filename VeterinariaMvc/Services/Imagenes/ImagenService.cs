@@ -21,6 +21,11 @@ namespace VeterinariaMvc.Services.Imagenes
             this._storage = storage;
         }
 
+        public async Task BorrarImagenAsync(string rutaRelativa)
+        {
+            await this._storage.BorrarArchivoAsync(rutaRelativa);
+        }
+
         public async Task<string> SubirImagenAsync(IFormFile archivo, CarpetaDestino carpeta, int tamano = 500)
         {
 

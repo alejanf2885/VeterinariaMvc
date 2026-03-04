@@ -18,6 +18,7 @@
     <Folder Include="Areas\Veterinario\" />
     <Folder Include="Dtos\Especie\" />
     <Folder Include="Dtos\Raza\" />
+    <Folder Include="Repositories\Clinica\" />
   </ItemGroup>
 
 </Project>

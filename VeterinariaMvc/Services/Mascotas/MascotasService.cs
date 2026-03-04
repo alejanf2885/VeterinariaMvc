@@ -6,6 +6,7 @@ using VeterinariaMvc.Models;
 using VeterinariaMvc.Models.Enums;
 using VeterinariaMvc.Repositories.MascotasRepository;
 using VeterinariaMvc.Services.Clinica;
+using VeterinariaMvc.Services.FileStorage;
 using VeterinariaMvc.Services.Imagenes;
 
 namespace VeterinariaMvc.Services.Mascotas
@@ -74,24 +75,24 @@ namespace VeterinariaMvc.Services.Mascotas
                 return null;
             }
 
-            Mascota? entidad = await this._mascotasRepo.GetMascotaEntityPorIdAsync(idMascota);
-            if (entidad == null) return null;
+            Mascota? mascota = await this._mascotasRepo.GetMascotaEntityPorIdAsync(idMascota);
+            if (mascota == null) return null;
 
             MascotaEditDto dto = new MascotaEditDto();
-            dto.Id = entidad.Id;
-            dto.Nombre = entidad.Nombre;
-            dto.IdEspecie = entidad.IdEspecie;
-            dto.IdRaza = entidad.IdRaza;
-            dto.Sexo = entidad.Sexo;
-            dto.FechaNacimiento = entidad.FechaNacimiento;
-            dto.PesoActual = entidad.PesoActual;
-            dto.ImagenActual = string.IsNullOrEmpty(entidad.Imagen)
+            dto.Id = mascota.Id;
+            dto.Nombre = mascota.Nombre;
+            dto.IdEspecie = mascota.IdEspecie;
+            dto.IdRaza = mascota.IdRaza;
+            dto.Sexo = mascota.Sexo;
+            dto.FechaNacimiento = mascota.FechaNacimiento;
+            dto.PesoActual = mascota.PesoActual;
+            dto.ImagenActual = string.IsNullOrEmpty(mascota.Imagen)
                 ? "/images/mascotas/default-avatar.png"
-                : entidad.Imagen;
+                : mascota.Imagen;
 
             return dto;
 
-          
+
         }
 
 
@@ -101,7 +102,17 @@ namespace VeterinariaMvc.Services.Mascotas
             if (mascotaDetalle == null) return false;
 
             bool esDueno = (mascotaDetalle.IdUsuario == usuario.Id);
-            if (!esDueno) return false; // de momento solo el dueño puede editar
+            //if (!esDueno) return false; 
+            bool esVeterinarioAutorizado = false;
+            if (usuario.IdRol == (int)Roles.Veterinario)
+            {
+                int? idClinicaVeterinario = await this._clinicaService.ObtenerIdClinicaDeUsuarioAsync(usuario.Id);
+                if (idClinicaVeterinario.HasValue && idClinicaVeterinario.Value == mascotaDetalle.IdClinica)
+                {
+                    esVeterinarioAutorizado = true;
+                }
+            }
+            if(!esDueno && !esVeterinarioAutorizado) return false;
 
             Mascota? entidad = await this._mascotasRepo.GetMascotaEntityPorIdAsync(dto.Id);
             if (entidad == null) return false;
@@ -115,15 +126,48 @@ namespace VeterinariaMvc.Services.Mascotas
 
             if (dto.NuevaImagen != null)
             {
+                // GUARDAMOS LA RUTA ANTIGUA
+                string? rutaImagenVieja = entidad.Imagen;
+
+                // SUBIMOS LA NUEVA
                 string nuevaRuta = await this._imagenService.SubirImagenAsync(
                     dto.NuevaImagen,
                     CarpetaDestino.Mascotas,
                     1000
                 );
+
+                // ACTUALIZAMOS LA ENTIDAD
                 entidad.Imagen = nuevaRuta;
+
+                // BORRAMOS LA ANTIGUA DEL DISCO
+                if (!string.IsNullOrEmpty(rutaImagenVieja))
+                {
+                    await this._imagenService.BorrarImagenAsync(rutaImagenVieja);
+                }
             }
 
             return await this._mascotasRepo.ActualizarMascotaAsync(entidad);
+        }
+
+        public async Task<bool> DesactivarMascotaAsync(int idMascota, UsuarioSessionDto usuario)
+        {
+            MascotaDetalle mascotaDetalle = await this._mascotasRepo.GetMascotaPorIdAsync(idMascota);
+            if (mascotaDetalle == null) return false;
+
+            bool esDueno = (mascotaDetalle.IdUsuario == usuario.Id);
+            bool esVeterinarioAutorizado = false;
+            if (usuario.IdRol == (int)Roles.Veterinario)
+            {
+                int? idClinicaVeterinario = await this._clinicaService.ObtenerIdClinicaDeUsuarioAsync(usuario.Id);
+                if (idClinicaVeterinario.HasValue && idClinicaVeterinario.Value == mascotaDetalle.IdClinica)
+                {
+                    esVeterinarioAutorizado = true;
+                }
+            }
+
+            if (!esDueno && !esVeterinarioAutorizado) return false;
+
+            return await this._mascotasRepo.EliminarMascotaAsync(idMascota);
         }
 
         public async Task<List<MascotaResumenDto>> GetMascotasByUserAsync(int idUsuario)

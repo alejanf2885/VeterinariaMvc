@@ -8,5 +8,8 @@ namespace VeterinariaMvc.Services.Mascotas
         Task<List<MascotaResumenDto>> GetMascotasByUserAsync(int idUsuario);
         Task<int> RegistrarMascotaAsync(MascotaRegisterDto mascotaRegistrarDto, int idUsuario);
         Task<MascotaDetalleDto?> GetMascotaPorIdAsync(int idMascota, UsuarioSessionDto usuario);
+
+        Task<MascotaEditDto?> GetMascotaParaEditarAsync(int idMascota, UsuarioSessionDto usuario);
+        Task<bool> EditarMascotaAsync(MascotaEditDto dto, UsuarioSessionDto usuario);
     }
 }

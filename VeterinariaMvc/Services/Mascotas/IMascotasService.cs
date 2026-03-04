@@ -12,5 +12,6 @@ namespace VeterinariaMvc.Services.Mascotas
         Task<MascotaEditDto?> GetMascotaParaEditarAsync(int idMascota, UsuarioSessionDto usuario);
         Task<bool> EditarMascotaAsync(MascotaEditDto dto, UsuarioSessionDto usuario);
         Task<bool> DesactivarMascotaAsync(int idMascota, UsuarioSessionDto usuario);
+        Task<bool> AsignarClinicaAMascotaAsync(int idMascota, int idClinica, UsuarioSessionDto usuario);
     }
 }

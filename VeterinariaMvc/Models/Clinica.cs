@@ -19,6 +19,12 @@ namespace VeterinariaMvc.Models
         [Column("TELEFONO")]
         public string Telefono { get; set; }
 
+        [Column("EMAIL")]
+        public string Email { get; set; }
+
+        [Column("IMAGEN")]
+        public string? Imagen { get; set; }
+
         [Column("ESTADO")]
         public bool Estado { get; set; }
     }

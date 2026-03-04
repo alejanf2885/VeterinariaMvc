@@ -170,6 +170,20 @@ namespace VeterinariaMvc.Services.Mascotas
             return await this._mascotasRepo.EliminarMascotaAsync(idMascota);
         }
 
+        public async Task<bool> AsignarClinicaAMascotaAsync(int idMascota, int idClinica, UsuarioSessionDto usuario)
+        {
+            // Validar que la mascota existe y pertenece al usuario
+            MascotaDetalle? mascotaDetalle = await this._mascotasRepo.GetMascotaPorIdAsync(idMascota);
+            if (mascotaDetalle == null) return false;
+
+            bool esDueno = (mascotaDetalle.IdUsuario == usuario.Id);
+            if (!esDueno) return false;
+
+            // Llamar al repositorio para ejecutar el SP
+            bool ok = await this._mascotasRepo.AsignarClinicaAMascotaAsync(idMascota, idClinica);
+            return ok;
+        }
+
         public async Task<List<MascotaResumenDto>> GetMascotasByUserAsync(int idUsuario)
         {
             List<MascotaResumenDto> mascotas =

@@ -1,10 +1,11 @@
-﻿@model VeterinariaMvc.Dtos.Mascota.MascotaDetalleDto
+﻿@model VeterinariaMvc.Areas.Cliente.Models.MascotaDetalleViewModel
 
 @{
-    ViewData["Title"] = "Ficha de " + Model.NombreMascota;
+    ViewData["Title"] = "Ficha de " + Model.Mascota.NombreMascota;
 }
 
 <div class="space-y-8 max-w-5xl mx-auto relative">
+    @* --- CABECERA --- *@
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
             <h2 class="text-3xl font-bold text-slate-800">Ficha Médica 📋</h2>
@@ -21,39 +22,42 @@
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        @* --- COLUMNA IZQUIERDA: INFO PRINCIPAL --- *@
         <div class="lg:col-span-2 space-y-6">
             <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden relative">
                 <div class="p-8 flex flex-col md:flex-row gap-8 items-center md:items-start">
+                    @* Imagen Mascota *@
                     <div class="h-48 w-48 shrink-0 rounded-3xl border-4 border-slate-50 shadow-md overflow-hidden bg-slate-100 relative group">
-                        <img src="@(string.IsNullOrEmpty(Model.ImagenMascota) ? "/images/mascotas/default-avatar.png" : Model.ImagenMascota)"
+                        <img src="@(string.IsNullOrEmpty(Model.Mascota.ImagenMascota) ? "/images/mascotas/default-avatar.png" : Model.Mascota.ImagenMascota)"
                              class="h-full w-full object-cover"
-                             alt="@Model.NombreMascota" />
+                             alt="@Model.Mascota.NombreMascota" />
                     </div>
 
+                    @* Datos Mascota *@
                     <div class="flex-1 space-y-4 text-center md:text-left">
                         <div>
                             <span class="px-3 py-1 bg-teal-100 text-teal-700 text-xs font-bold rounded-full uppercase tracking-wider">
-                                @Model.Especie
+                                @Model.Mascota.Especie
                             </span>
-                            <h1 class="text-4xl font-black text-slate-800 mt-2">@Model.NombreMascota</h1>
-                            <p class="text-xl text-slate-500">@Model.Raza</p>
+                            <h1 class="text-4xl font-black text-slate-800 mt-2">@Model.Mascota.NombreMascota</h1>
+                            <p class="text-xl text-slate-500">@Model.Mascota.Raza</p>
                         </div>
 
                         <div class="grid grid-cols-2 gap-4 pt-4">
                             <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 flex flex-col justify-center items-center md:items-start">
                                 <p class="text-xs font-bold text-slate-400 uppercase">Peso Actual</p>
-                                <p class="text-xl font-bold text-slate-800">@(Model.Peso?.ToString("N2") ?? "---") <span class="text-sm font-medium">kg</span></p>
+                                <p class="text-xl font-bold text-slate-800">@(Model.Mascota.Peso?.ToString("N2") ?? "---") <span class="text-sm font-medium">kg</span></p>
                             </div>
                             <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 flex flex-col justify-center items-center md:items-start">
                                 <p class="text-xs font-bold text-slate-400 uppercase">Estado Salud</p>
-                                <p class="text-xl font-bold text-teal-600">@(Model.EstadoEnClinica ?? "Estable")</p>
+                                <p class="text-xl font-bold text-teal-600">@(Model.Mascota.EstadoEnClinica ?? "Estable")</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                @* Acciones Rápidas *@
                 <div class="bg-slate-50 px-8 py-4 border-t border-slate-100 flex flex-wrap justify-center md:justify-end gap-3 items-center">
-
                     <button onclick="document.getElementById('modalEliminar').showModal()"
                             class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors group"
                             title="Eliminar mascota">
@@ -64,7 +68,7 @@
 
                     <div class="hidden md:block w-px h-6 bg-slate-200 mx-1"></div>
 
-                    <a asp-area="Cliente" asp-controller="Mascotas" asp-action="Editar" asp-route-id="@Model.IdMascota"
+                    <a asp-area="Cliente" asp-controller="Mascotas" asp-action="Editar" asp-route-id="@Model.Mascota.IdMascota"
                        class="px-4 py-2 text-sm font-bold text-teal-600 hover:bg-teal-100 rounded-lg transition-colors">
                         Editar Perfil
                     </a>
@@ -78,6 +82,7 @@
                 </div>
             </div>
 
+            @* Historial *@
             <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
                 <h3 class="text-lg font-bold text-slate-800 mb-4">Últimas Actividades</h3>
                 <div class="text-center py-8">
@@ -91,33 +96,42 @@
             </div>
         </div>
 
+        @* --- COLUMNA DERECHA: CLÍNICA Y AYUDA --- *@
         <div class="space-y-6">
             <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                <div class="p-6 bg-slate-800 text-white">
+                <div class="p-6 bg-slate-800 text-white flex justify-between items-center">
                     <h3 class="font-bold flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-10V4m0 10V4m-4 14h.01" />
                         </svg>
                         Centro Veterinario
                     </h3>
+                    @if (!string.IsNullOrEmpty(Model.Mascota.NombreClinica))
+                    {
+                        <button onclick="document.getElementById('modalCambiarClinica').showModal()"
+                                class="text-xs bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded transition-colors uppercase font-bold">
+                            Cambiar
+                        </button>
+                    }
                 </div>
                 <div class="p-6 space-y-4">
-                    @if (!string.IsNullOrEmpty(Model.NombreClinica))
+                    @if (!string.IsNullOrEmpty(Model.Mascota.NombreClinica))
                     {
                         <div>
                             <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Nombre</p>
-                            <p class="text-slate-700 font-semibold">@Model.NombreClinica</p>
+                            <p class="text-slate-700 font-semibold">@Model.Mascota.NombreClinica</p>
                         </div>
                         <div>
                             <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Dirección</p>
-                            <p class="text-slate-600 text-sm italic">@Model.DireccionClinica</p>
+                            <p class="text-slate-600 text-sm italic">@Model.Mascota.DireccionClinica</p>
                         </div>
+
                         <div class="pt-2">
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-blue-50 text-blue-700 border border-blue-100">
                                 <svg class="-ml-0.5 mr-1.5 h-2 w-2 text-blue-400" fill="currentColor" viewBox="0 0 8 8">
                                     <circle cx="4" cy="4" r="3" />
                                 </svg>
-                                Paciente @Model.EstadoEnClinica
+                                Paciente @(Model.Mascota.EstadoEnClinica ?? "Registrado")
                             </span>
                         </div>
                     }
@@ -125,7 +139,10 @@
                     {
                         <div class="text-center py-4">
                             <p class="text-slate-400 text-sm">Mascota no vinculada a ninguna clínica actualmente.</p>
-                            <button class="mt-3 text-teal-600 text-sm font-bold hover:underline">Vincular ahora</button>
+                            <button onclick="document.getElementById('modalCambiarClinica').showModal()"
+                                    class="mt-3 text-teal-600 text-sm font-bold hover:underline">
+                                Vincular ahora
+                            </button>
                         </div>
                     }
                 </div>
@@ -147,32 +164,106 @@
     </div>
 </div>
 
-<dialog id="modalEliminar" class="p-6 rounded-2xl shadow-2xl bg-white w-full max-w-md border-0 focus:outline-none backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm open:animate-fade-in">
+@* --- MODAL: ASIGNAR/CAMBIAR CLÍNICA --- *@
+<dialog id="modalCambiarClinica" class="p-0 rounded-2xl shadow-2xl bg-white w-full max-w-lg border-0 focus:outline-none backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm">
+    <div class="p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-bold text-slate-800">Seleccionar Centro 🏥</h3>
+            <button onclick="document.getElementById('modalCambiarClinica').close()" class="text-slate-400 hover:text-slate-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
 
+        <form asp-area="Cliente" asp-controller="Mascotas" asp-action="AsignarClinica" method="post">
+            <input type="hidden" name="idMascota" value="@Model.Mascota.IdMascota" />
+
+            <div class="space-y-3 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
+                @foreach (var clinica in Model.Clinicas)
+                {
+                    <label class="relative flex items-center p-4 rounded-xl border-2 border-slate-100 cursor-pointer hover:bg-slate-50 transition-all has-[:checked]:border-teal-500 has-[:checked]:bg-teal-50 group">
+                        <input type="radio" name="idClinica" value="@clinica.Id" class="hidden peer" required
+                               @(Model.Mascota.NombreClinica == clinica.Nombre ? "checked" : "") />
+
+                        <div class="h-12 w-12 rounded-lg bg-slate-100 overflow-hidden flex-shrink-0">
+                            <img src="@(string.IsNullOrEmpty(clinica.Imagen) ? "/images/clinicas/default-logo.png" : clinica.Imagen)"
+                                 class="h-full w-full object-cover" alt="Logo">
+                        </div>
+
+                        <div class="ml-4 flex-1">
+                            <p class="font-bold text-slate-800 group-hover:text-teal-700">@clinica.Nombre</p>
+                            <p class="text-xs text-slate-500 italic">@clinica.Direccion</p>
+                        </div>
+
+                        <div class="hidden peer-checked:flex items-center justify-center h-6 w-6 bg-teal-500 rounded-full text-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                    </label>
+                }
+            </div>
+
+            <div class="mt-8 flex gap-3">
+                <button type="button" onclick="document.getElementById('modalCambiarClinica').close()"
+                        class="flex-1 px-4 py-3 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-colors">
+                    Cancelar
+                </button>
+                <button type="submit" class="flex-1 px-4 py-3 bg-teal-600 text-white font-bold rounded-xl shadow-lg hover:bg-teal-700 transition-all">
+                    Confirmar Cambio
+                </button>
+            </div>
+        </form>
+    </div>
+</dialog>
+
+@* --- MODAL: ELIMINAR (DESACTIVAR) --- *@
+<dialog id="modalEliminar" class="p-6 rounded-2xl shadow-2xl bg-white w-full max-w-md border-0 focus:outline-none backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm">
     <div class="flex flex-col items-center text-center mb-6 pt-2">
         <div class="h-14 w-14 bg-red-100 text-red-600 rounded-full flex items-center justify-center mb-4">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
         </div>
-        <h3 class="text-xl font-bold text-slate-800 mb-2">¿Dar de baja a @Model.NombreMascota?</h3>
+        <h3 class="text-xl font-bold text-slate-800 mb-2">¿Dar de baja a @Model.Mascota.NombreMascota?</h3>
         <p class="text-slate-500 text-sm">
-            Esta acción desactivará el perfil de tu mascota. No se eliminará su historial clínico, pero dejará de aparecer en tu panel principal.
+            Esta acción desactivará el perfil. No se eliminará su historial clínico, pero dejará de aparecer en tu panel principal.
         </p>
     </div>
 
     <div class="flex flex-col-reverse md:flex-row gap-3">
         <form method="dialog" class="w-full md:w-1/2">
-            <button class="w-full px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl transition-colors duration-200">
+            <button class="w-full px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl transition-colors">
                 Cancelar
             </button>
         </form>
 
         <form asp-controller="Mascotas" asp-action="Desactivar" method="post" class="w-full md:w-1/2">
-            <input type="hidden" name="idMascota" value="@Model.IdMascota" />
-            <button type="submit" class="w-full px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl shadow-sm hover:shadow transition-all duration-200">
+            <input type="hidden" name="idMascota" value="@Model.Mascota.IdMascota" />
+            <button type="submit" class="w-full px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl shadow-sm transition-all">
                 Sí, dar de baja
             </button>
         </form>
     </div>
 </dialog>
+
+@* --- CSS EXTRA PARA EL SCROLLBAR DEL MODAL --- *@
+<style>
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #e2e8f0;
+        border-radius: 10px;
+    }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #cbd5e1;
+        }
+</style>

@@ -1,13 +1,11 @@
-﻿using VeterinariaMvc.Models;
+using VeterinariaMvc.Dtos.Auth;
+using VeterinariaMvc.Models;
 
 namespace VeterinariaMvc.Services.Auth
 {
     public interface IAuthService
     {
-
         Task<Usuario?> LoginAsync(string email, string password);
-        Task<Usuario?> RegisterAsync
-                (string email, string password, string nombre, string? telefono, IFormFile Imagen);
-
+        Task<Usuario?> RegisterUsuarioAsync(RegisterDto dto);
     }
 }

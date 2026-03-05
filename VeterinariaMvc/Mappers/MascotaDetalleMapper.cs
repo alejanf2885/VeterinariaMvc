@@ -19,6 +19,7 @@ namespace VeterinariaMvc.Mappers
                 Peso = entidad.Peso,
                 NombreClinica = entidad.NombreClinica,
                 DireccionClinica = entidad.DireccionClinica,
+                IdClinica = entidad.IdClinica ?? 0,
                 EstadoEnClinica = entidad.EstadoEnClinica
             };
         }

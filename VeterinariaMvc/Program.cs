@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using VeterinariaMvc.Data;
 using VeterinariaMvc.Repositories.Auth;
 using VeterinariaMvc.Repositories.Clinica;
+using VeterinariaMvc.Repositories.Consulta;
 using VeterinariaMvc.Repositories.EspecieRepository;
 using VeterinariaMvc.Repositories.MascotasRepository;
 using VeterinariaMvc.Repositories.RazaRepository;
@@ -9,6 +10,7 @@ using VeterinariaMvc.Repositories.UsuarioRepository;
 using VeterinariaMvc.Services.Archivos;
 using VeterinariaMvc.Services.Auth;
 using VeterinariaMvc.Services.Clinica;
+using VeterinariaMvc.Services.Consulta;
 using VeterinariaMvc.Services.Criptografia;
 using VeterinariaMvc.Services.Estado;
 using VeterinariaMvc.Services.FileStorage;
@@ -36,6 +38,7 @@ builder.Services.AddTransient<IRazaRepository, RazaRepository>();
 builder.Services.AddTransient<IEspecieRepository, EspecieRepository>();
 builder.Services.AddTransient<IVeterinarioRepository, VeterinarioRepository>();
 builder.Services.AddTransient<IClinicaRepository, ClinicaRepository>();
+builder.Services.AddTransient<IConsultaRepository, ConsultaRepository>();
 
 //
 
@@ -53,6 +56,7 @@ builder.Services.AddTransient<IImagenService, ImagenService>();
 builder.Services.AddTransient<IMascotasService, MascotasService>();
 builder.Services.AddTransient<IMascotaCatalogoService, MascotaCatalogoService>();
 builder.Services.AddTransient<IClinicaService, ClinicaService>();
+builder.Services.AddTransient<IConsultaService, ConsultaService>();
 
 
 

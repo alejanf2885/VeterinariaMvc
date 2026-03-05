@@ -4,6 +4,7 @@ using VeterinariaMvc.Dtos.Auth;
 using VeterinariaMvc.Enums;
 using VeterinariaMvc.Mappers;
 using VeterinariaMvc.Models;
+using VeterinariaMvc.Models.Enums;
 using VeterinariaMvc.Services.Auth;
 using VeterinariaMvc.Services.Estado;
 using VeterinariaMvc.Services.Imagenes;
@@ -59,34 +60,32 @@ namespace VeterinariaMvc.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterDto registerDto)
         {
-
             if (!ModelState.IsValid)
+                return View(registerDto);
+            registerDto.Rol = Roles.Usuario;
+            try
             {
+                Usuario? usuario = await this.authService.RegisterUsuarioAsync(registerDto);
+
+                if (usuario != null)
+                {
+                    await this.estadoUsuarioService.GuardarSesionAsync(usuario.ToSessionDto());
+                    return RedirectToAction("Index", "Home");
+                }
+
+                ViewData["ERROR"] = "No se pudo crear la cuenta. Inténtalo de nuevo.";
                 return View(registerDto);
             }
-
-            //Comprobar que no exista email
-            if(await this.usuarioService.ExisteEmailAsync(registerDto.Email))
+            catch (InvalidOperationException ex)
             {
-                ViewData["ERROR"] = "El correo electronico ya está en uso";
+                ViewData["ERROR"] = ex.Message;
                 return View(registerDto);
             }
-
-         
-
-            //Crear usuario nuevo
-            Usuario usuario = await this.authService.RegisterAsync
-                 (registerDto.Email, registerDto.Password, registerDto.Nombre, registerDto.Telefono, registerDto.Imagen);
-
-
-            if (usuario != null)
+            catch
             {
-                await this.estadoUsuarioService.GuardarSesionAsync(usuario.ToSessionDto());
-                return RedirectToAction("Index", "Home");
+                ViewData["ERROR"] = "Ha ocurrido un error al registrar el usuario.";
+                return View(registerDto);
             }
-
-            ViewData["ERROR"] = "No se pudo crear la cuenta. Inténtalo de nuevo.";
-            return View(registerDto);
         }
 
         [HttpPost]

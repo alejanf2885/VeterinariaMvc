@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using VeterinariaMvc.Models.Enums;
 
 namespace VeterinariaMvc.Dtos.Auth
 {
@@ -26,5 +27,7 @@ namespace VeterinariaMvc.Dtos.Auth
         public string? Telefono { get; set; } 
 
         public IFormFile? Imagen { get; set; }
+
+        public Roles Rol { get; set; } = Roles.Usuario;
     }
 }

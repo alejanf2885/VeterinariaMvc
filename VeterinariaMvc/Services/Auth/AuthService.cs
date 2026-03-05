@@ -1,7 +1,10 @@
-﻿using VeterinariaMvc.Dtos.Auth;
+﻿using System;
+using Microsoft.AspNetCore.Http;
+using VeterinariaMvc.Dtos.Auth;
 using VeterinariaMvc.Enums;
 using VeterinariaMvc.Models;
 using VeterinariaMvc.Models.Auth;
+using VeterinariaMvc.Models.Enums;
 using VeterinariaMvc.Repositories.Auth;
 using VeterinariaMvc.Repositories.UsuarioRepository;
 using VeterinariaMvc.Services.Criptografia;
@@ -12,72 +15,69 @@ namespace VeterinariaMvc.Services.Auth
 {
     public class AuthService : IAuthService
     {
-        private IAuthUsuarioRepository authUsuarioRepository;
-        private IPasswordHasher passwordHasher;
-        private IUsuarioService usuarioService;
-        private IImagenService imagenService;
-        private IUsuarioRepository usuarioRepository; 
+        private readonly IAuthUsuarioRepository _authRepo;
+        private readonly IPasswordHasher _passwordHasher;
+        private readonly IUsuarioService _usuarioService;
+        private readonly IImagenService _imagenService;
+        private readonly IUsuarioRepository _usuarioRepo;
 
-
-
-        public AuthService
-            (IAuthUsuarioRepository authUsuarioRepository,
+        public AuthService(
+            IAuthUsuarioRepository authRepo,
             IPasswordHasher passwordHasher,
             IUsuarioService usuarioService,
             IImagenService imagenService,
-            IUsuarioRepository usuarioRepository)
+            IUsuarioRepository usuarioRepo)
         {
-            this.authUsuarioRepository = authUsuarioRepository;
-            this.passwordHasher = passwordHasher;
-            this.usuarioService = usuarioService;
-            this.imagenService = imagenService;
-            this.usuarioRepository = usuarioRepository;
+            _authRepo = authRepo;
+            _passwordHasher = passwordHasher;
+            _usuarioService = usuarioService;
+            _imagenService = imagenService;
+            _usuarioRepo = usuarioRepo;
         }
 
         public async Task<Usuario?> LoginAsync(string email, string password)
         {
+            AuthUsuario? auth = await _authRepo.ObtenerPorEmailAsync(email);
+            if (auth == null || !auth.Activo) return null;
 
-            AuthUsuario usuario = await this.authUsuarioRepository.ObtenerPorEmailAsync(email);
+            if (!_passwordHasher.VerificarPassword(password, auth.PasswordHash))
+                return null;
 
-            if (usuario == null) return null;
-            if (usuario.Activo == false) return null;
-
-            bool valido = this.passwordHasher.VerificarPassword(password, usuario.PasswordHash);
-
-            if (valido)
-            {
-                Usuario usuarioFinal = await this.usuarioService.ObtenerPorEmailAsync(email);
-                return usuarioFinal;
-            }
-
-            return null;
-
+            return await _usuarioService.ObtenerPorEmailAsync(email);
         }
 
-        public async Task<Usuario?> RegisterAsync
-            (string email, string password, string nombre, string? telefono, IFormFile imagen)
+        public Task<Usuario?> RegisterUsuarioAsync(RegisterDto dto)
         {
+            // Ahora le pasamos el dto.Rol a RegistrarCoreAsync
+            return RegistrarCoreAsync(dto.Email, dto.Password, dto.Nombre, dto.Telefono, dto.Imagen, dto.Rol);
+        }
 
-            //Existe ya el email a registrarse
-            bool existe = await this.usuarioService.ExisteEmailAsync(email);
+        private async Task<Usuario?> RegistrarCoreAsync(
+            string email, string password, string nombre, string? telefono, IFormFile? imagen, Roles rol) 
+        {
+            // 1) Validar que no exista el email
+            if (await _usuarioService.ExisteEmailAsync(email))
+                throw new InvalidOperationException("El email ya está registrado.");
 
-            if (existe)
-            {
-                throw new InvalidOperationException("El email ya esta registrado.");
-            }
-
+            // 2) Procesar imagen
             string rutaFoto = "/images/usuarios/default-avatar.png";
-            if(imagen != null && imagen.Length > 0)
+            if (imagen != null && imagen.Length > 0)
             {
-                 rutaFoto = await this.imagenService.SubirImagenAsync(imagen, CarpetaDestino.Usuarios);
-
+                rutaFoto = await _imagenService.SubirImagenAsync(imagen, CarpetaDestino.Usuarios, 500);
             }
 
-            string passwordHash = this.passwordHasher.HashearPassword(password);
+            // 3) Hashear contraseña
+            string passwordHash = _passwordHasher.HashearPassword(password);
 
-            Usuario usuario = await this.usuarioRepository.RegistrarUsuarioAsync
-                (email, nombre, telefono, rutaFoto, TipoCredencial.PASSWORD, passwordHash);
-
+            // 4) Crear usuario
+            Usuario? usuario = await _usuarioRepo.RegistrarUsuarioAsync(
+                email,
+                nombre,
+                telefono ?? string.Empty,
+                rutaFoto,
+                TipoCredencial.PASSWORD,
+                rol, 
+                passwordHash);
 
             return usuario;
         }

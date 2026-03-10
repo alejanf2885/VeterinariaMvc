@@ -24,6 +24,8 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         @* --- COLUMNA IZQUIERDA: INFO PRINCIPAL --- *@
         <div class="lg:col-span-2 space-y-6">
+
+            @* Tarjeta Principal Mascota *@
             <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden relative">
                 <div class="p-8 flex flex-col md:flex-row gap-8 items-center md:items-start">
                     @* Imagen Mascota *@
@@ -73,7 +75,7 @@
                         Editar Perfil
                     </a>
 
-                    @if (Model.Mascota.IdClinica> 0)
+                    @if (Model.Mascota.IdClinica > 0)
                     {
                         <a asp-area="Cliente" asp-controller="Consultas" asp-action="Reservar"
                            asp-route-idMascota="@Model.Mascota.IdMascota"
@@ -98,6 +100,37 @@
                             Asignar Clínica para Cita
                         </button>
                     }
+                </div>
+            </div>
+
+            @* --- TRATAMIENTOS ACTIVOS --- *@
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-teal-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                        </svg>
+                        Tratamientos
+                    </h3>
+                </div>
+
+                <div class="bg-teal-50/50 border border-teal-100 rounded-xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="flex flex-col sm:flex-row items-center text-center sm:text-left gap-4">
+                        <div class="h-12 w-12 bg-white text-teal-600 rounded-full shadow-sm flex items-center justify-center shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="font-bold text-slate-800">Plan de Salud</p>
+                            <p class="text-sm text-slate-500 mt-1">Revisa el historial médico, medicación y los seguimientos activos de tu mascota.</p>
+                        </div>
+                    </div>
+
+                    <a asp-area="Cliente" asp-controller="Tratamientos" asp-action="Index"
+                       class="whitespace-nowrap px-5 py-2.5 bg-white border border-slate-200 text-teal-700 text-sm font-bold rounded-xl shadow-sm hover:bg-teal-600 hover:text-white hover:border-teal-600 transition-all">
+                        Ver tratamientos
+                    </a>
                 </div>
             </div>
 
@@ -144,7 +177,7 @@
                             <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Dirección</p>
                             <p class="text-slate-600 text-sm italic">@Model.Mascota.DireccionClinica</p>
                         </div>
-                     
+
 
                         <div class="pt-2">
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-blue-50 text-blue-700 border border-blue-100">

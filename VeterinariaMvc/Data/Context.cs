@@ -2,6 +2,7 @@
 using VeterinariaMvc.Dtos.Bloque;
 using VeterinariaMvc.Dtos.Consultas;
 using VeterinariaMvc.Dtos.Consultas.VeterinariaMvc.Dtos.Consulta;
+using VeterinariaMvc.Dtos.Tratamiento;
 using VeterinariaMvc.Models;
 using VeterinariaMvc.Models.Auth;
 
@@ -22,5 +23,26 @@ namespace VeterinariaMvc.Data
         public DbSet<Veterinario> Veterinarios { get; set; }
         public DbSet<BloqueDisponibleDto> BloquesDisponibles { get; set; }
         public DbSet<ConsultaResumen> ConsultasResumidas { get; set; }
+        public DbSet<Tratamiento> Tratamientos { get; set; }
+        public DbSet<SeguimientoTratamiento> SeguimientosTratamiento { get; set; }
+        public DbSet<TratamientoDto> TratamientosDto { get; set; }
+
+        public DbSet<SeguimientoDto> SeguimientosDto { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<TratamientoDto>(entity =>
+            {
+                entity.HasNoKey(); 
+                entity.Ignore(t => t.Seguimientos); 
+            });
+
+            modelBuilder.Entity<SeguimientoDto>(entity =>
+            {
+                entity.HasNoKey();
+            });
+        }
     }
 }

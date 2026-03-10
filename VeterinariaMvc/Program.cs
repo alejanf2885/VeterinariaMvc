@@ -19,6 +19,8 @@ using VeterinariaMvc.Services.MascotaCatalogosService;
 using VeterinariaMvc.Services.Mascotas;
 using VeterinariaMvc.Services.SaneadorFotos;
 using VeterinariaMvc.Services.UsuarioService;
+using VeterinariaMvc.Services.Tratamientos;
+using VeterinariaMvc.Repositories.Tratamientos;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,6 +41,7 @@ builder.Services.AddTransient<IEspecieRepository, EspecieRepository>();
 builder.Services.AddTransient<IVeterinarioRepository, VeterinarioRepository>();
 builder.Services.AddTransient<IClinicaRepository, ClinicaRepository>();
 builder.Services.AddTransient<IConsultaRepository, ConsultaRepository>();
+builder.Services.AddTransient<ITratamientoRepository, TratamientoRepository>();
 
 //
 
@@ -57,6 +60,7 @@ builder.Services.AddTransient<IMascotasService, MascotasService>();
 builder.Services.AddTransient<IMascotaCatalogoService, MascotaCatalogoService>();
 builder.Services.AddTransient<IClinicaService, ClinicaService>();
 builder.Services.AddTransient<IConsultaService, ConsultaService>();
+builder.Services.AddTransient<ITratamientoService, TratamientoService>();
 
 
 

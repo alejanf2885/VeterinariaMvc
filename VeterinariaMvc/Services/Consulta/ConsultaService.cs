@@ -1,4 +1,5 @@
 ﻿using VeterinariaMvc.Dtos.Bloque;
+using VeterinariaMvc.Dtos.Consultas.VeterinariaMvc.Dtos.Consulta;
 using VeterinariaMvc.Repositories.Consulta;
 
 namespace VeterinariaMvc.Services.Consulta
@@ -23,6 +24,22 @@ namespace VeterinariaMvc.Services.Consulta
         {
             int resultado = await _repo.ReservarConsultaAsync(idMascota, idClinica, idBloque, motivo);
             return resultado > 0;
+        }
+
+    
+        public async Task<List<ConsultaResumen>> GetConsultasDashboardAsync(int idUsuario)
+        {
+            List<ConsultaResumen> todas = await _repo.GetConsultasByUserAsync(idUsuario);
+
+            return todas
+                .Where(c => c.Estado.ToUpper() != "CANCELADA" && c.Fecha >= DateTime.Now)
+                .OrderBy(c => c.Fecha) // La más próxima primero
+                .ToList();
+        }
+
+        public async Task<List<ConsultaResumen>> GetHistorialCompletoAsync(int idUsuario)
+        {
+            return await _repo.GetConsultasByUserAsync(idUsuario);
         }
     }
 }

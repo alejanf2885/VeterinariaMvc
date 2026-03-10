@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VeterinariaMvc.Areas.Cliente.Models;
+using VeterinariaMvc.Dtos.Consultas.VeterinariaMvc.Dtos.Consulta;
 using VeterinariaMvc.Dtos.Mascota;
 using VeterinariaMvc.Dtos.Session;
 using VeterinariaMvc.Services.Consulta;
@@ -35,7 +36,7 @@ namespace VeterinariaMvc.Areas.Cliente.Controllers
 
             // 2. SEGURIDAD: Verificar que la mascota le pertenece al usuario.
             // Usamos tu servicio que ya tiene esta lógica integrada.
-            var mascota = await _mascotasService.GetMascotaPorIdAsync(idMascota, usuario);
+            MascotaDetalleDto mascota = await _mascotasService.GetMascotaPorIdAsync(idMascota, usuario);
             if (mascota == null)
             {
                 // Si la mascota no es suya (o no existe), lo echamos de aquí
@@ -98,6 +99,17 @@ namespace VeterinariaMvc.Areas.Cliente.Controllers
             ViewData["ERROR"] = "El horario seleccionado ya no está disponible. Por favor, elige otro.";
             model.HorariosDisponibles = await _consultaService.ObtenerHorariosDisponiblesAsync(model.IdClinica, model.FechaSeleccionada);
             return View("Reservar", model);
+        }
+
+
+        public async Task<IActionResult> Consultas()
+        {
+            // 1. Obtener usuario actual
+            UsuarioSessionDto usuario = await _estadoUsuario.ObtenerUsuarioActualAsync();
+            if (usuario == null) return RedirectToAction("Login", "Auth", new { area = "" });
+            // 2. Obtener consultas del usuario
+            List<ConsultaResumen> consultas = await _consultaService.GetHistorialCompletoAsync(usuario.Id);
+            return View(consultas);
         }
     }
 }

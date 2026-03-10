@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Data;
 using VeterinariaMvc.Data;
 using VeterinariaMvc.Dtos.Bloque;
+using VeterinariaMvc.Dtos.Consultas.VeterinariaMvc.Dtos.Consulta;
 
 namespace VeterinariaMvc.Repositories.Consulta
 {
@@ -18,6 +19,15 @@ namespace VeterinariaMvc.Repositories.Consulta
                            orderby datos.Turno
                            select datos;
 
+            return await consulta.ToListAsync();
+        }
+
+        public async Task<List<ConsultaResumen>> GetConsultasByUserAsync(int idUsuario)
+        {
+            var consulta = from datos in this._context.ConsultasResumidas
+                           where datos.IdUsuario == idUsuario
+                           orderby datos.Fecha descending
+                           select datos;
             return await consulta.ToListAsync();
         }
 

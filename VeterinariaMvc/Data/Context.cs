@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VeterinariaMvc.Dtos.Bloque;
+using VeterinariaMvc.Dtos.Consultas;
+using VeterinariaMvc.Dtos.Consultas.VeterinariaMvc.Dtos.Consulta;
 using VeterinariaMvc.Models;
 using VeterinariaMvc.Models.Auth;
 
@@ -19,5 +21,6 @@ namespace VeterinariaMvc.Data
         public DbSet<Clinica> Clinicas { get; set; }
         public DbSet<Veterinario> Veterinarios { get; set; }
         public DbSet<BloqueDisponibleDto> BloquesDisponibles { get; set; }
+        public DbSet<ConsultaResumen> ConsultasResumidas { get; set; }
     }
 }

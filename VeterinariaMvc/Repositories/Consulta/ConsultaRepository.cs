@@ -12,6 +12,23 @@ namespace VeterinariaMvc.Repositories.Consulta
         private readonly Context _context;
         public ConsultaRepository(Context context) { _context = context; }
 
+        public async Task<bool> CancelarConsultaAsync(int idConsulta)
+        {
+            ConsultaResumen consultaAEliminar = await this._context.ConsultasResumidas
+                .FirstOrDefaultAsync(datos => datos.IdConsulta == idConsulta);
+
+            if (consultaAEliminar == null)
+            {
+                return false;
+            }
+
+            consultaAEliminar.Estado = "CANCELADA";
+
+            int filasAfectadas = await this._context.SaveChangesAsync();
+
+            return filasAfectadas > 0;
+        }
+
         public async Task<List<BloqueDisponibleDto>> GetBloquesDisponiblesAsync(int idClinica, DateTime fecha)
         {
             var consulta = from datos in this._context.BloquesDisponibles
@@ -20,6 +37,14 @@ namespace VeterinariaMvc.Repositories.Consulta
                            select datos;
 
             return await consulta.ToListAsync();
+        }
+
+        public async Task<ConsultaResumen> GetConsultaDetalleAsync(int idConsulta)
+        {
+            var consulta = from datos in this._context.ConsultasResumidas
+                           where datos.IdConsulta == idConsulta
+                           select datos;
+            return await consulta.FirstOrDefaultAsync();
         }
 
         public async Task<List<ConsultaResumen>> GetConsultasByUserAsync(int idUsuario)

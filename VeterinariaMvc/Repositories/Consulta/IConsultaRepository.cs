@@ -9,5 +9,9 @@ namespace VeterinariaMvc.Repositories.Consulta
         Task<int> ReservarConsultaAsync(int idMascota, int idClinica, int idBloque, string motivo);
 
         Task<List<ConsultaResumen>> GetConsultasByUserAsync(int idUsuario);
+
+        Task<ConsultaResumen> GetConsultaDetalleAsync(int idConsulta);
+
+        Task<bool> CancelarConsultaAsync(int idConsulta);
     }
 }

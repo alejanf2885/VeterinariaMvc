@@ -100,7 +100,7 @@
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
         <div class="p-6 border-b border-slate-100 flex justify-between items-center">
             <h3 class="text-lg font-bold text-slate-800">Mis Próximas Citas</h3>
-            <a asp-action="Historial" asp-controller="Consultas" class="text-sm font-semibold text-teal-600 hover:text-teal-800">Historial completo &rarr;</a>
+            <a asp-action="Consultas" asp-controller="Consultas" class="text-sm font-semibold text-teal-600 hover:text-teal-800">Historial completo &rarr;</a>
         </div>
 
         @if (Model.Consultas != null && Model.Consultas.Any())
@@ -149,9 +149,10 @@
                                     }
                                 </td>
                                 <td class="p-4 text-center">
-                                    <button class="text-red-500 hover:text-red-700 font-semibold text-sm transition-colors" onclick="cancelarCita(@cita.IdConsulta)">
+                                   
+                                    <a asp-controller="Consultas" asp-action="Cancelar" asp-route-id="@cita.IdConsulta" id="cancelarCita_@cita.IdConsulta" class=" text-red-500 hover:text-red-700 font-semibold text-sm transition-colors">
                                         Cancelar
-                                    </button>
+                                    </a>
                                 </td>
                             </tr>
                         }

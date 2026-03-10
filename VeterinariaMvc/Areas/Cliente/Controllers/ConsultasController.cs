@@ -111,5 +111,42 @@ namespace VeterinariaMvc.Areas.Cliente.Controllers
             List<ConsultaResumen> consultas = await _consultaService.GetHistorialCompletoAsync(usuario.Id);
             return View(consultas);
         }
+
+        public async Task<IActionResult> Detalles(int id)
+        {
+            // 1. Obtener usuario actual
+            UsuarioSessionDto usuario = await _estadoUsuario.ObtenerUsuarioActualAsync();
+            if (usuario == null) return RedirectToAction("Login", "Auth", new { area = "" });
+            // 2. Obtener detalles de la consulta
+            ConsultaResumen consulta = await _consultaService.GetConsultaDetalleAsync(id, usuario.Id);
+            if (consulta == null)
+            {
+                TempData["ToastMessage"] = "No tienes permiso para ver esta consulta.";
+                TempData["ToastType"] = "error";
+                return RedirectToAction("Consultas");
+            }
+            return View(consulta);
+        }
+
+        public async Task<IActionResult> Cancelar(int id)
+        {
+            // 1. Obtener usuario actual
+            UsuarioSessionDto usuario = await _estadoUsuario.ObtenerUsuarioActualAsync();
+            if (usuario == null) return RedirectToAction("Login", "Auth", new { area = "" });
+            // 2. Intentar cancelar la consulta
+            bool exito = await _consultaService.CancelarConsultaAsync(id, usuario.Id);
+            if (exito)
+            {
+                TempData["ToastMessage"] = "Consulta cancelada correctamente.";
+                TempData["ToastType"] = "success";
+            }
+            else
+            {
+                TempData["ToastMessage"] = "No se pudo cancelar la consulta. Intenta de nuevo.";
+                TempData["ToastType"] = "error";
+            }
+            return RedirectToAction("Consultas");
+        }
+
     }
 }

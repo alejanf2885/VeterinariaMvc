@@ -41,5 +41,29 @@ namespace VeterinariaMvc.Services.Consulta
         {
             return await _repo.GetConsultasByUserAsync(idUsuario);
         }
+
+        public async Task<ConsultaResumen> GetConsultaDetalleAsync(int idConsulta, int idUsuario)
+        {
+            ConsultaResumen detalle =await this._repo.GetConsultaDetalleAsync(idConsulta);
+
+            if (detalle == null || detalle.IdUsuario != idUsuario)
+                return null;
+
+            return detalle;
+
+
+
+
+        }
+
+        public async Task<bool> CancelarConsultaAsync(int idConsulta, int idUsuario)
+        {
+            ConsultaResumen consulta = await this._repo.GetConsultaDetalleAsync(idConsulta);
+
+            if (consulta == null || consulta.IdUsuario != idUsuario || consulta.Estado.ToUpper() == "CANCELADA")
+                return false;
+
+            return await this._repo.CancelarConsultaAsync(idConsulta);
+        }
     }
 }

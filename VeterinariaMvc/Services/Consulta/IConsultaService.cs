@@ -10,5 +10,9 @@ namespace VeterinariaMvc.Services.Consulta
 
         Task<List<ConsultaResumen>> GetConsultasDashboardAsync(int idUsuario);
         Task<List<ConsultaResumen>> GetHistorialCompletoAsync(int idUsuario);
+
+        Task<ConsultaResumen> GetConsultaDetalleAsync(int idConsulta, int idUsuario);
+
+        Task<bool> CancelarConsultaAsync(int idConsulta, int idUsuario);
     }
 }

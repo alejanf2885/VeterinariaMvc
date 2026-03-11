@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using VeterinariaMvc.Data;
 using VeterinariaMvc.Dtos.Tratamiento;
 using VeterinariaMvc.Models;
+using VeterinariaMvc.Models.Seguimientos;
+using VeterinariaMvc.Models.Tratamientos;
 
 namespace VeterinariaMvc.Repositories.Tratamientos
 {
@@ -15,54 +17,36 @@ namespace VeterinariaMvc.Repositories.Tratamientos
             _context = context;
         }
 
-        public async Task<List<TratamientoDto>> GetTratamientosPorMascotaAsync(int idMascota)
+        public async Task<List<TratamientoView>> GetTratamientosPorMascotaAsync(int idMascota)
         {
-            string query = "EXEC SP_GET_TRATAMIENTOS_POR_MASCOTA @IdMascota";
-            SqlParameter parametro = new SqlParameter("@IdMascota", idMascota);
-
-            return await _context.Set<TratamientoDto>()
-                .FromSqlRaw(query, parametro)
+           List<TratamientoView> tratamientos = await _context.TratamientosView
+                .Where(t => t.IdMascota == idMascota)
                 .ToListAsync();
+            return tratamientos;
         }
 
-        public async Task<List<TratamientoDto>> GetTratamientosPorUsuarioAsync(int idUsuario)
+        public async Task<List<TratamientoView>> GetTratamientosPorUsuarioAsync(int idUsuario)
         {
-            string query = "EXEC SP_GET_TRATAMIENTOS_POR_USUARIO @IdUsuario";
-            SqlParameter parametro = new SqlParameter("@IdUsuario", idUsuario);
-
-            return await _context.Set<TratamientoDto>()
-                .FromSqlRaw(query, parametro)
+            List<TratamientoView> tratamientos = await _context.TratamientosView
+                .Where(t => t.IdUsuario == idUsuario)
                 .ToListAsync();
+            return tratamientos;
         }
 
-        public async Task<TratamientoDto?> GetTratamientoDetalleAsync(int idTratamiento, int idUsuario)
+        public async Task<TratamientoView?> GetTratamientoDetalleAsync(int idTratamiento, int idUsuario)
         {
-            string query = "EXEC SP_GET_TRATAMIENTO_DETALLE @IdTratamiento, @IdUsuario";
-            SqlParameter paramIdTratamiento = new SqlParameter("@IdTratamiento", idTratamiento);
-            SqlParameter paramIdUsuario = new SqlParameter("@IdUsuario", idUsuario);
-
-            List<TratamientoDto> tratamientosDto = await _context.Set<TratamientoDto>()
-                .FromSqlRaw(query, paramIdTratamiento, paramIdUsuario)
-                .ToListAsync();
-
-            TratamientoDto? tratamientoDto = tratamientosDto.FirstOrDefault();
-
-            if (tratamientoDto != null)
-            {
-                tratamientoDto.Seguimientos = await GetSeguimientosPorTratamientoAsync(idTratamiento);
-            }
-
-            return tratamientoDto;
+            TratamientoView? tratamiento = await _context.TratamientosView
+                .FirstOrDefaultAsync(t => t.Id == idTratamiento && t.IdUsuario == idUsuario);
+            return tratamiento;
         }
 
-        public async Task<List<SeguimientoDto>> GetSeguimientosPorTratamientoAsync(int idTratamiento)
+        public async Task<List<SeguimientoView>> GetSeguimientosPorTratamientoAsync(int idTratamiento)
         {
-            string query = "EXEC SP_GET_SEGUIMIENTOS_POR_TRATAMIENTO @IdTratamiento";
-            SqlParameter parametro = new SqlParameter("@IdTratamiento", idTratamiento);
-
-            return await _context.Set<SeguimientoDto>()
-                .FromSqlRaw(query, parametro)
+           List<SeguimientoView> seguimientos = await _context.SeguimientosView
+                .Where(s => s.IdTratamiento == idTratamiento)
+                .OrderByDescending(s => s.Fecha)
                 .ToListAsync();
+            return seguimientos;
         }
 
         public async Task<bool> AgregarSeguimientoAsync(int idTratamiento, int idUsuario, string comentario)

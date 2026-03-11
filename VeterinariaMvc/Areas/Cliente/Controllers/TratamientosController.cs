@@ -1,5 +1,6 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using MvcCoreSession.Helpers;
 using VeterinariaMvc.Areas.Cliente.Models;
 using VeterinariaMvc.Dtos.Session;
 using VeterinariaMvc.Dtos.Tratamiento;
@@ -23,17 +24,17 @@ namespace VeterinariaMvc.Areas.Cliente.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            UsuarioSessionDto usuario = await this._estadoUsuario.ObtenerUsuarioActualAsync();
+            UsuarioSessionDto usuario = await _estadoUsuario.ObtenerUsuarioActualAsync();
             if (usuario == null)
             {
                 return RedirectToAction("Login", "Auth", new { area = "" });
             }
 
-            List<TratamientoDto> tratamientos = await _tratamientoService.GetTratamientosPorUsuarioAsync(usuario.Id);
+            List<TratamientoDto> tratamientosDto = await _tratamientoService.GetTratamientosPorUsuarioAsync(usuario.Id);
 
-            var viewModel = new TratamientosViewModel
+            TratamientosViewModel viewModel = new TratamientosViewModel
             {
-                Tratamientos = tratamientos
+                Tratamientos = tratamientosDto
             };
 
             return View(viewModel);
@@ -42,21 +43,20 @@ namespace VeterinariaMvc.Areas.Cliente.Controllers
         [HttpGet]
         public async Task<IActionResult> Detalle(int id)
         {
-            UsuarioSessionDto usuario = await this._estadoUsuario.ObtenerUsuarioActualAsync();
+            UsuarioSessionDto usuario = await _estadoUsuario.ObtenerUsuarioActualAsync();
             if (usuario == null)
             {
                 return RedirectToAction("Login", "Auth", new { area = "" });
             }
 
-            var tratamiento = await _tratamientoService.GetTratamientoDetalleAsync(id, usuario.Id);
-
+            TratamientoDto tratamiento = await _tratamientoService.GetTratamientoDetalleAsync(id, usuario.Id);
             if (tratamiento == null)
             {
                 TempData["Error"] = "No tienes permiso para ver este tratamiento o no existe.";
                 return RedirectToAction(nameof(Index));
             }
 
-            var viewModel = new TratamientoDetalleViewModel
+            TratamientoDetalleViewModel viewModel = new TratamientoDetalleViewModel
             {
                 Tratamiento = tratamiento
             };
@@ -67,7 +67,7 @@ namespace VeterinariaMvc.Areas.Cliente.Controllers
         [HttpPost]
         public async Task<IActionResult> AgregarSeguimiento(int id, string comentario)
         {
-            UsuarioSessionDto usuario = await this._estadoUsuario.ObtenerUsuarioActualAsync();
+            UsuarioSessionDto usuario = await _estadoUsuario.ObtenerUsuarioActualAsync();
             if (usuario == null)
             {
                 return RedirectToAction("Login", "Auth", new { area = "" });
@@ -79,16 +79,10 @@ namespace VeterinariaMvc.Areas.Cliente.Controllers
                 return RedirectToAction(nameof(Detalle), new { id });
             }
 
-            var resultado = await _tratamientoService.AgregarSeguimientoAsync(id, usuario.Id, comentario);
+            bool resultado = await _tratamientoService.AgregarSeguimientoAsync(id, usuario.Id, comentario);
 
-            if (resultado)
-            {
-                TempData["Success"] = "Seguimiento agregado correctamente.";
-            }
-            else
-            {
-                TempData["Error"] = "No se pudo agregar el seguimiento.";
-            }
+            TempData[resultado ? "Success" : "Error"] =
+                resultado ? "Seguimiento agregado correctamente." : "No se pudo agregar el seguimiento.";
 
             return RedirectToAction(nameof(Detalle), new { id });
         }

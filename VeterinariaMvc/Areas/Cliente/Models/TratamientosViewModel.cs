@@ -1,4 +1,5 @@
 using VeterinariaMvc.Dtos.Tratamiento;
+using VeterinariaMvc.Models.Tratamientos;
 
 namespace VeterinariaMvc.Areas.Cliente.Models
 {

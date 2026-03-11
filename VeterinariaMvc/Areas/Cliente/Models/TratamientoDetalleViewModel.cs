@@ -1,4 +1,5 @@
 using VeterinariaMvc.Dtos.Tratamiento;
+using VeterinariaMvc.Models.Tratamientos;
 
 namespace VeterinariaMvc.Areas.Cliente.Models
 {
@@ -6,5 +7,7 @@ namespace VeterinariaMvc.Areas.Cliente.Models
     {
         public TratamientoDto Tratamiento { get; set; }
         public string NuevoComentario { get; set; }
+
+        
     }
 }

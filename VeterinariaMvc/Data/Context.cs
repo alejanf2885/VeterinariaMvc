@@ -5,6 +5,8 @@ using VeterinariaMvc.Dtos.Consultas.VeterinariaMvc.Dtos.Consulta;
 using VeterinariaMvc.Dtos.Tratamiento;
 using VeterinariaMvc.Models;
 using VeterinariaMvc.Models.Auth;
+using VeterinariaMvc.Models.Seguimientos;
+using VeterinariaMvc.Models.Tratamientos;
 
 namespace VeterinariaMvc.Data
 {
@@ -25,24 +27,10 @@ namespace VeterinariaMvc.Data
         public DbSet<ConsultaResumen> ConsultasResumidas { get; set; }
         public DbSet<Tratamiento> Tratamientos { get; set; }
         public DbSet<SeguimientoTratamiento> SeguimientosTratamiento { get; set; }
-        public DbSet<TratamientoDto> TratamientosDto { get; set; }
+        public DbSet<TratamientoView> TratamientosView { get; set; }
+        public DbSet<SeguimientoView> SeguimientosView { get; set; }
 
-        public DbSet<SeguimientoDto> SeguimientosDto { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<TratamientoDto>(entity =>
-            {
-                entity.HasNoKey(); 
-                entity.Ignore(t => t.Seguimientos); 
-            });
-
-            modelBuilder.Entity<SeguimientoDto>(entity =>
-            {
-                entity.HasNoKey();
-            });
-        }
     }
 }

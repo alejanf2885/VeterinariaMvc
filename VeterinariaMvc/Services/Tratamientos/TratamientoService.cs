@@ -1,4 +1,6 @@
 ﻿using VeterinariaMvc.Dtos.Tratamiento;
+using VeterinariaMvc.Models.Seguimientos;
+using VeterinariaMvc.Models.Tratamientos;
 using VeterinariaMvc.Repositories.Tratamientos;
 
 namespace VeterinariaMvc.Services.Tratamientos
@@ -12,38 +14,86 @@ namespace VeterinariaMvc.Services.Tratamientos
             _tratamientoRepository = tratamientoRepository;
         }
 
-        // 1️⃣ Obtener tratamientos por mascota
-        // Nota: Eliminé el idUsuario si no lo usas para filtrar aquí, 
-        // pero lo mantengo en la firma si tu interfaz lo requiere.
         public async Task<List<TratamientoDto>> GetTratamientosPorMascotaAsync(int idMascota, int idUsuario)
         {
-            // El repositorio ya devuelve List<TratamientoDto> con nombres de mascota y veterinario
-            return await _tratamientoRepository.GetTratamientosPorMascotaAsync(idMascota);
+            List<TratamientoView> tratamientos = await _tratamientoRepository.GetTratamientosPorMascotaAsync(idMascota);
+            return await MapTratamientosAListaDto(tratamientos);
         }
 
-        // 2️⃣ Obtener tratamientos por usuario
         public async Task<List<TratamientoDto>> GetTratamientosPorUsuarioAsync(int idUsuario)
         {
-            return await _tratamientoRepository.GetTratamientosPorUsuarioAsync(idUsuario);
+            List<TratamientoView> tratamientos = await _tratamientoRepository.GetTratamientosPorUsuarioAsync(idUsuario);
+            return await MapTratamientosAListaDto(tratamientos);
         }
 
-        // 3️⃣ Obtener detalle de un tratamiento
         public async Task<TratamientoDto?> GetTratamientoDetalleAsync(int idTratamiento, int idUsuario)
         {
-            // El repositorio ya se encarga de buscar el tratamiento y cargar sus seguimientos
-            return await _tratamientoRepository.GetTratamientoDetalleAsync(idTratamiento, idUsuario);
+            TratamientoView tratamiento = await _tratamientoRepository.GetTratamientoDetalleAsync(idTratamiento, idUsuario);
+            if (tratamiento == null) return null;
+
+            List<SeguimientoDto> seguimientos = await GetSeguimientosPorTratamientoAsync(tratamiento.Id);
+
+            return MapTratamientoViewToDto(tratamiento, seguimientos);
         }
 
-        // 4️⃣ Agregar seguimiento
         public async Task<bool> AgregarSeguimientoAsync(int idTratamiento, int idUsuario, string comentario)
         {
-            // Validación de lógica de negocio sencilla
             if (string.IsNullOrWhiteSpace(comentario))
-            {
                 return false;
-            }
 
             return await _tratamientoRepository.AgregarSeguimientoAsync(idTratamiento, idUsuario, comentario);
+        }
+
+        public async Task<List<SeguimientoDto>> GetSeguimientosPorTratamientoAsync(int idTratamiento)
+        {
+            List<SeguimientoView> seguimientosView = await _tratamientoRepository.GetSeguimientosPorTratamientoAsync(idTratamiento);
+            return seguimientosView.ConvertAll(MapSeguimientoViewToDto);
+        }
+
+        private async Task<List<TratamientoDto>> MapTratamientosAListaDto(List<TratamientoView> tratamientos)
+        {
+            List<TratamientoDto> listaDto = new List<TratamientoDto>();
+
+            foreach (TratamientoView t in tratamientos)
+            {
+                List<SeguimientoDto> seguimientos = await GetSeguimientosPorTratamientoAsync(t.Id);
+                listaDto.Add(MapTratamientoViewToDto(t, seguimientos));
+            }
+
+            return listaDto;
+        }
+
+        private static TratamientoDto MapTratamientoViewToDto(TratamientoView t, List<SeguimientoDto> seguimientos)
+        {
+            return new TratamientoDto
+            {
+                Id = t.Id,
+                IdMascota = t.IdMascota,
+                NombreMascota = t.NombreMascota,
+                IdVeterinario = t.IdVeterinario,
+                IdUsuario = t.IdUsuario,
+                NombreVeterinario = t.NombreVeterinario,
+                IdConsulta = t.IdConsulta,
+                Nombre = t.Nombre,
+                Descripcion = t.Descripcion,
+                FechaInicio = t.FechaInicio,
+                FechaFin = t.FechaFin,
+                Estado = t.Estado,
+                Seguimientos = seguimientos
+            };
+        }
+
+        private static SeguimientoDto MapSeguimientoViewToDto(SeguimientoView s)
+        {
+            return new SeguimientoDto
+            {
+                Id = s.Id,
+                IdTratamiento = s.IdTratamiento,
+                IdUsuario = s.IdUsuario,
+                NombreUsuario = s.NombreUsuario,
+                Comentario = s.Comentario,
+                Fecha = s.Fecha
+            };
         }
     }
 }

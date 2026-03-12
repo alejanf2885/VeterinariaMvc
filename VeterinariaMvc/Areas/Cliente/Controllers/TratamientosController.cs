@@ -85,6 +85,19 @@ namespace VeterinariaMvc.Areas.Cliente.Controllers
                 resultado ? "Seguimiento agregado correctamente." : "No se pudo agregar el seguimiento.";
 
             return RedirectToAction(nameof(Detalle), new { id });
+
+        }
+
+
+        public async Task<IActionResult> TratamientosMascota(int idmascota)
+        {
+            UsuarioSessionDto usuario = await _estadoUsuario.ObtenerUsuarioActualAsync();
+            if (usuario == null)
+            {
+                return RedirectToAction("Login", "Auth", new { area = "" });
+            }
+            List<TratamientoDto> tratamientos = await _tratamientoService.GetTratamientosPorMascotaAsync(idmascota, usuario.Id);
+            return View(tratamientos);
         }
     }
 }

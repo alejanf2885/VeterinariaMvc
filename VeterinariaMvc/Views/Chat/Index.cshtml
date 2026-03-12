@@ -1,0 +1,250 @@
+@model VeterinariaMvc.Models.Chats.ChatPageViewModel
+
+@{
+    ViewData["Title"] = "Chat";
+    var defaultImg = "https://i.imgur.com/HeIi0wU.png";
+}
+
+<div class="flex h-[calc(100vh-12rem)] bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+
+    <!-- Panel izquierdo: lista de conversaciones -->
+    <div class="w-80 border-r border-slate-200 flex flex-col">
+        <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+            <h2 class="text-lg font-bold text-slate-800">Mensajes</h2>
+            <a asp-controller="Chat" asp-action="NuevoChat" asp-area=""
+               class="bg-teal-500 hover:bg-teal-600 text-white rounded-full p-1.5 transition shadow-sm"
+               title="Nuevo chat">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+                </svg>
+            </a>
+        </div>
+        <div id="convList" class="flex-1 overflow-y-auto">
+            @if (Model.Conversaciones.Count == 0)
+            {
+                <div id="convListEmpty" class="p-6 text-center text-slate-400 text-sm">
+                    No tienes conversaciones todavía.
+                </div>
+            }
+            else
+            {
+                @foreach (var conv in Model.Conversaciones)
+                {
+                    var isActive = conv.IdConversacion == Model.IdConversacionActiva;
+                    <a asp-controller="Chat" asp-action="Index" asp-area="" asp-route-idConversacion="@conv.IdConversacion"
+                       class="conv-item flex items-center gap-3 px-4 py-3 cursor-pointer transition hover:bg-slate-50 @(isActive ? "bg-teal-50 border-l-4 border-teal-500" : "border-l-4 border-transparent")"
+                       data-conv-id="@conv.IdConversacion">
+                        <img src="@(string.IsNullOrEmpty(conv.ImagenOtroUsuario) ? defaultImg : conv.ImagenOtroUsuario)"
+                             class="h-10 w-10 rounded-full object-cover border border-slate-200" />
+                        <div class="flex-1 min-w-0">
+                            <div class="flex justify-between items-center">
+                                <p class="text-sm font-semibold text-slate-800 truncate">@conv.NombreOtroUsuario</p>
+                                @if (conv.FechaUltimoMensaje.HasValue)
+                                {
+                                    <span class="text-xs text-slate-400">@conv.FechaUltimoMensaje.Value.ToString("HH:mm")</span>
+                                }
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <p class="text-xs text-slate-500 truncate">@(conv.UltimoMensaje ?? "Sin mensajes")</p>
+                                @if (conv.MensajesNoLeidos > 0)
+                                {
+                                    <span class="ml-2 bg-teal-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                                        @conv.MensajesNoLeidos
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                    </a>
+                }
+            }
+        </div>
+    </div>
+
+    <!-- Panel derecho: conversación activa -->
+    <div class="flex-1 flex flex-col">
+        @if (Model.IdConversacionActiva.HasValue && Model.HistorialActivo != null)
+        {
+            <!-- Cabecera -->
+            <div class="px-6 py-4 border-b border-slate-100 flex items-center gap-3">
+                <img src="@(string.IsNullOrEmpty(Model.ImagenDestinatario) ? defaultImg : Model.ImagenDestinatario)"
+                     class="h-10 w-10 rounded-full object-cover border-2 border-teal-500" />
+                <div>
+                    <p class="font-semibold text-slate-800">@Model.NombreDestinatario</p>
+                    <p class="text-xs text-teal-600" id="statusIndicator">En línea</p>
+                </div>
+            </div>
+
+            <!-- Mensajes -->
+            <div id="mensajesContainer" class="flex-1 overflow-y-auto px-6 py-4 space-y-3 bg-slate-50">
+                @foreach (var msg in Model.HistorialActivo)
+                {
+                    bool esMio = msg.IdRemitente == Model.IdUsuarioActual;
+                    <div class="flex @(esMio ? "justify-end" : "justify-start")">
+                        <div class="max-w-xs lg:max-w-md px-4 py-2 rounded-2xl text-sm @(esMio ? "bg-teal-500 text-white rounded-br-sm" : "bg-white text-slate-800 border border-slate-200 rounded-bl-sm shadow-sm")">
+                            <p>@msg.Mensaje</p>
+                            <p class="text-[10px] mt-1 @(esMio ? "text-teal-100" : "text-slate-400") text-right">
+                                @msg.FechaEnvio.ToString("HH:mm")
+                            </p>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- Input -->
+            <div class="px-6 py-4 border-t border-slate-100 bg-white">
+                <form id="chatForm" class="flex items-center gap-3">
+                    <input type="text" id="mensajeInput"
+                           class="flex-1 border border-slate-300 rounded-full px-5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                           placeholder="Escribe un mensaje..." autocomplete="off" />
+                    <button type="submit"
+                            class="bg-teal-500 hover:bg-teal-600 text-white rounded-full p-2.5 transition shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                        </svg>
+                    </button>
+                </form>
+            </div>
+        }
+        else
+        {
+            <div class="flex-1 flex items-center justify-center text-slate-400">
+                <div class="text-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto mb-4 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                    <p class="text-lg font-medium">Selecciona una conversación</p>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+<script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
+<script>
+    (function () {
+        const idConversacion = @(Model.IdConversacionActiva.HasValue ? Model.IdConversacionActiva.Value : 0);
+        const idUsuario = @Model.IdUsuarioActual;
+        const defaultImg = 'https://i.imgur.com/HeIi0wU.png';
+
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/chatHub")
+            .withAutomaticReconnect()
+            .build();
+
+        const container = document.getElementById('mensajesContainer');
+        const form = document.getElementById('chatForm');
+        const input = document.getElementById('mensajeInput');
+
+        function scrollToBottom() {
+            if (container) container.scrollTop = container.scrollHeight;
+        }
+        scrollToBottom();
+
+        // Recibir nueva conversación creada por otro usuario
+        connection.on("NuevaConversacion", function (conv) {
+            const sidebar = document.getElementById('convList');
+            if (!sidebar) return;
+
+            // Evitar duplicados
+            if (sidebar.querySelector('[data-conv-id="' + conv.idConversacion + '"]')) return;
+
+            // Quitar el mensaje de "no tienes conversaciones"
+            const emptyMsg = document.getElementById('convListEmpty');
+            if (emptyMsg) emptyMsg.remove();
+
+            const a = document.createElement('a');
+            a.href = '/Chat?idConversacion=' + conv.idConversacion;
+            a.className = 'conv-item flex items-center gap-3 px-4 py-3 cursor-pointer transition hover:bg-slate-50 border-l-4 border-teal-500 bg-teal-50';
+            a.dataset.convId = conv.idConversacion;
+
+            const img = conv.imagenOtroUsuario || defaultImg;
+            a.innerHTML = `
+                <img src="${img}" class="h-10 w-10 rounded-full object-cover border border-slate-200" />
+                <div class="flex-1 min-w-0">
+                    <div class="flex justify-between items-center">
+                        <p class="text-sm font-semibold text-slate-800 truncate">${conv.nombreOtroUsuario}</p>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <p class="text-xs text-teal-600 truncate font-medium">Nueva conversación</p>
+                    </div>
+                </div>`;
+            sidebar.prepend(a);
+        });
+
+        // Actualizar sidebar cuando se envía/recibe un mensaje
+        connection.on("ActualizarSidebar", function (data) {
+            const sidebar = document.getElementById('convList');
+            if (!sidebar) return;
+
+            const item = sidebar.querySelector('[data-conv-id="' + data.idConversacion + '"]');
+            if (!item) return;
+
+            // Actualizar texto del último mensaje
+            const previewEl = item.querySelector('.text-slate-500.truncate');
+            if (previewEl) previewEl.textContent = data.ultimoMensaje;
+
+            // Actualizar hora
+            let timeEl = item.querySelector('.text-slate-400');
+            if (timeEl) {
+                timeEl.textContent = data.fechaEnvio;
+            } else {
+                const nameRow = item.querySelector('.flex.justify-between.items-center');
+                if (nameRow) {
+                    const span = document.createElement('span');
+                    span.className = 'text-xs text-slate-400';
+                    span.textContent = data.fechaEnvio;
+                    nameRow.appendChild(span);
+                }
+            }
+
+            // Mover la conversación al inicio de la lista
+            sidebar.prepend(item);
+        });
+
+        // Mensajes en tiempo real (solo si hay conversación activa)
+        if (idConversacion !== 0) {
+            connection.on("RecibirMensaje", function (msg) {
+                const esMio = msg.idRemitente === idUsuario;
+                const div = document.createElement('div');
+                div.className = 'flex ' + (esMio ? 'justify-end' : 'justify-start');
+                div.innerHTML = `
+                    <div class="max-w-xs lg:max-w-md px-4 py-2 rounded-2xl text-sm ${esMio
+                        ? 'bg-teal-500 text-white rounded-br-sm'
+                        : 'bg-white text-slate-800 border border-slate-200 rounded-bl-sm shadow-sm'}">
+                        <p>${msg.mensaje}</p>
+                        <p class="text-[10px] mt-1 ${esMio ? 'text-teal-100' : 'text-slate-400'} text-right">
+                            ${msg.fechaEnvio}
+                        </p>
+                    </div>`;
+                container.appendChild(div);
+                scrollToBottom();
+
+                if (!esMio) {
+                    connection.invoke("MarcarLeidos", idConversacion, idUsuario).catch(console.error);
+                }
+            });
+
+            if (form) {
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    const texto = input.value.trim();
+                    if (!texto) return;
+                    input.value = '';
+                    connection.invoke("EnviarMensaje", idConversacion, idUsuario, texto).catch(console.error);
+                });
+            }
+        }
+
+        // Conectar siempre para recibir notificaciones de nuevas conversaciones
+        connection.start().then(function () {
+            console.log("SignalR conectado");
+            connection.invoke("RegistrarUsuario", idUsuario).catch(console.error);
+            if (idConversacion !== 0) {
+                connection.invoke("UnirseAConversacion", idConversacion).catch(console.error);
+                connection.invoke("MarcarLeidos", idConversacion, idUsuario).catch(console.error);
+            }
+        }).catch(console.error);
+    })();
+</script>
+}

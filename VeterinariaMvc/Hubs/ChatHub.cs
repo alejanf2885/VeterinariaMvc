@@ -13,25 +13,17 @@ namespace VeterinariaMvc.Hubs
             _chatService = chatService;
         }
 
-        /// <summary>
-        /// Registra al usuario en su grupo personal para recibir notificaciones.
-        /// </summary>
         public async Task RegistrarUsuario(int idUsuario)
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, $"user-{idUsuario}");
         }
 
-        /// <summary>
-        /// El cliente llama a este método para unirse al grupo de su conversación.
-        /// </summary>
         public async Task UnirseAConversacion(int idConversacion)
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, $"conv-{idConversacion}");
         }
 
-        /// <summary>
-        /// El cliente envía un mensaje: se persiste y se reenvía al grupo.
-        /// </summary>
+   
         public async Task EnviarMensaje(int idConversacion, int idRemitente, string texto)
         {
             var (mensaje, idUsuarioDestino) =
@@ -63,9 +55,6 @@ namespace VeterinariaMvc.Hubs
                 .SendAsync("ActualizarSidebar", sidebarData);
         }
 
-        /// <summary>
-        /// Marca los mensajes como leídos y notifica al grupo.
-        /// </summary>
         public async Task MarcarLeidos(int idConversacion, int idUsuarioReceptor)
         {
             await _chatService.MarcarComoLeidosAsync(idConversacion, idUsuarioReceptor);

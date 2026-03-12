@@ -25,11 +25,13 @@ namespace VeterinariaMvc.Models
         [Column("PESO")]
         public decimal? Peso { get; set; }
 
+
         [Column("IDUSUARIO")]
         public int IdUsuario { get; set; }
 
         [Column("IDCLINICA")]
         public int? IdClinica { get; set; }
+
 
         [Column("NOMBRECLINICA")]
         public string? NombreClinica { get; set; }

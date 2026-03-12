@@ -21,7 +21,7 @@
         </a>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4">
             <div class="p-3 bg-teal-100 text-teal-600 rounded-xl">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -33,6 +33,35 @@
                 <p class="text-2xl font-bold text-slate-800">@Model.Mascotas.Count</p>
             </div>
         </div>
+
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4">
+            <div class="p-3 bg-blue-100 text-blue-600 rounded-xl">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+            </div>
+            <div>
+                <p class="text-sm text-slate-500 font-medium">Próximas Citas</p>
+                <p class="text-2xl font-bold text-slate-800">@(Model.Consultas?.Count ?? 0)</p>
+            </div>
+        </div>
+
+        <a asp-controller="Tratamientos" asp-action="Index" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4 hover:shadow-md hover:border-teal-300 transition-all cursor-pointer group">
+            <div class="p-3 bg-purple-100 text-purple-600 rounded-xl group-hover:bg-purple-200 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+            </div>
+            <div class="flex-grow">
+                <p class="text-sm text-slate-500 font-medium group-hover:text-teal-600 transition-colors">Historial Médico</p>
+                <p class="text-xl font-bold text-slate-800">Mis Tratamientos</p>
+            </div>
+            <div class="text-slate-300 group-hover:text-teal-600 transition-colors transform group-hover:translate-x-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </div>
+        </a>
     </div>
 
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
@@ -41,13 +70,12 @@
             <span class="text-xs font-semibold px-3 py-1 bg-slate-100 text-slate-500 rounded-full">Actualizado hoy</span>
         </div>
 
-        @if (Model.Mascotas.Any())
+        @if (Model.Mascotas != null && Model.Mascotas.Any())
         {
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
                 @foreach (var mascota in Model.Mascotas)
                 {
                     <div class="border border-slate-100 rounded-xl p-5 flex flex-col items-center hover:shadow-md transition-shadow relative">
-
                         <div class="absolute top-4 right-4">
                             @if (mascota.Sexo?.ToLower() == "macho")
                             {
@@ -79,7 +107,81 @@
         }
         else
         {
-            <div class="p-12 text-center">
+            <div class="p-12 text-center text-slate-500">
+                Aún no tienes mascotas registradas.
+            </div>
+        }
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+        <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+            <h3 class="text-lg font-bold text-slate-800">Mis Próximas Citas</h3>
+            <a asp-action="Consultas" asp-controller="Consultas" class="text-sm font-semibold text-teal-600 hover:text-teal-800">Historial completo &rarr;</a>
+        </div>
+
+        @if (Model.Consultas != null && Model.Consultas.Any())
+        {
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 text-slate-500 text-sm border-b border-slate-100">
+                            <th class="p-4 font-semibold">Mascota</th>
+                            <th class="p-4 font-semibold">Clínica</th>
+                            <th class="p-4 font-semibold">Fecha y Hora</th>
+                            <th class="p-4 font-semibold">Motivo</th>
+                            <th class="p-4 font-semibold text-center">Estado</th>
+                            <th class="p-4 font-semibold text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm text-slate-700">
+                        @foreach (var cita in Model.Consultas)
+                        {
+                            <tr class="border-b border-slate-50 hover:bg-slate-50 transition-colors">
+                                <td class="p-4 font-bold text-slate-800">@cita.NombreMascota</td>
+                                <td class="p-4">@cita.NombreClinica</td>
+                                <td class="p-4">
+                                    <div class="flex flex-col">
+                                        <span class="text-slate-800 font-semibold">
+                                            @cita.Fecha.ToString("dd 'de' MMMM 'de' yyyy", new System.Globalization.CultureInfo("es-ES"))
+                                        </span>
+                                        <span class="text-xs text-slate-500 font-normal mt-0.5">
+                                            @cita.Fecha.ToString("HH:mm")
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="p-4">@cita.Motivo</td>
+                                <td class="p-4 text-center">
+                                    @if (cita.Estado?.ToUpper() == "CONFIRMADA")
+                                    {
+                                        <span class="bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full">Confirmada</span>
+                                    }
+                                    else if (cita.Estado?.ToUpper() == "PENDIENTE")
+                                    {
+                                        <span class="bg-amber-100 text-amber-700 text-xs font-bold px-3 py-1 rounded-full">Pendiente</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="bg-slate-100 text-slate-600 text-xs font-bold px-3 py-1 rounded-full">@cita.Estado</span>
+                                    }
+                                </td>
+                                <td class="p-4 text-center">
+                                    <a asp-controller="Consultas" asp-action="Cancelar" asp-route-id="@cita.IdConsulta" id="cancelarCita_@cita.IdConsulta" class="text-red-500 hover:text-red-700 font-semibold text-sm transition-colors">
+                                        Cancelar
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="p-12 text-center text-slate-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-slate-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <p>No tienes citas programadas próximamente.</p>
             </div>
         }
     </div>

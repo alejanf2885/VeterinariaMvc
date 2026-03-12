@@ -1,0 +1,140 @@
+﻿@model VeterinariaMvc.Areas.Cliente.Models.NuevaReservaViewModel
+
+@{
+    ViewData["Title"] = "Reservar Cita para " + Model.NombreMascota;
+}
+
+<div class="space-y-8 max-w-3xl mx-auto relative pt-4">
+
+    @* --- CABECERA --- *@
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <h2 class="text-3xl font-bold text-slate-800">Reservar Cita 📅</h2>
+            <p class="text-slate-500 mt-1">
+                Para <span class="font-black text-teal-600">@Model.NombreMascota</span> en
+                <span class="font-bold text-slate-700">@Model.NombreClinica</span>
+            </p>
+        </div>
+
+        <a asp-area="Cliente" asp-controller="Mascotas" asp-action="Detalles" asp-route-id="@Model.IdMascota"
+           class="inline-flex items-center text-slate-500 hover:text-slate-800 font-semibold transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Volver a la Ficha
+        </a>
+    </div>
+
+    @* --- MENSAJES DE ERROR --- *@
+    @if (ViewData["ERROR"] != null)
+    {
+        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-center gap-3 shadow-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <span class="font-bold text-sm">@ViewData["ERROR"]</span>
+        </div>
+    }
+
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+
+        @* --- PASO 1: SELECCIÓN DE FECHA (GET) --- *@
+        <div class="p-8 border-b border-slate-100 bg-slate-50/50">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="h-8 w-8 rounded-full bg-teal-100 text-teal-700 font-bold flex items-center justify-center">1</div>
+                <h3 class="text-lg font-bold text-slate-800">Selecciona el día</h3>
+            </div>
+
+            <form method="get" asp-action="Reservar" class="flex flex-col sm:flex-row gap-4">
+                <input type="hidden" name="idMascota" value="@Model.IdMascota" />
+                <input type="hidden" name="idClinica" value="@Model.IdClinica" />
+                <input type="hidden" name="nombreMascota" value="@Model.NombreMascota" />
+                <input type="hidden" name="nombreClinica" value="@Model.NombreClinica" />
+
+                <input type="date" name="fecha" value="@Model.FechaSeleccionada.ToString("yyyy-MM-dd")"
+                       min="@DateTime.Today.ToString("yyyy-MM-dd")"
+                       class="flex-1 px-4 py-3 text-slate-700 font-medium border-2 border-slate-200 rounded-xl focus:border-teal-500 focus:ring-0 outline-none transition-colors" />
+
+                <button type="submit" class="px-6 py-3 bg-slate-800 text-white font-bold rounded-xl hover:bg-slate-700 transition-colors shadow-md whitespace-nowrap">
+                    Buscar Huecos
+                </button>
+            </form>
+        </div>
+
+        @* --- PASO 2: FORMULARIO DE CONFIRMACIÓN (POST) --- *@
+        <div class="p-8">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="h-8 w-8 rounded-full bg-teal-100 text-teal-700 font-bold flex items-center justify-center">2</div>
+                <h3 class="text-lg font-bold text-slate-800">Detalles de la Cita</h3>
+            </div>
+
+            <form method="post" asp-action="ConfirmarReserva">
+                <input type="hidden" asp-for="IdMascota" />
+                <input type="hidden" asp-for="IdClinica" />
+                <input type="hidden" asp-for="FechaSeleccionada" />
+
+                <div class="space-y-6">
+
+                    @* Selección de Hora *@
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Horarios disponibles</label>
+
+                        @if (Model.HorariosDisponibles != null && Model.HorariosDisponibles.Any())
+                        {
+                            <div class="relative">
+                                <select asp-for="IdBloque" class="w-full px-4 py-3 appearance-none bg-white border-2 border-slate-200 rounded-xl text-slate-700 font-bold focus:border-teal-500 focus:ring-0 outline-none transition-colors cursor-pointer">
+                                    <option value="">-- Selecciona una hora --</option>
+                                    @foreach (var bloque in Model.HorariosDisponibles)
+                                    {
+                                        <option value="@bloque.IdBloque">@bloque.Turno h. (Quedan @bloque.HuecosLibres huecos)</option>
+                                    }
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                </div>
+                            </div>
+                            <span asp-validation-for="IdBloque" class="text-red-500 text-sm font-medium mt-1 block"></span>
+                        }
+                        else
+                        {
+                            <div class="p-5 bg-amber-50 rounded-xl border border-amber-200 text-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-amber-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <p class="text-amber-800 font-bold">Agenda completa</p>
+                                <p class="text-amber-600 text-sm mt-1">No hay citas disponibles para el día <b>@Model.FechaSeleccionada.ToString("dd/MM/yyyy")</b>.<br />Por favor, busca en otra fecha.</p>
+                            </div>
+                        }
+                    </div>
+
+                    @* Motivo de la Consulta *@
+                    @if (Model.HorariosDisponibles != null && Model.HorariosDisponibles.Any())
+                    {
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Motivo de la visita</label>
+                            <textarea asp-for="Motivo" rows="3"
+                                      class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl text-slate-700 font-medium focus:border-teal-500 focus:ring-0 outline-none transition-colors resize-none placeholder:text-slate-300"
+                                      placeholder="Ej: Vacunación anual, revisión, le duele una pata..."></textarea>
+                            <span asp-validation-for="Motivo" class="text-red-500 text-sm font-medium mt-1 block"></span>
+                        </div>
+
+                        @* Botones de Acción *@
+                        <div class="flex flex-col-reverse sm:flex-row gap-3 pt-6 mt-6 border-t border-slate-100">
+                            <a asp-controller="Mascotas" asp-action="Detalles" asp-route-id="@Model.IdMascota"
+                               class="sm:w-1/3 px-6 py-3.5 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-colors text-center">
+                                Cancelar
+                            </a>
+                            <button type="submit" class="sm:flex-1 px-6 py-3.5 bg-teal-600 text-white font-bold rounded-xl shadow-lg shadow-teal-200 hover:bg-teal-700 hover:shadow-xl transition-all flex justify-center items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                Confirmar Reserva
+                            </button>
+                        </div>
+                    }
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+

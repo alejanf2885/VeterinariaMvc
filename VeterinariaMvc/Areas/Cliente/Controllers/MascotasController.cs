@@ -8,6 +8,7 @@ using VeterinariaMvc.Services.Clinica;
 using VeterinariaMvc.Services.Estado;
 using VeterinariaMvc.Services.MascotaCatalogosService;
 using VeterinariaMvc.Services.Mascotas;
+using VeterinariaMvc.Services.Tratamientos;
 
 namespace VeterinariaMvc.Areas.Cliente.Controllers
 {
@@ -18,13 +19,20 @@ namespace VeterinariaMvc.Areas.Cliente.Controllers
         private IMascotasService _mascotasService;
         private IMascotaCatalogoService _mascotaCatalogoService;
         private IClinicaService _clinicaService;
+        private ITratamientoService _tratamientoService;
 
-        public MascotasController(IEstadoUsuarioService estadoUsuario, IMascotasService mascotasService, IMascotaCatalogoService mascotaCatalogoService, IClinicaService clinicaService)
+        public MascotasController(
+            IEstadoUsuarioService estadoUsuario, 
+            IMascotasService mascotasService, 
+            IMascotaCatalogoService mascotaCatalogoService, 
+            IClinicaService clinicaService,
+            ITratamientoService tratamientoService)
         {
             this._estadoUsuario = estadoUsuario;
             this._mascotasService = mascotasService;
             this._mascotaCatalogoService = mascotaCatalogoService;
             this._clinicaService = clinicaService;
+            this._tratamientoService = tratamientoService;
         }
 
         public async Task<IActionResult> Registrar()
@@ -81,6 +89,9 @@ namespace VeterinariaMvc.Areas.Cliente.Controllers
 
             model.Mascota = mascotaDetalleDto;
 
+            // Cargar tratamientos de la mascota
+            var tratamientos = await this._tratamientoService.GetTratamientosPorMascotaAsync(id, usuario.Id);
+            model.Tratamientos = tratamientos;
 
             return View(model);
         }

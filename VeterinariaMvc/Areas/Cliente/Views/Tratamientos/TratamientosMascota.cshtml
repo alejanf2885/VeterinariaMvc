@@ -1,0 +1,134 @@
+﻿@using VeterinariaMvc.Dtos.Tratamiento
+@model List<TratamientoDto>
+
+@{
+    ViewData["Title"] = "Mis Tratamientos";
+}
+
+<div class="space-y-8">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <h2 class="text-3xl font-bold text-slate-800">Tratamientos Médicos</h2>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-xl">
+            @TempData["Success"]
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl">
+            @TempData["Error"]
+        </div>
+    }
+
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+        <div class="p-6 border-b border-slate-100">
+            <h3 class="text-lg font-bold text-slate-800">Todos los Tratamientos</h3>
+        </div>
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 text-slate-500 text-sm border-b border-slate-100">
+                            <th class="p-4 font-semibold">Tratamiento</th>
+                            <th class="p-4 font-semibold">Veterinario</th>
+                            <th class="p-4 font-semibold">Fecha Inicio</th>
+                            <th class="p-4 font-semibold">Fecha Fin</th>
+                            <th class="p-4 font-semibold text-center">Estado</th>
+                            <th class="p-4 font-semibold text-center">Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody class="text-sm text-slate-700">
+                        @foreach (var tratamiento in Model)
+                        {
+                            <tr class="border-b border-slate-50 hover:bg-slate-50 transition-colors">
+                                <td class="p-4">
+                                    <div class="flex flex-col">
+                                        <span class="font-semibold text-slate-800">@tratamiento.Nombre</span>
+
+                                        @if (!string.IsNullOrEmpty(tratamiento.Descripcion))
+                                        {
+                                            <span class="text-xs text-slate-500 mt-1">
+                                                @tratamiento.Descripcion
+                                            </span>
+                                        }
+                                    </div>
+                                </td>
+
+                                <td class="p-4">@tratamiento.NombreVeterinario</td>
+
+                                <td class="p-4">
+                                    @tratamiento.FechaInicio.ToString("dd/MM/yyyy")
+                                </td>
+
+                                <td class="p-4">
+                                    @if (tratamiento.FechaFin.HasValue)
+                                    {
+                                        @tratamiento.FechaFin.Value.ToString("dd/MM/yyyy")
+                                    }
+                                    else
+                                    {
+                                        <span class="text-slate-400">En curso</span>
+                                    }
+                                </td>
+
+                                <td class="p-4 text-center">
+                                    @if (tratamiento.Estado?.ToUpper() == "ACTIVO")
+                                    {
+                                        <span class="bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full">
+                                            Activo
+                                        </span>
+                                    }
+                                    else if (tratamiento.Estado?.ToUpper() == "COMPLETADO")
+                                    {
+                                        <span class="bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1 rounded-full">
+                                            Completado
+                                        </span>
+                                    }
+                                    else if (tratamiento.Estado?.ToUpper() == "SUSPENDIDO")
+                                    {
+                                        <span class="bg-amber-100 text-amber-700 text-xs font-bold px-3 py-1 rounded-full">
+                                            Suspendido
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="bg-slate-100 text-slate-600 text-xs font-bold px-3 py-1 rounded-full">
+                                            @tratamiento.Estado
+                                        </span>
+                                    }
+                                </td>
+
+                                <td class="p-4 text-center">
+                                    <a asp-action="Detalle"
+                                       asp-route-id="@tratamiento.Id"
+                                       class="text-teal-600 hover:text-teal-800 font-semibold text-sm transition-colors">
+                                        Ver Detalle
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="p-12 text-center text-slate-500">
+                <p>No tienes tratamientos registrados aún.</p>
+                <p class="text-sm mt-2">
+                    Los tratamientos son asignados por tu veterinario durante las consultas.
+                </p>
+            </div>
+        }
+    </div>
+</div>

@@ -5,6 +5,8 @@ using VeterinariaMvc.Dtos.Consultas.VeterinariaMvc.Dtos.Consulta;
 using VeterinariaMvc.Dtos.Tratamiento;
 using VeterinariaMvc.Models;
 using VeterinariaMvc.Models.Auth;
+using VeterinariaMvc.Models.Chats;
+using VeterinariaMvc.Models.Clientes;
 using VeterinariaMvc.Models.Seguimientos;
 using VeterinariaMvc.Models.Tratamientos;
 
@@ -29,7 +31,9 @@ namespace VeterinariaMvc.Data
         public DbSet<SeguimientoTratamiento> SeguimientosTratamiento { get; set; }
         public DbSet<TratamientoView> TratamientosView { get; set; }
         public DbSet<SeguimientoView> SeguimientosView { get; set; }
-
+        public DbSet<ChatConversacion> ChatConversaciones { get; set; }
+        public DbSet<ChatMensaje> ChatMensajes { get; set; }
+        public DbSet<Cliente> Clientes { get; set; }
 
 
     }

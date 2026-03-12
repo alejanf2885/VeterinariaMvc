@@ -64,6 +64,31 @@
         </a>
     </div>
 
+    <div class="grid grid-cols-1 md:grid-cols-1 gap-6 mb-2">
+        <a asp-area="" asp-controller="Chat" asp-action="Index" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4 hover:shadow-md hover:border-teal-300 transition-all cursor-pointer group relative">
+            <div class="p-3 bg-teal-100 text-teal-600 rounded-xl group-hover:bg-teal-200 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+            </div>
+            <div class="flex-grow">
+                <p class="text-sm text-slate-500 font-medium group-hover:text-teal-600 transition-colors">Mensajería</p>
+                <p class="text-xl font-bold text-slate-800">Mis Chats</p>
+            </div>
+            @if (Model.TotalMensajesNoLeidos > 0)
+            {
+                <span class="bg-teal-500 text-white text-xs font-bold rounded-full h-6 min-w-[1.5rem] px-1.5 flex items-center justify-center">
+                    @Model.TotalMensajesNoLeidos
+                </span>
+            }
+            <div class="text-slate-300 group-hover:text-teal-600 transition-colors transform group-hover:translate-x-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </div>
+        </a>
+    </div>
+
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
         <div class="p-6 border-b border-slate-100 flex justify-between items-center">
             <h3 class="text-lg font-bold text-slate-800">Mis Mascotas</h3>
@@ -109,6 +134,66 @@
         {
             <div class="p-12 text-center text-slate-500">
                 Aún no tienes mascotas registradas.
+            </div>
+        }
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+        <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <h3 class="text-lg font-bold text-slate-800">Mis Chats</h3>
+                @if (Model.TotalMensajesNoLeidos > 0)
+                {
+                    <span class="bg-teal-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center">
+                        @Model.TotalMensajesNoLeidos
+                    </span>
+                }
+            </div>
+            <a asp-area="" asp-controller="Chat" asp-action="Index"
+               class="text-sm font-semibold text-teal-600 hover:text-teal-800">Ver todos &rarr;</a>
+        </div>
+
+        @if (Model.Conversaciones.Any())
+        {
+            <div class="divide-y divide-slate-50">
+                @{
+                    var defaultImg = "https://i.imgur.com/HeIi0wU.png";
+                }
+                @foreach (var conv in Model.Conversaciones.Take(3))
+                {
+                    <a asp-area="" asp-controller="Chat" asp-action="Index" asp-route-idConversacion="@conv.IdConversacion"
+                       class="flex items-center gap-4 px-6 py-4 hover:bg-slate-50 transition-colors">
+                        <img src="@(string.IsNullOrEmpty(conv.ImagenOtroUsuario) ? defaultImg : conv.ImagenOtroUsuario)"
+                             class="h-11 w-11 rounded-full object-cover border-2 @(conv.MensajesNoLeidos > 0 ? "border-teal-500" : "border-slate-200")" />
+                        <div class="flex-1 min-w-0">
+                            <div class="flex justify-between items-center">
+                                <p class="text-sm font-semibold text-slate-800 truncate">@conv.NombreOtroUsuario</p>
+                                @if (conv.FechaUltimoMensaje.HasValue)
+                                {
+                                    <span class="text-xs text-slate-400 ml-2 whitespace-nowrap">@conv.FechaUltimoMensaje.Value.ToString("HH:mm")</span>
+                                }
+                            </div>
+                            <div class="flex justify-between items-center mt-0.5">
+                                <p class="text-xs text-slate-500 truncate">@(conv.UltimoMensaje ?? "Sin mensajes")</p>
+                                @if (conv.MensajesNoLeidos > 0)
+                                {
+                                    <span class="ml-2 bg-teal-500 text-white text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center shrink-0">
+                                        @conv.MensajesNoLeidos
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                    </a>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="p-12 text-center text-slate-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-slate-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+                <p>No tienes conversaciones activas.</p>
             </div>
         }
     </div>

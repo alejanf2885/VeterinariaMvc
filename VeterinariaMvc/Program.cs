@@ -21,6 +21,9 @@ using VeterinariaMvc.Services.SaneadorFotos;
 using VeterinariaMvc.Services.UsuarioService;
 using VeterinariaMvc.Services.Tratamientos;
 using VeterinariaMvc.Repositories.Tratamientos;
+using VeterinariaMvc.Repositories.Chats;
+using VeterinariaMvc.Services.Chats;
+using VeterinariaMvc.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,6 +45,7 @@ builder.Services.AddTransient<IVeterinarioRepository, VeterinarioRepository>();
 builder.Services.AddTransient<IClinicaRepository, ClinicaRepository>();
 builder.Services.AddTransient<IConsultaRepository, ConsultaRepository>();
 builder.Services.AddTransient<ITratamientoRepository, TratamientoRepository>();
+builder.Services.AddTransient<IChatRepository, ChatRepository>();
 
 //
 
@@ -61,6 +65,7 @@ builder.Services.AddTransient<IMascotaCatalogoService, MascotaCatalogoService>()
 builder.Services.AddTransient<IClinicaService, ClinicaService>();
 builder.Services.AddTransient<IConsultaService, ConsultaService>();
 builder.Services.AddTransient<ITratamientoService, TratamientoService>();
+builder.Services.AddTransient<IChatService, ChatService>();
 
 
 
@@ -83,6 +88,7 @@ builder.Services.AddHttpContextAccessor();
 
 //Cache
 builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSignalR();
 
 //CREAMOS UN SERVICIO DE SESSION
 builder.Services.AddSession(options =>
@@ -122,5 +128,6 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
+app.MapHub<ChatHub>("/chatHub");
 
 app.Run();

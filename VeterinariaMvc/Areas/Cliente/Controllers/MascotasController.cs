@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using VeterinariaMvc.Areas.Cliente.Models;
 using VeterinariaMvc.Dtos.Clinica;
 using VeterinariaMvc.Dtos.Mascota;
@@ -13,6 +14,7 @@ using VeterinariaMvc.Services.Tratamientos;
 namespace VeterinariaMvc.Areas.Cliente.Controllers
 {
     [Area("Cliente")]
+    [Authorize]
     public class MascotasController : Controller
     {
         private IEstadoUsuarioService _estadoUsuario;
@@ -20,19 +22,22 @@ namespace VeterinariaMvc.Areas.Cliente.Controllers
         private IMascotaCatalogoService _mascotaCatalogoService;
         private IClinicaService _clinicaService;
         private ITratamientoService _tratamientoService;
+        private readonly IAuthorizationService _authService;
 
         public MascotasController(
             IEstadoUsuarioService estadoUsuario, 
             IMascotasService mascotasService, 
             IMascotaCatalogoService mascotaCatalogoService, 
             IClinicaService clinicaService,
-            ITratamientoService tratamientoService)
+            ITratamientoService tratamientoService,
+            IAuthorizationService authService)
         {
             this._estadoUsuario = estadoUsuario;
             this._mascotasService = mascotasService;
             this._mascotaCatalogoService = mascotaCatalogoService;
             this._clinicaService = clinicaService;
             this._tratamientoService = tratamientoService;
+            this._authService = authService;
         }
 
         public async Task<IActionResult> Registrar()
@@ -51,47 +56,32 @@ namespace VeterinariaMvc.Areas.Cliente.Controllers
         [HttpPost]
         public async Task<IActionResult> Registrar(RegistrarMascotaViewModel model)
         {
-            UsuarioSessionDto usuario = await this._estadoUsuario.ObtenerUsuarioActualAsync();
+            int idUsuario = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
 
-            if (usuario == null) return RedirectToAction("Login", "Auth", new { area = "" });
-
-            int mascotaId = await this._mascotasService.RegistrarMascotaAsync(model.Formulario, usuario.Id);
-
-
-
+            await _mascotasService.RegistrarMascotaAsync(model.Formulario, idUsuario);
 
             return RedirectToAction("Index", "Home");
         }
 
         public async Task<IActionResult> Detalles(int id)
         {
-            UsuarioSessionDto usuario = await this._estadoUsuario.ObtenerUsuarioActualAsync();
-
-            if (usuario == null) return RedirectToAction("Login", "Auth", new { area = "" });
-
-            MascotaDetalleViewModel model = new MascotaDetalleViewModel();
-
-            MascotaDetalleDto mascotaDetalleDto = await this._mascotasService.GetMascotaPorIdAsync(id, usuario);
-
-
+            MascotaDetalleDto? mascotaDetalleDto = await _mascotasService.GetMascotaPorIdAsync(id);
             if (mascotaDetalleDto == null) return RedirectToAction("Index", "Home");
 
-            List<ClinicaDto> clinicaDtos = await this._clinicaService.GetClinicasAsync();
-
-            if (clinicaDtos != null)
+            var autorizacion = await _authService.AuthorizeAsync(User, mascotaDetalleDto, "PoliticaPermisoMascota");
+            if (!autorizacion.Succeeded)
             {
-                model.Clinicas = clinicaDtos;
-            }
-            else
-            {
-                model.Clinicas = new List<ClinicaDto>();
+                TempData["ToastMessage"] = "No tienes permiso para ver los detalles de esta mascota.";
+                TempData["ToastType"] = "error";
+                return RedirectToAction("Index", "Home");
             }
 
-            model.Mascota = mascotaDetalleDto;
-
-            // Cargar tratamientos de la mascota
-            var tratamientos = await this._tratamientoService.GetTratamientosPorMascotaAsync(id, usuario.Id);
-            model.Tratamientos = tratamientos;
+            MascotaDetalleViewModel model = new MascotaDetalleViewModel
+            {
+                Mascota = mascotaDetalleDto,
+                Clinicas = await _clinicaService.GetClinicasAsync() ?? new List<ClinicaDto>(),
+                Tratamientos = await _tratamientoService.GetTratamientosPorMascotaAsync(id)
+            };
 
             return View(model);
         }
@@ -101,7 +91,7 @@ namespace VeterinariaMvc.Areas.Cliente.Controllers
             UsuarioSessionDto usuario = await this._estadoUsuario.ObtenerUsuarioActualAsync();
             if (usuario == null) return RedirectToAction("Login", "Auth", new { area = "" });
 
-            MascotaEditDto? mascotaEditDto = await this._mascotasService.GetMascotaParaEditarAsync(id, usuario);
+            MascotaEditDto? mascotaEditDto = await this._mascotasService.GetMascotaParaEditarAsync(id);
             if (mascotaEditDto == null) return RedirectToAction("Index", "Home");
 
             CatalogosMascotaViewModels catalogos =
@@ -129,7 +119,7 @@ namespace VeterinariaMvc.Areas.Cliente.Controllers
 
             model.Formulario.Id = id;
 
-            bool ok = await this._mascotasService.EditarMascotaAsync(model.Formulario, usuario);
+            bool ok = await this._mascotasService.EditarMascotaAsync(model.Formulario);
             if (!ok) return RedirectToAction("Index", "Home");
 
             return RedirectToAction("Detalles", new { id });
@@ -142,7 +132,7 @@ namespace VeterinariaMvc.Areas.Cliente.Controllers
             UsuarioSessionDto usuario = await this._estadoUsuario.ObtenerUsuarioActualAsync();
             if (usuario == null) return RedirectToAction("Login", "Auth", new { area = "" });
 
-            bool ok = await this._mascotasService.DesactivarMascotaAsync(idMascota, usuario);
+            bool ok = await this._mascotasService.DesactivarMascotaAsync(idMascota);
 
            
 
@@ -160,7 +150,7 @@ namespace VeterinariaMvc.Areas.Cliente.Controllers
             UsuarioSessionDto usuario = await this._estadoUsuario.ObtenerUsuarioActualAsync();
             if (usuario == null) return RedirectToAction("Login", "Auth", new { area = "" });
 
-            bool ok = await this._mascotasService.AsignarClinicaAMascotaAsync(idMascota, idClinica, usuario);
+            bool ok = await this._mascotasService.AsignarClinicaAMascotaAsync(idMascota, idClinica);
 
             TempData["ToastMessage"] = ok
                 ? "La clínica ha sido asignada correctamente."

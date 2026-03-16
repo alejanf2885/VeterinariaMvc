@@ -82,10 +82,11 @@
 
                                     @if (esCancelable)
                                     {
-                                        <button class="text-red-500 hover:text-red-700 font-bold text-sm transition-colors hover:underline"
-                                                onclick="cancelarCita(@cita.IdConsulta)">
-                                            Cancelar
-                                        </button>
+                                        <form asp-controller="Consultas" asp-action="Cancelar" asp-route-id="@cita.IdConsulta" method="post" class="inline m-0 p-0" onsubmit="return confirm('¿Estás seguro de que deseas cancelar esta cita?');">
+                                            <button type="submit" id="cancelarCita_@cita.IdConsulta" class="text-red-500 hover:text-red-700 font-bold text-sm transition-colors hover:underline bg-transparent border-none p-0 cursor-pointer">
+                                                Cancelar
+                                            </button>
+                                        </form>
                                     }
                                     else
                                     {

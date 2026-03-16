@@ -12,6 +12,7 @@ namespace VeterinariaMvc.Mappers
             return new MascotaDetalleDto
             {
                 IdMascota = entidad.IdMascota,
+                IdUsuario = entidad.IdUsuario,
                 NombreMascota = entidad.NombreMascota,
                 Especie = entidad.Especie,
                 Raza = entidad.Raza,

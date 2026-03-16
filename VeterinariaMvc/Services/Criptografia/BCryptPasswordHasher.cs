@@ -15,7 +15,6 @@ namespace VeterinariaMvc.Services.Criptografia
         public bool VerificarPassword(string password, string hashGuardado)
         {
             bool verificacion = BCrypt.Net.BCrypt.Verify(password,hashGuardado);
-
             return verificacion;
         }
     }

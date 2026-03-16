@@ -250,9 +250,11 @@
                                     }
                                 </td>
                                 <td class="p-4 text-center">
-                                    <a asp-controller="Consultas" asp-action="Cancelar" asp-route-id="@cita.IdConsulta" id="cancelarCita_@cita.IdConsulta" class="text-red-500 hover:text-red-700 font-semibold text-sm transition-colors">
-                                        Cancelar
-                                    </a>
+                                    <form asp-controller="Consultas" asp-action="Cancelar" asp-route-id="@cita.IdConsulta" method="post" class="inline m-0 p-0">
+                                        <button type="submit" id="cancelarCita_@cita.IdConsulta" class="text-red-500 hover:text-red-700 font-semibold text-sm transition-colors bg-transparent border-none p-0 cursor-pointer">
+                                            Cancelar
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                         }

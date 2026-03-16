@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization; // <-- NUEVO: Para las políticas
 using VeterinariaMvc.Data;
 using VeterinariaMvc.Repositories.Auth;
 using VeterinariaMvc.Repositories.Clinica;
@@ -24,18 +26,15 @@ using VeterinariaMvc.Repositories.Tratamientos;
 using VeterinariaMvc.Repositories.Chats;
 using VeterinariaMvc.Services.Chats;
 using VeterinariaMvc.Hubs;
+using VeterinariaMvc.Security; 
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Inyecciones de dependecias
-
-
-
-// Repositories
-
+// ==========================================
+// REPOSITORIES
+// ==========================================
 builder.Services.AddTransient<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddTransient<IAuthUsuarioRepository, AuthUsuarioRepository>();
 builder.Services.AddTransient<IMascotasRepository, MascotasRepository>();
@@ -47,15 +46,15 @@ builder.Services.AddTransient<IConsultaRepository, ConsultaRepository>();
 builder.Services.AddTransient<ITratamientoRepository, TratamientoRepository>();
 builder.Services.AddTransient<IChatRepository, ChatRepository>();
 
-//
-
-
-// Servicios
-
+// ==========================================
+// SERVICIOS
+// ==========================================
 builder.Services.AddTransient<IUsuarioService, UsuarioService>();
 builder.Services.AddTransient<IPasswordHasher, BCryptPasswordHasher>();
 builder.Services.AddTransient<IAuthService, AuthService>();
-builder.Services.AddTransient<IEstadoUsuarioService, SessionUsuarioService>();
+
+builder.Services.AddScoped<IEstadoUsuarioService, ClaimsUsuarioService>();
+
 builder.Services.AddTransient<INombreArchivoService, NombreArchivoService>();
 builder.Services.AddTransient<IProcesadorImagenService, ProcesadorImagenService>();
 builder.Services.AddTransient<IFileStorageService, FileStorageService>();
@@ -67,61 +66,93 @@ builder.Services.AddTransient<IConsultaService, ConsultaService>();
 builder.Services.AddTransient<ITratamientoService, TratamientoService>();
 builder.Services.AddTransient<IChatService, ChatService>();
 
+// ==========================================
+// SEGURIDAD: AUTENTICACIÓN Y AUTORIZACIÓN
+// ==========================================
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Auth/Login";
+        options.AccessDeniedPath = "/Home/Error";
+        options.ExpireTimeSpan = TimeSpan.FromDays(7);
+    });
 
+builder.Services.AddScoped<IAuthorizationHandler, PermisoMascotaHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, PermisoTratamientoHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, PermisoConsultaHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, PermisoChatHandler>();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("PoliticaPermisoMascota", policy =>
+    {
+        policy.Requirements.Add(new PermisoMascotaRequirement());
+    });
+    options.AddPolicy("PoliticaPermisoTratamiento", policy =>
+    {
+        policy.Requirements.Add(new PermisoTratamientoRequirement());
+    });
+    options.AddPolicy("PoliticaPermisoConsulta", policy =>
+    {
+        policy.Requirements.Add(new PermisoConsultaRequirement());
+    });
+    options.AddPolicy("PoliticaPermisoChat", policy =>
+    {
+        policy.Requirements.Add(new PermisoChatRequirement());
+    });
+});
+// ==========================================
 
-
-
-
-
-//
-
-
-// Conexion BBDD 
-string connectionString =
-    builder.Configuration.GetConnectionString("SqlVeterinaria");
-builder.Services.AddDbContext<Context>
-    (options => options.UseSqlServer(connectionString));
-
-
+// ==========================================
+// CONEXIÓN A BASE DE DATOS
+// ==========================================
+string connectionString = builder.Configuration.GetConnectionString("SqlVeterinaria");
+builder.Services.AddDbContext<Context>(options => options.UseSqlServer(connectionString));
 
 builder.Services.AddHttpContextAccessor();
 
-//Cache
+// Cache y WebSockets (SignalR para el chat)
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSignalR();
 
-//CREAMOS UN SERVICIO DE SESSION
+// SERVICIO DE SESSION 
 builder.Services.AddSession(options =>
 {
-
     options.IdleTimeout = TimeSpan.FromHours(1);
-
 });
 
 var app = builder.Build();
 
+// ==========================================
+// MIDDLEWARES DE PIPELINE
+// ==========================================
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
-
-//HABILITAMOS SESSION
 app.UseSession();
 
+// ==========================================
+// ENRUTAMIENTO Y PROTECCIÓN DE ÁREAS
+// ==========================================
+
+app.MapAreaControllerRoute(
+    name: "AreaCliente",
+    areaName: "Cliente",
+    pattern: "Cliente/{controller=Home}/{action=Index}/{id?}")
+    .RequireAuthorization();
 
 app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
-
 
 app.MapControllerRoute(
     name: "default",

@@ -1,0 +1,74 @@
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Security.Claims;
+using VeterinariaMvc.Dtos.Session;
+
+namespace VeterinariaMvc.Services.Estado
+{
+    public class ClaimsUsuarioService : IEstadoUsuarioService
+    {
+        private readonly IHttpContextAccessor _contextAccessor;
+
+        public ClaimsUsuarioService(IHttpContextAccessor contextAccessor)
+        {
+            _contextAccessor = contextAccessor;
+        }
+
+        public async Task DestruirSesionAsync()
+        {
+            if (_contextAccessor.HttpContext != null)
+            {
+                await _contextAccessor.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            }
+        }
+
+        public async Task GuardarSesionAsync(UsuarioSessionDto usuario)
+        {
+            List<Claim> claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
+                new Claim(ClaimTypes.Name, usuario.Nombre ?? ""),
+                new Claim(ClaimTypes.Email, usuario.Email ?? ""),
+                new Claim(ClaimTypes.Role, usuario.IdRol.ToString()),
+                new Claim("Imagen", usuario.Imagen ?? "")
+            };
+
+            ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+            AuthenticationProperties authProperties = new AuthenticationProperties
+            {
+                IsPersistent = true,
+                ExpiresUtc = DateTimeOffset.UtcNow.AddDays(7)
+            };
+
+            if (_contextAccessor.HttpContext != null)
+            {
+                await _contextAccessor.HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(claimsIdentity),
+                    authProperties);
+            }
+        }
+
+        public async Task<UsuarioSessionDto?> ObtenerUsuarioActualAsync()
+        {
+            var user = _contextAccessor.HttpContext?.User;
+
+            if (user == null || user.Identity == null || !user.Identity.IsAuthenticated)
+            {
+                return null;
+            }
+
+            UsuarioSessionDto usuarioDto = new UsuarioSessionDto
+            {
+                Id = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0"),
+                Nombre = user.FindFirst(ClaimTypes.Name)?.Value,
+                Email = user.FindFirst(ClaimTypes.Email)?.Value,
+                IdRol = int.Parse(user.FindFirst(ClaimTypes.Role)?.Value ?? "1"),
+                Imagen = user.FindFirst("Imagen")?.Value
+            };
+
+            return usuarioDto;
+        }
+    }
+}

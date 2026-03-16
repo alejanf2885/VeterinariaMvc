@@ -69,8 +69,7 @@ namespace VeterinariaMvc.Controllers
 
                 if (usuario != null)
                 {
-                    await this.estadoUsuarioService.GuardarSesionAsync(usuario.ToSessionDto());
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Login", "Home");
                 }
 
                 ViewData["ERROR"] = "No se pudo crear la cuenta. Inténtalo de nuevo.";

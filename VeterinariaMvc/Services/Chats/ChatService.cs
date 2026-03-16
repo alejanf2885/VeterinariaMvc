@@ -85,5 +85,13 @@ namespace VeterinariaMvc.Services.Chats
         {
             return await _chatRepo.ObtenerIdClientePorUsuarioAsync(idUsuario);
         }
+
+        public async Task<bool> EsParticipanteDeConversacionAsync(int idConversacion, int idUsuario)
+        {
+            var (idUsuarioCliente, idUsuarioVeterinario) =
+                await _chatRepo.ObtenerUsuariosConversacionAsync(idConversacion);
+
+            return idUsuario == idUsuarioCliente || idUsuario == idUsuarioVeterinario;
+        }
     }
 }

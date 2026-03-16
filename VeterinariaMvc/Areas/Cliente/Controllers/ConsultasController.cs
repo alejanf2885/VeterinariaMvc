@@ -1,51 +1,51 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using VeterinariaMvc.Areas.Cliente.Models;
 using VeterinariaMvc.Dtos.Consultas.VeterinariaMvc.Dtos.Consulta;
 using VeterinariaMvc.Dtos.Mascota;
-using VeterinariaMvc.Dtos.Session;
 using VeterinariaMvc.Services.Consulta;
-using VeterinariaMvc.Services.Estado;
 using VeterinariaMvc.Services.Mascotas;
 
 namespace VeterinariaMvc.Areas.Cliente.Controllers
 {
     [Area("Cliente")]
+    [Authorize]
     public class ConsultasController : Controller
     {
         private readonly IConsultaService _consultaService;
         private readonly IMascotasService _mascotasService;
-        private readonly IEstadoUsuarioService _estadoUsuario;
+        private readonly IAuthorizationService _authService;
 
         public ConsultasController(
             IConsultaService consultaService,
             IMascotasService mascotasService,
-            IEstadoUsuarioService estadoUsuario)
+            IAuthorizationService authService)
         {
             _consultaService = consultaService;
             _mascotasService = mascotasService;
-            _estadoUsuario = estadoUsuario;
+            _authService = authService;
+        }
+
+        private int ObtenerIdUsuarioActual()
+        {
+            return int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
         }
 
         [HttpGet]
         public async Task<IActionResult> Reservar(int idMascota, int idClinica, string nombreMascota, string nombreClinica, DateTime? fecha)
         {
-            // 1. Obtener usuario actual
-            UsuarioSessionDto usuario = await _estadoUsuario.ObtenerUsuarioActualAsync();
-            if (usuario == null) return RedirectToAction("Login", "Auth", new { area = "" });
+            var mascota = await _mascotasService.GetMascotaPorIdAsync(idMascota);
+            if (mascota == null) return RedirectToAction("Index", "Home");
 
-            // 2. SEGURIDAD: Verificar que la mascota le pertenece al usuario.
-            // Usamos tu servicio que ya tiene esta lógica integrada.
-            MascotaDetalleDto mascota = await _mascotasService.GetMascotaPorIdAsync(idMascota, usuario);
-            if (mascota == null)
+            var autorizacion = await _authService.AuthorizeAsync(User, mascota, "PoliticaPermisoMascota");
+            if (!autorizacion.Succeeded)
             {
-                // Si la mascota no es suya (o no existe), lo echamos de aquí
                 TempData["ToastMessage"] = "No tienes permiso para solicitar cita para esta mascota.";
                 TempData["ToastType"] = "error";
                 return RedirectToAction("Index", "Home");
             }
 
-            // 3. Preparar el modelo
             DateTime fechaBusqueda = fecha ?? DateTime.Today.AddDays(1);
 
             NuevaReservaViewModel model = new NuevaReservaViewModel
@@ -65,27 +65,23 @@ namespace VeterinariaMvc.Areas.Cliente.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ConfirmarReserva(NuevaReservaViewModel model)
         {
-            // 1. Obtener usuario actual
-            UsuarioSessionDto usuario = await _estadoUsuario.ObtenerUsuarioActualAsync();
-            if (usuario == null) return RedirectToAction("Login", "Auth", new { area = "" });
+            var mascota = await _mascotasService.GetMascotaPorIdAsync(model.IdMascota);
+            if (mascota == null) return RedirectToAction("Index", "Home");
 
-            // 2. SEGURIDAD: Verificar que la mascota le pertenece al usuario.
-            MascotaDetalleDto mascota = await _mascotasService.GetMascotaPorIdAsync(model.IdMascota, usuario);
-            if (mascota == null)
+            var autorizacion = await _authService.AuthorizeAsync(User, mascota, "PoliticaPermisoMascota");
+            if (!autorizacion.Succeeded)
             {
                 TempData["ToastMessage"] = "Intento de reserva no autorizado.";
                 TempData["ToastType"] = "error";
                 return RedirectToAction("Index", "Home");
             }
 
-            // 3. Validar formulario
             if (!ModelState.IsValid)
             {
                 model.HorariosDisponibles = await _consultaService.ObtenerHorariosDisponiblesAsync(model.IdClinica, model.FechaSeleccionada);
                 return View("Reservar", model);
             }
 
-            // 4. Guardar Reserva
             bool exito = await _consultaService.CrearReservaAsync(model.IdMascota, model.IdClinica, model.IdBloque.Value, model.Motivo);
 
             if (exito)
@@ -95,46 +91,60 @@ namespace VeterinariaMvc.Areas.Cliente.Controllers
                 return RedirectToAction("Detalles", "Mascotas", new { id = model.IdMascota });
             }
 
-            // 5. Si falló la BD (ej. el turno se ocupó en el último segundo)
             ViewData["ERROR"] = "El horario seleccionado ya no está disponible. Por favor, elige otro.";
             model.HorariosDisponibles = await _consultaService.ObtenerHorariosDisponiblesAsync(model.IdClinica, model.FechaSeleccionada);
             return View("Reservar", model);
         }
 
-
         public async Task<IActionResult> Consultas()
         {
-            // 1. Obtener usuario actual
-            UsuarioSessionDto usuario = await _estadoUsuario.ObtenerUsuarioActualAsync();
-            if (usuario == null) return RedirectToAction("Login", "Auth", new { area = "" });
-            // 2. Obtener consultas del usuario
-            List<ConsultaResumen> consultas = await _consultaService.GetHistorialCompletoAsync(usuario.Id);
+            int idUsuario = ObtenerIdUsuarioActual();
+            List<ConsultaResumen> consultas = await _consultaService.GetHistorialCompletoAsync(idUsuario);
+
             return View(consultas);
         }
 
+        [HttpGet]
         public async Task<IActionResult> Detalles(int id)
         {
-            // 1. Obtener usuario actual
-            UsuarioSessionDto usuario = await _estadoUsuario.ObtenerUsuarioActualAsync();
-            if (usuario == null) return RedirectToAction("Login", "Auth", new { area = "" });
-            // 2. Obtener detalles de la consulta
-            ConsultaResumen consulta = await _consultaService.GetConsultaDetalleAsync(id, usuario.Id);
+            ConsultaResumen consulta = await _consultaService.GetConsultaDetalleAsync(id);
+
             if (consulta == null)
+            {
+                TempData["ToastMessage"] = "La consulta no existe.";
+                TempData["ToastType"] = "error";
+                return RedirectToAction("Consultas");
+            }
+
+            var autorizacion = await _authService.AuthorizeAsync(User, consulta, "PoliticaPermisoConsulta");
+            if (!autorizacion.Succeeded)
             {
                 TempData["ToastMessage"] = "No tienes permiso para ver esta consulta.";
                 TempData["ToastType"] = "error";
                 return RedirectToAction("Consultas");
             }
+
             return View(consulta);
         }
 
+        [HttpPost] 
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Cancelar(int id)
         {
-            // 1. Obtener usuario actual
-            UsuarioSessionDto usuario = await _estadoUsuario.ObtenerUsuarioActualAsync();
-            if (usuario == null) return RedirectToAction("Login", "Auth", new { area = "" });
-            // 2. Intentar cancelar la consulta
-            bool exito = await _consultaService.CancelarConsultaAsync(id, usuario.Id);
+            ConsultaResumen consulta = await _consultaService.GetConsultaDetalleAsync(id);
+
+            if (consulta == null) return RedirectToAction("Consultas");
+
+            var autorizacion = await _authService.AuthorizeAsync(User, consulta, "PoliticaPermisoConsulta");
+            if (!autorizacion.Succeeded)
+            {
+                TempData["ToastMessage"] = "Intento de cancelación no autorizado.";
+                TempData["ToastType"] = "error";
+                return RedirectToAction("Consultas");
+            }
+
+            bool exito = await _consultaService.CancelarConsultaAsync(id);
+
             if (exito)
             {
                 TempData["ToastMessage"] = "Consulta cancelada correctamente.";
@@ -145,8 +155,8 @@ namespace VeterinariaMvc.Areas.Cliente.Controllers
                 TempData["ToastMessage"] = "No se pudo cancelar la consulta. Intenta de nuevo.";
                 TempData["ToastType"] = "error";
             }
+
             return RedirectToAction("Consultas");
         }
-
     }
 }

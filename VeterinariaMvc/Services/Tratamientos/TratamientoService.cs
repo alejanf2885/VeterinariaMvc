@@ -1,6 +1,7 @@
 ﻿using VeterinariaMvc.Dtos.Tratamiento;
 using VeterinariaMvc.Models.Seguimientos;
 using VeterinariaMvc.Models.Tratamientos;
+using VeterinariaMvc.Repositories.Consulta;
 using VeterinariaMvc.Repositories.Tratamientos;
 
 namespace VeterinariaMvc.Services.Tratamientos
@@ -8,10 +9,12 @@ namespace VeterinariaMvc.Services.Tratamientos
     public class TratamientoService : ITratamientoService
     {
         private readonly ITratamientoRepository _tratamientoRepository;
+        private readonly IConsultaRepository _consultaRepository;
 
-        public TratamientoService(ITratamientoRepository tratamientoRepository)
+        public TratamientoService(ITratamientoRepository tratamientoRepository, IConsultaRepository consultaRepository)
         {
             _tratamientoRepository = tratamientoRepository;
+            _consultaRepository = consultaRepository;
         }
 
         public async Task<List<TratamientoDto>> GetTratamientosPorMascotaAsync(int idMascota)
@@ -50,6 +53,32 @@ namespace VeterinariaMvc.Services.Tratamientos
         {
             List<SeguimientoView> seguimientosView = await _tratamientoRepository.GetSeguimientosPorTratamientoAsync(idTratamiento);
             return seguimientosView.ConvertAll(MapSeguimientoViewToDto);
+        }
+
+        public async Task<bool> CrearTratamientoAsync(
+            int idMascota,
+            int idVeterinario,
+            int idConsulta,
+            string nombre,
+            string? descripcion,
+            DateTime fechaInicio,
+            DateTime? fechaFin)
+        {
+            bool creado = await _tratamientoRepository.CrearTratamientoAsync(
+                idMascota,
+                idVeterinario,
+                idConsulta,
+                nombre,
+                descripcion,
+                fechaInicio,
+                fechaFin);
+
+            if (creado && idConsulta > 0)
+            {
+                await _consultaRepository.ActualizarEstadoConsultaAsync(idConsulta, "EN CURSO");
+            }
+
+            return creado;
         }
 
        

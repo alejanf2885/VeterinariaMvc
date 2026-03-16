@@ -1,0 +1,90 @@
+@model VeterinariaMvc.Areas.Veterinario.Models.DashboardVeterinarioViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Panel Veterinario";
+}
+
+<div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div>
+        <h1 class="text-3xl font-bold text-slate-800">Panel del Veterinario</h1>
+        <p class="text-slate-500 mt-1">Estas son tus próximas citas.</p>
+    </div>
+
+    <div class="flex gap-3">
+        <a asp-controller="Chat" asp-action="Index" asp-area=""
+           class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50 shadow-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+            Ver chats con clientes
+        </a>
+    </div>
+</div>
+
+<div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
+        <h2 class="font-bold text-slate-800">Próximas citas</h2>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left text-slate-600">
+            <thead class="text-xs uppercase bg-slate-50 text-slate-500 border-b border-slate-200">
+                <tr>
+                    <th class="px-6 py-3">Fecha / Hora</th>
+                    <th class="px-6 py-3">Mascota</th>
+                    <th class="px-6 py-3">Dueño</th>
+                    <th class="px-6 py-3">Motivo</th>
+                    <th class="px-6 py-3">Estado</th>
+                    <th class="px-6 py-3">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                @foreach (var c in Model.CitasAsignadas)
+                {
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="px-6 py-4 font-medium text-slate-900">
+                            @c.FechaHoraConsulta.ToString("dd/MM/yyyy HH:mm")
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-2">
+                                <div class="h-8 w-8 rounded-full bg-slate-200 overflow-hidden">
+                                    <img src="@c.ImagenMascota" alt="@c.NombreMascota" class="h-full w-full object-cover" />
+                                </div>
+                                <span>@c.NombreMascota</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex flex-col">
+                                <span class="font-medium text-slate-900">@c.NombreDueno</span>
+                                <span class="text-xs text-slate-500">@c.TelefonoDueno</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">@c.Motivo</td>
+                        <td class="px-6 py-4">
+                            <span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-emerald-100 text-emerald-700">@c.Estado</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <a asp-area="Veterinario"
+                               asp-controller="Tratamientos"
+                               asp-action="Create"
+                               asp-route-idConsulta="@c.IdConsulta"
+                               asp-route-idMascota="@c.IdMascota"
+                               asp-route-nombreMascota="@c.NombreMascota"
+                               asp-route-idVeterinario="@c.IdVeterinario"
+                               class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-md bg-teal-600 text-white hover:bg-teal-700">
+                                Crear tratamiento
+                            </a>
+                        </td>
+                    </tr>
+                }
+                @if (Model.CitasAsignadas.Count == 0)
+                {
+                    <tr>
+                        <td colspan="6" class="px-6 py-8 text-center text-slate-500">
+                            No tienes citas asignadas.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

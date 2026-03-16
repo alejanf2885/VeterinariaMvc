@@ -64,5 +64,38 @@ namespace VeterinariaMvc.Repositories.Tratamientos
                 return false;
             }
         }
+
+        public async Task<bool> CrearTratamientoAsync(
+            int idMascota,
+            int idVeterinario,
+            int idConsulta,
+            string nombre,
+            string? descripcion,
+            DateTime fechaInicio,
+            DateTime? fechaFin)
+        {
+            var tratamiento = new Tratamiento
+            {
+                IdMascota = idMascota,
+                IdVeterinario = idVeterinario,
+                IdConsulta = idConsulta,
+                Nombre = nombre,
+                Descripcion = descripcion,
+                FechaInicio = fechaInicio,
+                FechaFin = fechaFin,
+                Estado = "ACTIVO"
+            };
+
+            try
+            {
+                await _context.Tratamientos.AddAsync(tratamiento);
+                int filasAfectadas = await _context.SaveChangesAsync();
+                return filasAfectadas > 0;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
     }
 }

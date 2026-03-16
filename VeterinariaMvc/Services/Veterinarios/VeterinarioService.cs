@@ -15,6 +15,11 @@ namespace VeterinariaMvc.Services.Veterinarios
             return _veterinarioRepository.ObtenerVeterinariosPorClinicaAsync(idClinica);
         }
 
+        public Task<int?> ObtenerIdVeterinarioAsync(int idUsuario, int idClinica)
+        {
+            return _veterinarioRepository.ObtenerIdVeterinarioAsync(idUsuario, idClinica);
+        }
+
         public Task<bool> EliminarVeterinarioAsync(int idUsuario, int idClinica)
         {
             return _veterinarioRepository.EliminarVeterinarioAsync(idUsuario, idClinica);

@@ -14,5 +14,6 @@ namespace VeterinariaMvc.Services.Mascotas
         Task<bool> DesactivarMascotaAsync(int idMascota);
         Task<bool> AsignarClinicaAMascotaAsync(int idMascota, int idClinica);
         Task<List<MascotaDetalle>> ObtenerMascotasPorClinicaAsync(int idClinica);
+        Task<int> ObtenerTotalMascotasPorClinicaAsync(int idClinica);
     }
 }

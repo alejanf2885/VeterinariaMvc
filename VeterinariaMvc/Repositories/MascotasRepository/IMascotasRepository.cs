@@ -29,5 +29,7 @@ namespace VeterinariaMvc.Repositories.MascotasRepository
 
         Task<List<MascotaDetalle>> ObtenerMascotasPorClinicaAsync(int idClinica);
 
+        Task<int> ObtenerTotalMascotasPorClinicaAsync(int idClinica);
+
     }
 }

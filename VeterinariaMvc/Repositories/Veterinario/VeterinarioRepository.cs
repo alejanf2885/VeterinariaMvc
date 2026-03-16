@@ -44,6 +44,14 @@ namespace VeterinariaMvc.Repositories.Clinica
             return await consulta.ToListAsync();
         }
 
+        public async Task<int?> ObtenerIdVeterinarioAsync(int idUsuario, int idClinica)
+        {
+            var veterinario = await this.context.Veterinarios
+                .FirstOrDefaultAsync(v => v.IdUsuario == idUsuario && v.IdClinica == idClinica);
+
+            return veterinario?.Id;
+        }
+
         public async Task<bool> RegistrarVeterinarioAsync(int idUsuario, int idClinica, string? numeroColegiado)
         {
             try

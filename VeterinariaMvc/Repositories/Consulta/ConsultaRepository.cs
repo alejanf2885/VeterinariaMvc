@@ -72,5 +72,45 @@ namespace VeterinariaMvc.Repositories.Consulta
 
             return (int)pamIdOut.Value;
         }
+
+        public async Task<List<DashboardCitaSinVeterinario>> GetCitasSinVeterinarioAsync(int idClinica)
+        {
+            var consulta = from datos in _context.CitasSinVeterinarioDashboard
+                           where datos.IdClinica == idClinica
+                           orderby datos.FechaHoraConsulta, datos.Turno
+                           select datos;
+            return await consulta.ToListAsync();
+        }
+
+        public async Task<List<DashboardCitaVeterinario>> GetCitasPorVeterinarioAsync(int idClinica)
+        {
+            var consulta = from datos in _context.CitasVeterinarioDashboard
+                           where datos.IdClinica == idClinica
+                           orderby datos.FechaHoraConsulta, datos.Turno, datos.NombreVeterinario
+                           select datos;
+            return await consulta.ToListAsync();
+        }
+
+        public async Task<bool> AsignarVeterinarioAsync(int idConsulta, int idVeterinario)
+        {
+            // Actualizamos directamente la tabla CONSULTA para guardar el ID del VETERINARIO
+            string sql = "UPDATE dbo.CONSULTA SET ID_VETERINARIO = @IdVeterinario WHERE ID = @IdConsulta";
+
+            var pamIdConsulta = new SqlParameter("@IdConsulta", idConsulta);
+            var pamIdVeterinario = new SqlParameter("@IdVeterinario", idVeterinario);
+
+            int filas = await _context.Database.ExecuteSqlRawAsync(sql, pamIdConsulta, pamIdVeterinario);
+            return filas > 0;
+        }
+
+        public async Task<bool> ActualizarEstadoConsultaAsync(int idConsulta, string estado)
+        {
+            string sql = "UPDATE dbo.CONSULTA SET ESTADO = @Estado WHERE ID = @IdConsulta";
+            var pamEstado = new SqlParameter("@Estado", estado);
+            var pamIdConsulta = new SqlParameter("@IdConsulta", idConsulta);
+
+            int filas = await _context.Database.ExecuteSqlRawAsync(sql, pamEstado, pamIdConsulta);
+            return filas > 0;
+        }
     }
 }

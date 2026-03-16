@@ -26,6 +26,7 @@ using VeterinariaMvc.Services.MascotaCatalogosService;
 using VeterinariaMvc.Services.Mascotas;
 using VeterinariaMvc.Services.SaneadorFotos;
 using VeterinariaMvc.Services.Tratamientos;
+using VeterinariaMvc.Repositories.Tratamientos;
 using VeterinariaMvc.Services.UsuarioService;
 using VeterinariaMvc.Services.Veterinarios;
 
@@ -46,6 +47,7 @@ builder.Services.AddTransient<IClinicaRepository, ClinicaRepository>();
 builder.Services.AddTransient<IConsultaRepository, ConsultaRepository>();
 builder.Services.AddTransient<ITratamientoRepository, TratamientoRepository>();
 builder.Services.AddTransient<IChatRepository, ChatRepository>();
+builder.Services.AddScoped<IConsultaVeterinarioRepository, ConsultaVeterinarioRepository>();
 
 
 // ==========================================
@@ -68,6 +70,7 @@ builder.Services.AddTransient<IConsultaService, ConsultaService>();
 builder.Services.AddTransient<ITratamientoService, TratamientoService>();
 builder.Services.AddTransient<IChatService, ChatService>();
 builder.Services.AddTransient<IVeterinarioService, VeterinarioService>();
+builder.Services.AddScoped<IConsultaVeterinarioService, ConsultaVeterinarioService>();
 
 // ==========================================
 // SEGURIDAD: AUTENTICACIÓN Y AUTORIZACIÓN

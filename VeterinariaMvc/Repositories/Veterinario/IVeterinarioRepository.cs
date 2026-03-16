@@ -9,6 +9,7 @@ namespace VeterinariaMvc.Repositories.Clinica
     {
         Task<int?> ObtenerIdClinicaDeUsuarioAsync(int idUsuario);
         Task<List<VeterinarioDto>> ObtenerVeterinariosPorClinicaAsync(int idClinica);
+        Task<int?> ObtenerIdVeterinarioAsync(int idUsuario, int idClinica);
         Task<bool> RegistrarVeterinarioAsync(
             int idUsuario,
             int idClinica,

@@ -54,5 +54,20 @@ namespace VeterinariaMvc.Services.Consulta
 
             return await _repo.CancelarConsultaAsync(idConsulta);
         }
+
+        public async Task<List<DashboardCitaSinVeterinario>> GetCitasSinVeterinarioDashboardAsync(int idClinica)
+        {
+            return await _repo.GetCitasSinVeterinarioAsync(idClinica);
+        }
+
+        public async Task<List<DashboardCitaVeterinario>> GetCitasPorVeterinarioDashboardAsync(int idClinica)
+        {
+            return await _repo.GetCitasPorVeterinarioAsync(idClinica);
+        }
+
+        public async Task<bool> AsignarVeterinarioAsync(int idConsulta, int idVeterinario)
+        {
+            return await _repo.AsignarVeterinarioAsync(idConsulta, idVeterinario);
+        }
     }
 }

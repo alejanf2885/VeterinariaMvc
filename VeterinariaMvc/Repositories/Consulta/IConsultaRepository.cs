@@ -13,5 +13,12 @@ namespace VeterinariaMvc.Repositories.Consulta
         Task<ConsultaResumen> GetConsultaDetalleAsync(int idConsulta);
 
         Task<bool> CancelarConsultaAsync(int idConsulta);
+
+        // Dashboard para clínica (admin)
+        Task<List<DashboardCitaSinVeterinario>> GetCitasSinVeterinarioAsync(int idClinica);
+        Task<List<DashboardCitaVeterinario>> GetCitasPorVeterinarioAsync(int idClinica);
+
+        Task<bool> AsignarVeterinarioAsync(int idConsulta, int idVeterinario);
+        Task<bool> ActualizarEstadoConsultaAsync(int idConsulta, string estado);
     }
 }

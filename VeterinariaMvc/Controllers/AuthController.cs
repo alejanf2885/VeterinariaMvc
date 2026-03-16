@@ -58,7 +58,7 @@ namespace VeterinariaMvc.Controllers
                 }
                 else if (usuario.IdRol == (int)Roles.Veterinario)
                 {
-                    return RedirectToAction("Index", "Home", new { area = "Veterinario" });
+                    return RedirectToAction("Index", "Dashboard", new { area = "Veterinario" });
                 }
 
                 return RedirectToAction("Index", "Home");

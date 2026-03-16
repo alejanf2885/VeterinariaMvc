@@ -145,5 +145,15 @@ namespace VeterinariaMvc.Repositories.MascotasRepository
                     .OrderBy(m => m.NombreMascota) 
                     .ToListAsync();
         }
+
+        public async Task<int> ObtenerTotalMascotasPorClinicaAsync(int idClinica)
+        {
+            // Contamos mascotas activas asociadas a la clínica según la vista de detalle
+            return await _context.MascotasDetalles
+                .Where(m => m.IdClinica == idClinica)
+                .Select(m => m.IdMascota)
+                .Distinct()
+                .CountAsync();
+        }
     }
 }

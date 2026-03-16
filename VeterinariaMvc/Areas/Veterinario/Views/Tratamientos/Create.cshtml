@@ -1,0 +1,58 @@
+@model VeterinariaMvc.Areas.Veterinario.Models.CrearTratamientoViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Nuevo tratamiento";
+}
+
+<div class="max-w-xl mx-auto bg-white rounded-xl shadow-sm border border-slate-200 p-6 mt-4">
+    <h2 class="text-2xl font-bold text-slate-800 mb-2">Nuevo tratamiento</h2>
+    <p class="text-sm text-slate-500 mb-4">
+        Mascota: <span class="font-semibold">@Model.NombreMascota</span>
+    </p>
+
+    <form asp-area="Veterinario" asp-controller="Tratamientos" asp-action="Create" method="post">
+        <input type="hidden" asp-for="IdConsulta" />
+        <input type="hidden" asp-for="IdMascota" />
+        <input type="hidden" asp-for="IdVeterinario" />
+
+        <div class="mb-4">
+            <label asp-for="Nombre" class="block text-sm font-medium text-slate-700"></label>
+            <input asp-for="Nombre" class="mt-1 block w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+            <span asp-validation-for="Nombre" class="text-xs text-red-500"></span>
+        </div>
+
+        <div class="mb-4">
+            <label asp-for="Descripcion" class="block text-sm font-medium text-slate-700"></label>
+            <textarea asp-for="Descripcion" rows="3" class="mt-1 block w-full border border-slate-300 rounded-lg px-3 py-2 text-sm"></textarea>
+            <span asp-validation-for="Descripcion" class="text-xs text-red-500"></span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+                <label asp-for="FechaInicio" class="block text-sm font-medium text-slate-700"></label>
+                <input asp-for="FechaInicio" type="date" class="mt-1 block w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+                <span asp-validation-for="FechaInicio" class="text-xs text-red-500"></span>
+            </div>
+            <div>
+                <label asp-for="FechaFin" class="block text-sm font-medium text-slate-700"></label>
+                <input asp-for="FechaFin" type="date" class="mt-1 block w-full border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+                <span asp-validation-for="FechaFin" class="text-xs text-red-500"></span>
+            </div>
+        </div>
+
+        <div class="flex justify-end gap-3 mt-6">
+            <a asp-area="Veterinario" asp-controller="Citas" asp-action="Index"
+               class="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-800">
+                Cancelar
+            </a>
+            <button type="submit"
+                    class="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold rounded-lg shadow-sm">
+                Guardar tratamiento
+            </button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

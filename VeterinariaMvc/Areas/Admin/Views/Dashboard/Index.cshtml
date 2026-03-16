@@ -1,141 +1,248 @@
-﻿@{
-    Layout = "~/Views/Shared/_Layout.cshtml"; // Asumo que usas el layout principal aquí
+﻿@model VeterinariaMvc.Areas.Admin.Models.DashboardVeterinariosViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = "Panel de Control - Clínica";
 }
 
-<div class="mb-8">
-    <h1 class="text-3xl font-bold text-slate-800">Hola, Clínica VetCare 👋</h1>
-    <p class="text-slate-500 mt-1">Aquí tienes un resumen de la actividad de tu centro veterinario.</p>
+<div class="mb-8 flex flex-col gap-2">
+    <h1 class="text-3xl font-bold text-slate-800">Panel de tu clínica</h1>
+    <p class="text-slate-500">Resumen rápido de la actividad de hoy.</p>
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex items-center gap-4 transition hover:shadow-md">
-        <div class="h-12 w-12 rounded-full bg-teal-100 flex items-center justify-center shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div class="bg-gradient-to-br from-teal-500 to-emerald-500 rounded-2xl shadow-md text-white p-6 flex items-center gap-4 hover:shadow-lg transition-shadow">
+        <div class="h-12 w-12 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
         </div>
         <div>
-            <p class="text-sm font-medium text-slate-500">Consultas para hoy</p>
-            <p class="text-2xl font-bold text-slate-800">12</p>
+            <p class="text-sm font-medium text-teal-50">Consultas para hoy</p>
+            <p class="text-3xl font-bold">@Model.TotalConsultasHoy</p>
         </div>
     </div>
 
-    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex items-center gap-4 transition hover:shadow-md">
-        <div class="h-12 w-12 rounded-full bg-orange-100 flex items-center justify-center shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex items-center gap-4 hover:shadow-md transition-shadow">
+        <div class="h-12 w-12 rounded-full bg-orange-50 flex items-center justify-center shrink-0 ring-1 ring-orange-100">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
             </svg>
         </div>
         <div>
-            <p class="text-sm font-medium text-slate-500">Mascotas Registradas</p>
-            <p class="text-2xl font-bold text-slate-800">145</p>
+            <p class="text-sm font-medium text-slate-500">Mascotas registradas</p>
+            <p class="text-3xl font-bold text-slate-800">@Model.TotalMascotasRegistradas</p>
         </div>
     </div>
 
-    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex items-center gap-4 transition hover:shadow-md">
-        <div class="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex items-center gap-4 hover:shadow-md transition-shadow">
+        <div class="h-12 w-12 rounded-full bg-blue-50 flex items-center justify-center shrink-0 ring-1 ring-blue-100">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
         </div>
         <div>
-            <p class="text-sm font-medium text-slate-500">Veterinarios en plantilla</p>
-            <p class="text-2xl font-bold text-slate-800">4</p>
+            <p class="text-sm font-medium text-slate-500">Citas sin veterinario</p>
+            <p class="text-3xl font-bold text-slate-800">@Model.TotalCitasSinVeterinario</p>
         </div>
     </div>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-    <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
-            <h2 class="font-bold text-slate-800">Próximas Citas Hoy</h2>
-            <a href="#" class="text-sm font-medium text-teal-600 hover:text-teal-700">Ver todas</a>
+    <div class="lg:col-span-2 flex flex-col gap-8">
+
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50/80">
+                <h2 class="font-bold text-slate-800">Próximas Citas por Veterinario</h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-white text-xs uppercase tracking-wider text-slate-500 border-b border-slate-200">
+                            <th class="px-6 py-4 font-semibold">Hora</th>
+                            <th class="px-6 py-4 font-semibold">Paciente</th>
+                            <th class="px-6 py-4 font-semibold">Veterinario</th>
+                            <th class="px-6 py-4 font-semibold">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm text-slate-700 divide-y divide-slate-100">
+                        @if (!Model.CitasPorVeterinario.Any())
+                        {
+                            <tr>
+                                <td colspan="4" class="px-6 py-10 text-center text-slate-500">
+                                    <div class="flex flex-col items-center justify-center gap-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        <p>No hay citas programadas para hoy.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var cita in Model.CitasPorVeterinario.OrderBy(c => c.FechaHoraConsulta).ThenBy(c => c.Turno))
+                            {
+                                <tr class="hover:bg-slate-50/80 transition-colors">
+                                    <td class="px-6 py-4 font-medium text-slate-900 whitespace-nowrap">
+                                        @(string.IsNullOrEmpty(cita.Turno) ? cita.FechaHoraConsulta.ToString("HH:mm") : cita.Turno)
+                                    </td>
+                                    <td class="px-6 py-4 min-w-[200px]">
+                                        <div class="flex items-center gap-3">
+                                            <div class="h-9 w-9 rounded-full bg-slate-200 overflow-hidden border border-slate-100 shrink-0">
+                                                <img src="@(string.IsNullOrEmpty(cita.ImagenMascota)
+                                                                                                             ? $"https://ui-avatars.com/api/?name={cita.NombreMascota}&background=random"
+                                                                                                             : cita.ImagenMascota)"
+                                                     alt="@cita.NombreMascota"
+                                                     loading="lazy"
+                                                     class="h-full w-full object-cover" />
+                                            </div>
+                                            <span class="font-medium text-slate-700">@cita.NombreMascota</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-slate-600">@cita.NombreVeterinario</td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2.5 py-1 text-xs font-semibold rounded-full border
+                                                    @(cita.Estado?.ToUpper() == "CONFIRMADA"
+                                                                                              ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                                                                              : cita.Estado?.ToUpper() == "CANCELADA"
+                                                                                                  ? "bg-rose-50 text-rose-700 border-rose-200"
+                                                                                                  : "bg-amber-50 text-amber-700 border-amber-200")">
+                                            @cita.Estado
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
-        <div class="p-0 overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-                <thead>
-                    <tr class="bg-white text-xs uppercase tracking-wider text-slate-500 border-b border-slate-200">
-                        <th class="px-6 py-3 font-medium">Hora</th>
-                        <th class="px-6 py-3 font-medium">Paciente</th>
-                        <th class="px-6 py-3 font-medium">Veterinario</th>
-                        <th class="px-6 py-3 font-medium">Estado</th>
-                    </tr>
-                </thead>
-                <tbody class="text-sm text-slate-700 divide-y divide-slate-100">
-                    <tr class="hover:bg-slate-50 transition">
-                        <td class="px-6 py-4 font-medium text-slate-900">09:30</td>
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-2">
-                                <div class="h-8 w-8 rounded-full bg-slate-200 overflow-hidden">
-                                    <img src="/images/ejemplo-perro.jpg" alt="Max" class="h-full w-full object-cover" onerror="this.src='https://ui-avatars.com/api/?name=Max&background=random'" />
-                                </div>
-                                <span>Max (Golden Retriever)</span>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4">Dra. Ana García</td>
-                        <td class="px-6 py-4">
-                            <span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-emerald-100 text-emerald-700">Confirmada</span>
-                        </td>
-                    </tr>
-                    <tr class="hover:bg-slate-50 transition">
-                        <td class="px-6 py-4 font-medium text-slate-900">10:00</td>
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-2">
-                                <div class="h-8 w-8 rounded-full bg-slate-200 overflow-hidden">
-                                    <img src="/images/ejemplo-gato.jpg" alt="Luna" class="h-full w-full object-cover" onerror="this.src='https://ui-avatars.com/api/?name=Luna&background=random'" />
-                                </div>
-                                <span>Luna (Siamés)</span>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4">Dr. Carlos Ruiz</td>
-                        <td class="px-6 py-4">
-                            <span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-amber-100 text-amber-700">En espera</span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-200 bg-rose-50/50 flex items-center gap-2">
+                <span class="flex h-2 w-2 rounded-full bg-rose-500"></span>
+                <h2 class="font-bold text-slate-800">Citas sin veterinario asignado</h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left text-slate-600">
+                    <thead class="text-xs uppercase bg-slate-50 text-slate-500 border-b border-slate-200">
+                        <tr>
+                            <th class="px-6 py-4 font-semibold">Fecha / Hora</th>
+                            <th class="px-6 py-4 font-semibold">Mascota</th>
+                            <th class="px-6 py-4 font-semibold">Dueño</th>
+                            <th class="px-6 py-4 font-semibold text-right">Asignar veterinario</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        @if (!Model.CitasSinVeterinario.Any())
+                        {
+                            <tr>
+                                <td colspan="4" class="px-6 py-10 text-center text-slate-500">
+                                    <div class="flex flex-col items-center justify-center gap-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        <p>¡Genial! Todas las citas tienen un veterinario asignado.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var cita in Model.CitasSinVeterinario.OrderBy(c => c.FechaHoraConsulta).ThenBy(c => c.Turno))
+                            {
+                                <tr class="hover:bg-slate-50/80 transition-colors">
+                                    <td class="px-6 py-4 font-medium text-slate-900 whitespace-nowrap">
+                                        @(string.IsNullOrEmpty(cita.Turno) ? cita.FechaHoraConsulta.ToString("dd/MM/yyyy HH:mm") : $"{cita.FechaHoraConsulta:dd/MM/yyyy} {cita.Turno}")
+                                    </td>
+                                    <td class="px-6 py-4 min-w-[180px]">
+                                        <div class="flex items-center gap-3">
+                                            <div class="h-9 w-9 rounded-full bg-slate-200 overflow-hidden shrink-0">
+                                                <img src="@(string.IsNullOrEmpty(cita.ImagenMascota)
+                                                                                                             ? $"https://ui-avatars.com/api/?name={cita.NombreMascota}&background=random"
+                                                                                                             : cita.ImagenMascota)"
+                                                     alt="@cita.NombreMascota"
+                                                     loading="lazy"
+                                                     class="h-full w-full object-cover" />
+                                            </div>
+                                            <span class="font-medium">@cita.NombreMascota</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex flex-col">
+                                            <span class="font-medium text-slate-800">@cita.NombreDueno</span>
+                                            <span class="text-xs text-slate-500 mt-0.5 flex items-center gap-1">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                                </svg>
+                                                @cita.TelefonoDueno
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <form asp-area="Admin" asp-controller="Consultas" asp-action="AsignarVeterinario" method="post" class="flex items-center justify-end gap-2">
+                                            <input type="hidden" name="idConsulta" value="@cita.IdConsulta" />
+                                            <select name="idUsuarioVeterinario" required class="bg-white border border-slate-300 text-slate-800 text-xs rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full px-2.5 py-1.5 min-w-[140px]">
+                                                <option value="">Seleccionar vet...</option>
+                                                @foreach (var vet in (IEnumerable<VeterinariaMvc.Dtos.Veterinarios.VeterinarioDto>)ViewBag.Veterinarios)
+                                                {
+                                                    <option value="@vet.IdUsuario">@vet.Nombre</option>
+                                                }
+                                            </select>
+                                            <button type="submit" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg shadow-sm transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-1">
+                                                Asignar
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
-    <div class="bg-white rounded-xl shadow-sm border border-slate-200">
-        <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
-            <h2 class="font-bold text-slate-800">Acciones Rápidas</h2>
-        </div>
-        <div class="p-6 flex flex-col gap-3">
+    <div class="lg:col-span-1 flex flex-col gap-8">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 sticky top-6">
+            <div class="px-6 py-4 border-b border-slate-200 bg-slate-50/80">
+                <h2 class="font-bold text-slate-800">Acciones Rápidas</h2>
+            </div>
+            <div class="p-6 flex flex-col gap-3">
+                <a asp-controller="Veterinarios" asp-action="Index"
+                   class="flex items-center justify-center gap-2 w-full py-2.5 px-4 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-sm font-semibold rounded-lg transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                    Ver Directorio Médico
+                </a>
 
-            <a asp-controller="Veterinarios" asp-action="Index"
-               class="flex items-center justify-center gap-2 w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg shadow-sm transition">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-                Ver Veterinarios
-            </a>
+                <a asp-controller="Veterinarios" asp-action="Create"
+                   class="flex items-center justify-center gap-2 w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg shadow-sm transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                    </svg>
+                    Añadir Veterinario
+                </a>
 
-            <a asp-controller="Veterinarios" asp-action="Create"
-               class="flex items-center justify-center gap-2 w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg shadow-sm transition">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                </svg>
-                Añadir Veterinario
-            </a>
+                <hr class="my-2 border-slate-100" />
 
-            <a href="#" class="flex items-center justify-center gap-2 w-full py-2.5 px-4 bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold rounded-lg shadow-sm transition">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                Agendar Cita Manual
-            </a>
+                <a href="#" class="flex items-center justify-center gap-2 w-full py-2.5 px-4 bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold rounded-lg shadow-sm transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    Agendar Cita Manual
+                </a>
 
-            <a href="#" class="flex items-center justify-center gap-2 w-full py-2.5 px-4 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-sm font-semibold rounded-lg shadow-sm transition">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                Configurar Agenda
-            </a>
-
+                <a href="#" class="flex items-center justify-center gap-2 w-full py-2.5 px-4 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-sm font-semibold rounded-lg transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    Configurar Agenda
+                </a>
+            </div>
         </div>
     </div>
 </div>

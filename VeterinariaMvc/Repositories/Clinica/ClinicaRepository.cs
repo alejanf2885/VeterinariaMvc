@@ -22,6 +22,7 @@ namespace VeterinariaMvc.Repositories.Clinica
 
         public async Task<int> InsertarClinicaAsync(ModelClinica clinica)
         {
+            clinica.Configurado = true;
             _context.Clinicas.Add(clinica);
             await _context.SaveChangesAsync();
             return clinica.Id;

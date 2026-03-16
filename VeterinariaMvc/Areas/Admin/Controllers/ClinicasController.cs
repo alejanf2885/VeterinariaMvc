@@ -9,7 +9,7 @@ using VeterinariaMvc.Services.Imagenes;
 namespace VeterinariaMvc.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "1")] 
+    [Authorize(Roles = "1")]
     public class ClinicasController : Controller
     {
         private readonly IClinicaService _clinicaService;
@@ -40,70 +40,53 @@ namespace VeterinariaMvc.Areas.Admin.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(RegistroClinicaViewModel model)
         {
-            ViewData["DEBUG"] = ""; // Inicializamos la variable de debug
-
-            
-
-            var claim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
-           
-
-            int dueño = int.Parse(claim.Value);
-            ViewData["DEBUG"] = $"Id del dueño: {dueño}";
-
-      
-
-         
-
-            var idClinicaExistente = await _clinicaService.ObtenerIdClinicaDeUsuarioAsync(dueño);
-            ViewData["DEBUG"] += $" | IdClinicaExistente: {idClinicaExistente}";
-          
-
-            string rutaFoto = "/images/usuarios/default-avatar.png";
-            if (model.Logo != null)
+            // Si el modelo falla, recuperamos los errores para verlos en pantalla
+            if (!ModelState.IsValid)
             {
-                rutaFoto = await _imagenService.SubirImagenAsync(model.Logo, CarpetaDestino.Clinica, 500);
-                ViewData["DEBUG"] += $" | Logo subido a: {rutaFoto}";
-            }
-            else
-            {
-                ViewData["DEBUG"] += " | No se subió logo, se usará default";
+                return View(model);
             }
 
             try
             {
+                var claim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+                if (claim == null) return RedirectToAction("Login", "Auth");
+                int dueñoId = int.Parse(claim.Value);
+
+                string rutaFoto = "/images/usuarios/default-avatar.png";
+                if (model.Logo != null)
+                {
+                    rutaFoto = await _imagenService.SubirImagenAsync(model.Logo, CarpetaDestino.Clinica, 500);
+                }
+
                 Clinica nuevaClinica = new Clinica
                 {
                     Nombre = model.NombreClinica,
                     Direccion = model.Direccion,
-                    Telefono = model.Telefono,
+                    Telefono = model.Telefono ?? "",
                     Email = model.Email,
                     Activo = true,
                     Estado = true,
-                    IdUsuario = dueño,
+                    IdUsuario = dueñoId, // Lo vinculamos al usuario actual
                     Imagen = rutaFoto
                 };
 
-                int id = await _clinicaService.RegistrarNuevaClinicaAsync(
+                // LLAMADA AL SERVICIO: Aquí quité el parámetro Password si ya no lo usas
+                await _clinicaService.RegistrarNuevaClinicaAsync(
                     nuevaClinica,
                     model.Email,
-                    model.Password,
                     model.HoraApertura,
                     model.HoraCierre,
                     model.DuracionCita
                 );
 
-                ViewData["DEBUG"] += $" | Clínica creada con Id: {id}";
-                TempData["ToastMessage"] = "Clínica y agenda creadas con éxito.";
-                TempData["ToastType"] = "success";
-
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
-                ViewData["ERROR"] = "No se pudo registrar la clínica: " + ex.Message;
-                ViewData["DEBUG"] += " | Excepción: " + ex.ToString();
+                ViewData["ERROR"] = ex.Message;
                 return View(model);
             }
         }

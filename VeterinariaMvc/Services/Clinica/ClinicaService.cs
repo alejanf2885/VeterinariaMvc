@@ -26,19 +26,10 @@ namespace VeterinariaMvc.Services.Clinica
         }
 
       
-        public async Task<int> RegistrarNuevaClinicaAsync(ModelClinica clinica, string emailAdmin, string passwordAdmin, TimeSpan apertura, TimeSpan cierre, int duracion)
+        public async Task<int> RegistrarNuevaClinicaAsync(ModelClinica clinica, string emailAdmin,  TimeSpan apertura, TimeSpan cierre, int duracion)
         {
             int idClinica = await _clinicaRepository.InsertarClinicaAsync(clinica);
 
-            var registerDto = new RegisterDto
-            {
-                Email = emailAdmin,
-                Password = passwordAdmin,
-                Nombre = $"Admin {clinica.Nombre}",
-                Rol = Roles.AdminClinica
-            };
-
-            await _authService.RegisterUsuarioAsync(registerDto);
 
             await _clinicaRepository.ConfigurarAgendaAsync(idClinica, apertura, cierre, duracion);
 

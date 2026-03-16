@@ -17,10 +17,8 @@ namespace VeterinariaMvc.Controllers
             _estadoUsuario = estadoUsuario;
         }
 
-        // 🔹 Página principal: redirige según rol
         public async Task<IActionResult> Index()
         {
-            // 🔹 Obtener usuario actual de la sesión
             var usuario = await _estadoUsuario.ObtenerUsuarioActualAsync();
 
             if (usuario == null)
@@ -51,7 +49,6 @@ namespace VeterinariaMvc.Controllers
             }
         }
 
-        // 🔹 Página de error estándar
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

@@ -9,7 +9,7 @@ namespace VeterinariaMvc.Services.Clinica
         Task<int?> ObtenerIdClinicaDeUsuarioAsync(int idUsuario);
 
         Task<List<ClinicaDto>> GetClinicasAsync();
-        Task<int> RegistrarNuevaClinicaAsync(ModelClinica clinica, string emailAdmin, string passwordAdmin, TimeSpan apertura, TimeSpan cierre, int duracion);
+        Task<int> RegistrarNuevaClinicaAsync(ModelClinica clinica, string emailAdmin,  TimeSpan apertura, TimeSpan cierre, int duracion);
         Task<bool> EsClinicaConfiguradaAsync(int idUsuario);
 
     }

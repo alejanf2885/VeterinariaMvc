@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using VeterinariaMvc.Areas.Cliente.Models;
 using VeterinariaMvc.Dtos.Clinica;
 using VeterinariaMvc.Dtos.Mascota;
@@ -13,6 +13,7 @@ using VeterinariaMvc.Services.Tratamientos;
 namespace VeterinariaMvc.Areas.Cliente.Controllers
 {
     [Area("Cliente")]
+    [Authorize]
     public class MascotasController : Controller
     {
         private IEstadoUsuarioService _estadoUsuario;

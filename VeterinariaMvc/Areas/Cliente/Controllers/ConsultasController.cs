@@ -114,10 +114,8 @@ namespace VeterinariaMvc.Areas.Cliente.Controllers
 
         public async Task<IActionResult> Detalles(int id)
         {
-            // 1. Obtener usuario actual
             UsuarioSessionDto usuario = await _estadoUsuario.ObtenerUsuarioActualAsync();
             if (usuario == null) return RedirectToAction("Login", "Auth", new { area = "" });
-            // 2. Obtener detalles de la consulta
             ConsultaResumen consulta = await _consultaService.GetConsultaDetalleAsync(id, usuario.Id);
             if (consulta == null)
             {
@@ -130,10 +128,8 @@ namespace VeterinariaMvc.Areas.Cliente.Controllers
 
         public async Task<IActionResult> Cancelar(int id)
         {
-            // 1. Obtener usuario actual
             UsuarioSessionDto usuario = await _estadoUsuario.ObtenerUsuarioActualAsync();
             if (usuario == null) return RedirectToAction("Login", "Auth", new { area = "" });
-            // 2. Intentar cancelar la consulta
             bool exito = await _consultaService.CancelarConsultaAsync(id, usuario.Id);
             if (exito)
             {

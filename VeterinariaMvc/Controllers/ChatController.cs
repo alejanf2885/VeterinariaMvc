@@ -119,7 +119,6 @@ namespace VeterinariaMvc.Controllers
             string nombreVet = await _chatService.ObtenerNombreUsuarioAsync(idUsuarioVeterinario);
             string? imagenVet = await _chatService.ObtenerImagenUsuarioAsync(idUsuarioVeterinario);
 
-            // Notificar al veterinario (ve los datos del cliente)
             await _hubContext.Clients.Group($"user-{idUsuarioVeterinario}")
                 .SendAsync("NuevaConversacion", new
                 {

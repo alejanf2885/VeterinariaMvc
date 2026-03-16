@@ -1,5 +1,4 @@
-﻿
-using VeterinariaMvc.Repositories.Clinica;
+﻿using VeterinariaMvc.Repositories.Clinica;
 
 namespace VeterinariaMvc.Services.Veterinarios
 {
@@ -10,6 +9,12 @@ namespace VeterinariaMvc.Services.Veterinarios
         {
             _veterinarioRepository = veterinarioRepository;
         }
+
+        public Task<System.Collections.Generic.List<VeterinariaMvc.Dtos.Veterinarios.VeterinarioDto>> ObtenerVeterinariosPorClinicaAsync(int idClinica)
+        {
+            return _veterinarioRepository.ObtenerVeterinariosPorClinicaAsync(idClinica);
+        }
+
         public Task<bool> EliminarVeterinarioAsync(int idUsuario, int idClinica)
         {
             return _veterinarioRepository.EliminarVeterinarioAsync(idUsuario, idClinica);

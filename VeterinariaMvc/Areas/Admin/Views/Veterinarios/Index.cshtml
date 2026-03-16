@@ -1,0 +1,80 @@
+@model List<VeterinariaMvc.Dtos.Veterinarios.VeterinarioDto>
+@{
+    ViewData["Title"] = "Gestión de Veterinarios";
+}
+
+<div class="p-6 md:p-8 space-y-6">
+    <div class="flex items-center justify-between">
+        <h2 class="text-2xl font-bold text-slate-800 tracking-tight">@ViewData["Title"]</h2>
+        <a asp-action="Create" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm transition">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            Añadir Veterinario
+        </a>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left text-slate-600">
+                <thead class="text-xs text-slate-700 uppercase bg-slate-50 border-b border-slate-200">
+                    <tr>
+                        <th class="px-6 py-4 font-semibold">Imagen</th>
+                        <th class="px-6 py-4 font-semibold">Nombre</th>
+                        <th class="px-6 py-4 font-semibold">Email</th>
+                        <th class="px-6 py-4 font-semibold">Teléfono</th>
+                        <th class="px-6 py-4 font-semibold">Nº Colegiado</th>
+                        <th class="px-6 py-4 font-semibold text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200">
+                    @foreach (var v in Model)
+                    {
+                        <tr class="hover:bg-slate-50 transition">
+                            <td class="px-6 py-4">
+                                @if (!string.IsNullOrEmpty(v.Imagen))
+                                {
+                                    <div class="h-10 w-10 py-1 rounded-full overflow-hidden border border-slate-200">
+                                        <img src="@v.Imagen" alt="Perfil" class="h-full w-full object-cover" />
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 font-bold border border-slate-300">
+                                        ?
+                                    </div>
+                                }
+                            </td>
+                            <td class="px-6 py-4 font-medium text-slate-900">@v.Nombre</td>
+                            <td class="px-6 py-4">@v.Email</td>
+                            <td class="px-6 py-4">@(v.Telefono ?? "-")</td>
+                            <td class="px-6 py-4 font-mono text-slate-500">@v.NumeroColegiado</td>
+                            <td class="px-6 py-4 text-center">
+                                <form asp-action="Delete" method="post" style="display:inline;" onsubmit="return confirm('¿Está seguro de eliminar este veterinario?');">
+                                    <input type="hidden" name="idUsuario" value="@v.IdUsuario" />
+                                    <button type="submit" class="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 font-medium rounded-md text-xs transition">
+                                        Eliminar
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                    @if (Model.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="6" class="px-6 py-8 text-center text-slate-500">
+                                <div class="flex flex-col items-center justify-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4" opacity="0.5" />
+                                        <circle cx="12" cy="12" r="9" stroke-width="1.5" />
+                                    </svg>
+                                    <p>No hay veterinarios registrados en esta clínica.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

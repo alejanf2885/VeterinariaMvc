@@ -1,7 +1,11 @@
-﻿namespace VeterinariaMvc.Services.Veterinarios
+﻿using VeterinariaMvc.Dtos.Veterinarios;
+
+namespace VeterinariaMvc.Services.Veterinarios
 {
     public interface IVeterinarioService
     {
+        Task<List<VeterinarioDto>> ObtenerVeterinariosPorClinicaAsync(int idClinica);
+
         Task<bool> RegistrarVeterinarioAsync(
          int idUsuario,
          int idClinica,

@@ -1,6 +1,6 @@
-﻿
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using VeterinariaMvc.Data;
+using VeterinariaMvc.Dtos.Veterinarios;
 using VeterinariaMvc.Enums;
 using VeterinariaMvc.Models;
 using VeterinariaMvc.Models.Enums;
@@ -26,6 +26,24 @@ namespace VeterinariaMvc.Repositories.Clinica
             int idClinica = await consulta.FirstOrDefaultAsync();
             return idClinica;
         }
+
+        public async Task<List<VeterinarioDto>> ObtenerVeterinariosPorClinicaAsync(int idClinica)
+        {
+            var consulta = from v in context.Veterinarios
+                           join u in context.Usuarios on v.IdUsuario equals u.Id
+                           where v.IdClinica == idClinica && u.Activo == true
+                           select new VeterinariaMvc.Dtos.Veterinarios.VeterinarioDto
+                           {
+                               IdUsuario = u.Id,
+                               Nombre = u.Nombre,
+                               Email = u.Email,
+                               Telefono = u.Telefono,
+                               Imagen = u.Imagen,
+                               NumeroColegiado = v.NumeroColegiado
+                           };
+            return await consulta.ToListAsync();
+        }
+
         public async Task<bool> RegistrarVeterinarioAsync(int idUsuario, int idClinica, string? numeroColegiado)
         {
             try

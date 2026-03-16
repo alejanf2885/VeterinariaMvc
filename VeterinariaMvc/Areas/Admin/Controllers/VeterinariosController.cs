@@ -12,15 +12,19 @@ namespace VeterinariaMvc.Areas.Admin.Controllers
     public class VeterinariosController : Controller
     {
         private readonly IAuthService _authService;
+        private readonly VeterinariaMvc.Services.Veterinarios.IVeterinarioService _veterinarioService;
 
-        public VeterinariosController(IAuthService authService)
+        public VeterinariosController(IAuthService authService, VeterinariaMvc.Services.Veterinarios.IVeterinarioService veterinarioService)
         {
             _authService = authService;
+            _veterinarioService = veterinarioService;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            int idClinica = int.Parse(User.FindFirst("IdClinica")?.Value ?? "0");
+            var veterinarios = await _veterinarioService.ObtenerVeterinariosPorClinicaAsync(idClinica);
+            return View(veterinarios);
         }
 
         public IActionResult Create()
@@ -43,6 +47,14 @@ namespace VeterinariaMvc.Areas.Admin.Controllers
 
             Usuario usuario = await this._authService.RegistrarVeterinarioAsync(model);
 
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Delete(int idUsuario)
+        {
+            int idClinica = int.Parse(User.FindFirst("IdClinica")?.Value ?? "0");
+            await _veterinarioService.EliminarVeterinarioAsync(idUsuario, idClinica);
             return RedirectToAction("Index");
         }
     }

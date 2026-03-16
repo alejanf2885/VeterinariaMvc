@@ -11,5 +11,6 @@ namespace VeterinariaMvc.Repositories.Clinica
         Task<bool> ConfigurarAgendaAsync(int idClinica, TimeSpan apertura, TimeSpan cierre, int duracionCita);
         Task<bool> EsClinicaConfiguradaAsync(int idUsuario);
 
+        Task<int?> ObtenerIdPorUsuarioAdminAsync(int idUsuario);
     }
 }

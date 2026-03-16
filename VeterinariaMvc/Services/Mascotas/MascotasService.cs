@@ -119,5 +119,10 @@ namespace VeterinariaMvc.Services.Mascotas
                 idUsuario
             );
         }
+
+        public async Task<List<MascotaDetalle>> ObtenerMascotasPorClinicaAsync(int idClinica)
+        {
+            return await this._mascotasRepo.ObtenerMascotasPorClinicaAsync(idClinica);
+        }
     }
 }

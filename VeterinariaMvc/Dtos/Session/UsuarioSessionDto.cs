@@ -7,5 +7,7 @@
         public string Nombre { get; set; }
         public string? Imagen { get; set; }
         public int IdRol { get; set; }
+
+        public int? IdClinica { get; set; }
     }
 }

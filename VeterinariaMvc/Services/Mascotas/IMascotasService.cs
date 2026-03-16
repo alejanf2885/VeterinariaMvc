@@ -1,4 +1,5 @@
 ﻿using VeterinariaMvc.Dtos.Mascota;
+using VeterinariaMvc.Models;
 
 namespace VeterinariaMvc.Services.Mascotas
 {
@@ -12,5 +13,6 @@ namespace VeterinariaMvc.Services.Mascotas
         Task<bool> EditarMascotaAsync(MascotaEditDto dto);
         Task<bool> DesactivarMascotaAsync(int idMascota);
         Task<bool> AsignarClinicaAMascotaAsync(int idMascota, int idClinica);
+        Task<List<MascotaDetalle>> ObtenerMascotasPorClinicaAsync(int idClinica);
     }
 }

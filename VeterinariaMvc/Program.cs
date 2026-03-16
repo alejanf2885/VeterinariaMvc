@@ -1,16 +1,21 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization; // <-- NUEVO: Para las políticas
+using Microsoft.AspNetCore.Authorization; 
+using Microsoft.EntityFrameworkCore;
 using VeterinariaMvc.Data;
+using VeterinariaMvc.Hubs;
 using VeterinariaMvc.Repositories.Auth;
+using VeterinariaMvc.Repositories.Chats;
 using VeterinariaMvc.Repositories.Clinica;
 using VeterinariaMvc.Repositories.Consulta;
 using VeterinariaMvc.Repositories.EspecieRepository;
 using VeterinariaMvc.Repositories.MascotasRepository;
 using VeterinariaMvc.Repositories.RazaRepository;
+using VeterinariaMvc.Repositories.Tratamientos;
 using VeterinariaMvc.Repositories.UsuarioRepository;
+using VeterinariaMvc.Security; 
 using VeterinariaMvc.Services.Archivos;
 using VeterinariaMvc.Services.Auth;
+using VeterinariaMvc.Services.Chats;
 using VeterinariaMvc.Services.Clinica;
 using VeterinariaMvc.Services.Consulta;
 using VeterinariaMvc.Services.Criptografia;
@@ -20,13 +25,9 @@ using VeterinariaMvc.Services.Imagenes;
 using VeterinariaMvc.Services.MascotaCatalogosService;
 using VeterinariaMvc.Services.Mascotas;
 using VeterinariaMvc.Services.SaneadorFotos;
-using VeterinariaMvc.Services.UsuarioService;
 using VeterinariaMvc.Services.Tratamientos;
-using VeterinariaMvc.Repositories.Tratamientos;
-using VeterinariaMvc.Repositories.Chats;
-using VeterinariaMvc.Services.Chats;
-using VeterinariaMvc.Hubs;
-using VeterinariaMvc.Security; 
+using VeterinariaMvc.Services.UsuarioService;
+using VeterinariaMvc.Services.Veterinarios;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,6 +46,7 @@ builder.Services.AddTransient<IClinicaRepository, ClinicaRepository>();
 builder.Services.AddTransient<IConsultaRepository, ConsultaRepository>();
 builder.Services.AddTransient<ITratamientoRepository, TratamientoRepository>();
 builder.Services.AddTransient<IChatRepository, ChatRepository>();
+
 
 // ==========================================
 // SERVICIOS
@@ -65,6 +67,7 @@ builder.Services.AddTransient<IClinicaService, ClinicaService>();
 builder.Services.AddTransient<IConsultaService, ConsultaService>();
 builder.Services.AddTransient<ITratamientoService, TratamientoService>();
 builder.Services.AddTransient<IChatService, ChatService>();
+builder.Services.AddTransient<IVeterinarioService, VeterinarioService>();
 
 // ==========================================
 // SEGURIDAD: AUTENTICACIÓN Y AUTORIZACIÓN

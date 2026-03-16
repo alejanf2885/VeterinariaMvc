@@ -44,10 +44,19 @@ namespace VeterinariaMvc.Services.Clinica
             return clinicas.Select(c => c.ToClinicaDto()).ToList();
         }
 
-    
-        public async Task<int?> ObtenerIdClinicaDeUsuarioAsync(int idUsuario)
+
+        public async Task<int?> ObtenerIdClinicaDeUsuarioAsync(int idUsuario, int idRol)
         {
-            return await _veterinarioRepository.ObtenerIdClinicaDeUsuarioAsync(idUsuario);
+            if (idRol == 1)
+            {
+                return await _clinicaRepository.ObtenerIdPorUsuarioAdminAsync(idUsuario);
+            }
+            else if (idRol == 3)
+            {
+                return await _veterinarioRepository.ObtenerIdClinicaDeUsuarioAsync(idUsuario);
+            }
+
+            return null;
         }
 
         public Task<bool> EsClinicaConfiguradaAsync(int idUsuario)

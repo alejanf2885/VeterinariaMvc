@@ -1,40 +1,62 @@
-﻿
-using VeterinariaMvc.Dtos.Clinica;
+﻿using VeterinariaMvc.Dtos.Clinica;
+using VeterinariaMvc.Dtos.Auth;
 using VeterinariaMvc.Mappers;
 using VeterinariaMvc.Models;
 using VeterinariaMvc.Repositories.Clinica;
 using ModelClinica = VeterinariaMvc.Models.Clinica;
-
+using VeterinariaMvc.Models.Enums;
+using VeterinariaMvc.Services.Auth;
 
 namespace VeterinariaMvc.Services.Clinica
 {
     public class ClinicaService : IClinicaService
     {
-        private IVeterinarioRepository veterinarioRepository;
-        private IClinicaRepository clinicaRepository;
-        public ClinicaService(IVeterinarioRepository veterinarioRepository, IClinicaRepository clinicaRepository)
+        private readonly IVeterinarioRepository _veterinarioRepository;
+        private readonly IClinicaRepository _clinicaRepository;
+        private readonly IAuthService _authService;
+
+        public ClinicaService(
+            IVeterinarioRepository veterinarioRepository,
+            IClinicaRepository clinicaRepository,
+            IAuthService authService)
         {
-            this.veterinarioRepository = veterinarioRepository;
-            this.clinicaRepository = clinicaRepository;
+            _veterinarioRepository = veterinarioRepository;
+            _clinicaRepository = clinicaRepository;
+            _authService = authService;
         }
 
-        public async Task<List<ClinicaDto>> GetClinicasAsync()
+      
+        public async Task<int> RegistrarNuevaClinicaAsync(ModelClinica clinica, string emailAdmin, string passwordAdmin, TimeSpan apertura, TimeSpan cierre, int duracion)
         {
-            List<ModelClinica> clinicas = await this.clinicaRepository.GetClinicasAsync();
+            int idClinica = await _clinicaRepository.InsertarClinicaAsync(clinica);
 
-            List<ClinicaDto> clinicasDto = clinicas
-            .Select(c => c.ToClinicaDto())
-            .ToList();
+            var registerDto = new RegisterDto
+            {
+                Email = emailAdmin,
+                Password = passwordAdmin,
+                Nombre = $"Admin {clinica.Nombre}",
+                Rol = Roles.AdminClinica
+            };
 
-            return clinicasDto;
-        }
+            await _authService.RegisterUsuarioAsync(registerDto);
 
-        public async Task<int?> ObtenerIdClinicaDeUsuarioAsync(int idUsuario)
-        {
-            int? idClinica = await this.veterinarioRepository.ObtenerIdClinicaDeUsuarioAsync(idUsuario);
+            await _clinicaRepository.ConfigurarAgendaAsync(idClinica, apertura, cierre, duracion);
+
             return idClinica;
         }
 
-       
+        
+        public async Task<List<ClinicaDto>> GetClinicasAsync()
+        {
+            var clinicas = await _clinicaRepository.GetClinicasAsync();
+
+            return clinicas.Select(c => c.ToClinicaDto()).ToList();
+        }
+
+    
+        public async Task<int?> ObtenerIdClinicaDeUsuarioAsync(int idUsuario)
+        {
+            return await _veterinarioRepository.ObtenerIdClinicaDeUsuarioAsync(idUsuario);
+        }
     }
 }

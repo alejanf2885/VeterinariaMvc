@@ -62,7 +62,6 @@ namespace VeterinariaMvc.Controllers
         {
             if (!ModelState.IsValid)
                 return View(registerDto);
-            registerDto.Rol = Roles.Usuario;
             try
             {
                 Usuario? usuario = await this.authService.RegisterUsuarioAsync(registerDto);

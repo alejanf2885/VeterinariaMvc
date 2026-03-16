@@ -27,5 +27,12 @@ namespace VeterinariaMvc.Models
 
         [Column("ESTADO")]
         public bool Estado { get; set; }
+
+        [Column("ACTIVO")]
+        public bool Activo { get; set; }
+
+        [Column("CONFIGURADO")]
+        public bool Configurado { get; set; }
+
     }
 }

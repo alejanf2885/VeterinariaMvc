@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 using VeterinariaMvc.Services.Estado;
 using VeterinariaMvc.Dtos.Session;
 using VeterinariaMvc.Services.Mascotas;
@@ -12,20 +14,18 @@ using VeterinariaMvc.Models.Chats;
 namespace VeterinariaMvc.Areas.Cliente.Controllers
 {
     [Area("Cliente")]
+    [Authorize] // Garantiza que solo usuarios autenticados ejecuten estas acciones
     public class HomeController : Controller
     {
-        private  IEstadoUsuarioService _estadoUsuario;
-        private  IMascotasService _mascotasService;
-        private  IConsultaService _consultaService;
-        private  IChatService _chatService;
+        private readonly IMascotasService _mascotasService;
+        private readonly IConsultaService _consultaService;
+        private readonly IChatService _chatService;
 
         public HomeController(
-            IEstadoUsuarioService estadoUsuario,
             IMascotasService mascotasService,
             IConsultaService consultaService,
             IChatService chatService)
         {
-            this._estadoUsuario = estadoUsuario;
             _mascotasService = mascotasService;
             _consultaService = consultaService;
             _chatService = chatService;
@@ -33,31 +33,28 @@ namespace VeterinariaMvc.Areas.Cliente.Controllers
 
         public async Task<IActionResult> Index()
         {
-            UsuarioSessionDto usuario = await _estadoUsuario.ObtenerUsuarioActualAsync();
+            int idUsuario = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-            if (usuario == null) return RedirectToAction("Login", "Auth", new { area = "" });
+            List<MascotaResumenDto> mascotas = await _mascotasService.GetMascotasByUserAsync(idUsuario);
+            List<ConsultaResumen> consultas = await _consultaService.GetConsultasDashboardAsync(idUsuario);
+            List<ChatConversacion> conversaciones = await _chatService.ObtenerConversacionesPorUsuarioAsync(idUsuario);
 
-            List<MascotaResumenDto> mascotas = await _mascotasService.GetMascotasByUserAsync(usuario.Id);
-            List<ConsultaResumen> consultas = await _consultaService.GetConsultasDashboardAsync(usuario.Id);
-
-            List<ChatConversacion> conversaciones =
-                await _chatService.ObtenerConversacionesPorUsuarioAsync(usuario.Id);
-
-            var listaConv = new List<ChatConversacionItemViewModel>();
+            List<ChatConversacionItemViewModel> listaConv = new List<ChatConversacionItemViewModel>();
             int totalNoLeidos = 0;
-            foreach (var conv in conversaciones)
-            {
-                var (idUsuarioCliente, idUsuarioVeterinario) =
-                    await _chatService.ObtenerUsuariosConversacionAsync(conv.Id);
 
-                int idOtroUsuario = usuario.Id == idUsuarioCliente
-                    ? idUsuarioVeterinario
-                    : idUsuarioCliente;
+            foreach (ChatConversacion conv in conversaciones)
+            {
+                (int idUsuarioCliente, int idUsuarioVeterinario) participantes = await _chatService.ObtenerUsuariosConversacionAsync(conv.Id);
+
+                int idOtroUsuario = idUsuario == participantes.idUsuarioCliente
+                    ? participantes.idUsuarioVeterinario
+                    : participantes.idUsuarioCliente;
 
                 string nombre = await _chatService.ObtenerNombreUsuarioAsync(idOtroUsuario);
                 string? imagen = await _chatService.ObtenerImagenUsuarioAsync(idOtroUsuario);
-                int noLeidos = await _chatService.ContarMensajesNoLeidosAsync(conv.Id, usuario.Id);
+                int noLeidos = await _chatService.ContarMensajesNoLeidosAsync(conv.Id, idUsuario);
                 ChatMensaje? ultimo = await _chatService.ObtenerUltimoMensajeAsync(conv.Id);
+
                 totalNoLeidos += noLeidos;
 
                 listaConv.Add(new ChatConversacionItemViewModel
@@ -71,13 +68,19 @@ namespace VeterinariaMvc.Areas.Cliente.Controllers
                 });
             }
 
-            DashboardViewModel model = new DashboardViewModel();
-
-            model.usuario = usuario;
-            model.Mascotas = mascotas;
-            model.Consultas = consultas;
-            model.Conversaciones = listaConv;
-            model.TotalMensajesNoLeidos = totalNoLeidos;
+            DashboardViewModel model = new DashboardViewModel
+            {
+                usuario = new UsuarioSessionDto
+                {
+                    Id = idUsuario,
+                    Nombre = User.Identity?.Name ?? "Usuario",
+                    Imagen = User.FindFirst("Imagen")?.Value
+                },
+                Mascotas = mascotas,
+                Consultas = consultas,
+                Conversaciones = listaConv,
+                TotalMensajesNoLeidos = totalNoLeidos
+            };
 
             return View(model);
         }

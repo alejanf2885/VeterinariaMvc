@@ -7,12 +7,9 @@ namespace VeterinariaMvc.Services.Consulta
     {
         Task<List<BloqueDisponibleDto>> ObtenerHorariosDisponiblesAsync(int idClinica, DateTime fecha);
         Task<bool> CrearReservaAsync(int idMascota, int idClinica, int idBloque, string motivo);
-
         Task<List<ConsultaResumen>> GetConsultasDashboardAsync(int idUsuario);
         Task<List<ConsultaResumen>> GetHistorialCompletoAsync(int idUsuario);
-
-        Task<ConsultaResumen> GetConsultaDetalleAsync(int idConsulta, int idUsuario);
-
-        Task<bool> CancelarConsultaAsync(int idConsulta, int idUsuario);
+        Task<ConsultaResumen> GetConsultaDetalleAsync(int idConsulta);
+        Task<bool> CancelarConsultaAsync(int idConsulta);
     }
 }

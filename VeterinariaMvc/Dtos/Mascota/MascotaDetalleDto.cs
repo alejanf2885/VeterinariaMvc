@@ -3,6 +3,7 @@
     public class MascotaDetalleDto
     {
         public int IdMascota { get; set; }
+        public int IdUsuario { get; set; }
         public string NombreMascota { get; set; }
         public string Especie { get; set; }
         public string Raza { get; set; }

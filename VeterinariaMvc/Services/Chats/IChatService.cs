@@ -20,5 +20,7 @@ namespace VeterinariaMvc.Services.Chats
         Task<(int IdUsuarioCliente, int IdUsuarioVeterinario)> ObtenerUsuariosConversacionAsync(int idConversacion);
         Task<List<VeterinarioDisponibleViewModel>> ObtenerVeterinariosDisponiblesAsync(int idUsuario);
         Task<int?> ObtenerIdClientePorUsuarioAsync(int idUsuario);
+
+        Task<bool> EsParticipanteDeConversacionAsync(int idConversacion, int idUsuario);
     }
 }

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization; // <-- NUEVO: Para las políticas
 using VeterinariaMvc.Data;
 using VeterinariaMvc.Repositories.Auth;
 using VeterinariaMvc.Repositories.Clinica;
@@ -25,6 +26,7 @@ using VeterinariaMvc.Repositories.Tratamientos;
 using VeterinariaMvc.Repositories.Chats;
 using VeterinariaMvc.Services.Chats;
 using VeterinariaMvc.Hubs;
+using VeterinariaMvc.Security; 
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,7 +53,6 @@ builder.Services.AddTransient<IUsuarioService, UsuarioService>();
 builder.Services.AddTransient<IPasswordHasher, BCryptPasswordHasher>();
 builder.Services.AddTransient<IAuthService, AuthService>();
 
-// Estado de Usuario con Claims (Scoped por el uso de HttpContext para Cookies)
 builder.Services.AddScoped<IEstadoUsuarioService, ClaimsUsuarioService>();
 
 builder.Services.AddTransient<INombreArchivoService, NombreArchivoService>();
@@ -66,15 +67,40 @@ builder.Services.AddTransient<ITratamientoService, TratamientoService>();
 builder.Services.AddTransient<IChatService, ChatService>();
 
 // ==========================================
-// SEGURIDAD: AUTENTICACIÓN POR COOKIES
+// SEGURIDAD: AUTENTICACIÓN Y AUTORIZACIÓN
 // ==========================================
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/Auth/Login"; 
-        options.AccessDeniedPath = "/Home/Error"; 
+        options.LoginPath = "/Auth/Login";
+        options.AccessDeniedPath = "/Home/Error";
         options.ExpireTimeSpan = TimeSpan.FromDays(7);
     });
+
+builder.Services.AddScoped<IAuthorizationHandler, PermisoMascotaHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, PermisoTratamientoHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, PermisoConsultaHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, PermisoChatHandler>();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("PoliticaPermisoMascota", policy =>
+    {
+        policy.Requirements.Add(new PermisoMascotaRequirement());
+    });
+    options.AddPolicy("PoliticaPermisoTratamiento", policy =>
+    {
+        policy.Requirements.Add(new PermisoTratamientoRequirement());
+    });
+    options.AddPolicy("PoliticaPermisoConsulta", policy =>
+    {
+        policy.Requirements.Add(new PermisoConsultaRequirement());
+    });
+    options.AddPolicy("PoliticaPermisoChat", policy =>
+    {
+        policy.Requirements.Add(new PermisoChatRequirement());
+    });
+});
+// ==========================================
 
 // ==========================================
 // CONEXIÓN A BASE DE DATOS

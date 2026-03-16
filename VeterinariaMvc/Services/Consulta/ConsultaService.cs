@@ -6,18 +6,17 @@ namespace VeterinariaMvc.Services.Consulta
 {
     public class ConsultaService : IConsultaService
     {
-        private  IConsultaRepository _repo;
+        private readonly IConsultaRepository _repo;
+
         public ConsultaService(IConsultaRepository repo)
         {
-            this._repo = repo;
-
+            _repo = repo;
         }
 
         public async Task<List<BloqueDisponibleDto>> ObtenerHorariosDisponiblesAsync(int idClinica, DateTime fecha)
         {
             if (fecha < DateTime.Today) return new List<BloqueDisponibleDto>();
-            List<BloqueDisponibleDto> bloques = await _repo.GetBloquesDisponiblesAsync(idClinica, fecha);
-            return bloques;
+            return await _repo.GetBloquesDisponiblesAsync(idClinica, fecha);
         }
 
         public async Task<bool> CrearReservaAsync(int idMascota, int idClinica, int idBloque, string motivo)
@@ -26,7 +25,6 @@ namespace VeterinariaMvc.Services.Consulta
             return resultado > 0;
         }
 
-    
         public async Task<List<ConsultaResumen>> GetConsultasDashboardAsync(int idUsuario)
         {
             List<ConsultaResumen> todas = await _repo.GetConsultasByUserAsync(idUsuario);
@@ -42,28 +40,19 @@ namespace VeterinariaMvc.Services.Consulta
             return await _repo.GetConsultasByUserAsync(idUsuario);
         }
 
-        public async Task<ConsultaResumen> GetConsultaDetalleAsync(int idConsulta, int idUsuario)
+        public async Task<ConsultaResumen> GetConsultaDetalleAsync(int idConsulta)
         {
-            ConsultaResumen detalle =await this._repo.GetConsultaDetalleAsync(idConsulta);
-
-            if (detalle == null || detalle.IdUsuario != idUsuario)
-                return null;
-
-            return detalle;
-
-
-
-
+            return await _repo.GetConsultaDetalleAsync(idConsulta);
         }
 
-        public async Task<bool> CancelarConsultaAsync(int idConsulta, int idUsuario)
+        public async Task<bool> CancelarConsultaAsync(int idConsulta)
         {
-            ConsultaResumen consulta = await this._repo.GetConsultaDetalleAsync(idConsulta);
+            ConsultaResumen consulta = await _repo.GetConsultaDetalleAsync(idConsulta);
 
-            if (consulta == null || consulta.IdUsuario != idUsuario || consulta.Estado.ToUpper() == "CANCELADA")
+            if (consulta == null || consulta.Estado.ToUpper() == "CANCELADA")
                 return false;
 
-            return await this._repo.CancelarConsultaAsync(idConsulta);
+            return await _repo.CancelarConsultaAsync(idConsulta);
         }
     }
 }

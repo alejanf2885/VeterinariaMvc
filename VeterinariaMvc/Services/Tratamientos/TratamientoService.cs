@@ -14,7 +14,7 @@ namespace VeterinariaMvc.Services.Tratamientos
             _tratamientoRepository = tratamientoRepository;
         }
 
-        public async Task<List<TratamientoDto>> GetTratamientosPorMascotaAsync(int idMascota, int idUsuario)
+        public async Task<List<TratamientoDto>> GetTratamientosPorMascotaAsync(int idMascota)
         {
             List<TratamientoView> tratamientos = await _tratamientoRepository.GetTratamientosPorMascotaAsync(idMascota);
             return await MapTratamientosAListaDto(tratamientos);
@@ -26,9 +26,11 @@ namespace VeterinariaMvc.Services.Tratamientos
             return await MapTratamientosAListaDto(tratamientos);
         }
 
-        public async Task<TratamientoDto?> GetTratamientoDetalleAsync(int idTratamiento, int idUsuario)
+        public async Task<TratamientoDto?> GetTratamientoDetalleAsync(int idTratamiento)
         {
-            TratamientoView tratamiento = await _tratamientoRepository.GetTratamientoDetalleAsync(idTratamiento, idUsuario);
+            // ⚠️ ATENCIÓN: Fíjate que le quité el idUsuario a la llamada del repositorio también
+            TratamientoView tratamiento = await _tratamientoRepository.GetTratamientoDetalleAsync(idTratamiento);
+
             if (tratamiento == null) return null;
 
             List<SeguimientoDto> seguimientos = await GetSeguimientosPorTratamientoAsync(tratamiento.Id);
@@ -50,6 +52,7 @@ namespace VeterinariaMvc.Services.Tratamientos
             return seguimientosView.ConvertAll(MapSeguimientoViewToDto);
         }
 
+       
         private async Task<List<TratamientoDto>> MapTratamientosAListaDto(List<TratamientoView> tratamientos)
         {
             List<TratamientoDto> listaDto = new List<TratamientoDto>();

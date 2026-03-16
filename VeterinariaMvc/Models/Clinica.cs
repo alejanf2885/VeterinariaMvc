@@ -34,5 +34,8 @@ namespace VeterinariaMvc.Models
         [Column("CONFIGURADO")]
         public bool Configurado { get; set; }
 
+        [Column("USUARIO_ID")]
+        public int IdUsuario { get; set; }
+
     }
 }

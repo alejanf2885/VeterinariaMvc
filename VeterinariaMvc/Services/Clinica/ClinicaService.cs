@@ -58,5 +58,10 @@ namespace VeterinariaMvc.Services.Clinica
         {
             return await _veterinarioRepository.ObtenerIdClinicaDeUsuarioAsync(idUsuario);
         }
+
+        public Task<bool> EsClinicaConfiguradaAsync(int idUsuario)
+        {
+            return _clinicaRepository.EsClinicaConfiguradaAsync(idUsuario);
+        }
     }
 }

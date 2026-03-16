@@ -62,13 +62,26 @@ namespace VeterinariaMvc.Controllers
         {
             if (!ModelState.IsValid)
                 return View(registerDto);
+
             try
             {
                 Usuario? usuario = await this.authService.RegisterUsuarioAsync(registerDto);
 
                 if (usuario != null)
                 {
-                    return RedirectToAction("Login", "Home");
+                    await this.estadoUsuarioService.GuardarSesionAsync(usuario.ToSessionDto());
+
+                    if (usuario.IdRol == (int)Roles.AdminClinica)
+                    {
+                        bool clinicaExiste = await this.estadoUsuarioService.EsClinicaConfiguradaAsync(usuario.Id);
+
+                        if (!clinicaExiste)
+                        {
+                            return RedirectToAction("Create", "Clinicas", new { area = "Admin" });
+                        }
+                    }
+
+                    return RedirectToAction("Index", "Home");
                 }
 
                 ViewData["ERROR"] = "No se pudo crear la cuenta. Inténtalo de nuevo.";

@@ -1,6 +1,6 @@
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 using VeterinariaMvc.Dtos.Session;
 using VeterinariaMvc.Models;
 using VeterinariaMvc.Models.Enums;
@@ -10,45 +10,55 @@ namespace VeterinariaMvc.Controllers
 {
     public class HomeController : Controller
     {
-
-        private IEstadoUsuarioService _estadoUsuario;
+        private readonly IEstadoUsuarioService _estadoUsuario;
 
         public HomeController(IEstadoUsuarioService estadoUsuario)
         {
-            this._estadoUsuario = estadoUsuario;
+            _estadoUsuario = estadoUsuario;
         }
+
+        // 🔹 Página principal: redirige según rol
         public async Task<IActionResult> Index()
         {
-            UsuarioSessionDto usuario = await _estadoUsuario.ObtenerUsuarioActualAsync();
+            // 🔹 Obtener usuario actual de la sesión
+            var usuario = await _estadoUsuario.ObtenerUsuarioActualAsync();
 
             if (usuario == null)
             {
                 return RedirectToAction("Login", "Auth");
             }
 
-            if (usuario.IdRol == (int)Roles.AdminClinica)
-            {
-                return RedirectToAction("Index", "Admin", new { area = "Admin" });
-            }
+            var rol = (Roles)usuario.IdRol;
 
-            if (usuario.IdRol == (int)Roles.Usuario)
+            switch (rol)
             {
-                return RedirectToAction("Index", "Home", new { area = "Cliente" });
-            }
+                case Roles.AdminClinica:
+                    bool configurado = await _estadoUsuario.EsClinicaConfiguradaAsync(usuario.Id);
+                    if (!configurado)
+                    {
+                        return RedirectToAction("Create", "Clinicas", new { area = "Admin" });
+                    }
+                    return RedirectToAction("Index", "Clinicas", new { area = "Admin" });
 
-            if (usuario.IdRol == (int)Roles.Veterinario)
-            {
-                return RedirectToAction("Index", "Home", new { area = "Veterinario" });
-            }
+                case Roles.Usuario:
+                    return RedirectToAction("Index", "Home", new { area = "Cliente" });
 
-            return RedirectToAction("Login", "Auth");
+                case Roles.Veterinario:
+                    return RedirectToAction("Index", "Home", new { area = "Veterinario" });
+
+                default:
+                    return RedirectToAction("Login", "Auth");
+            }
         }
 
-
+        // 🔹 Página de error estándar
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View(new ErrorViewModel
+            {
+                RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
+            });
         }
     }
 }

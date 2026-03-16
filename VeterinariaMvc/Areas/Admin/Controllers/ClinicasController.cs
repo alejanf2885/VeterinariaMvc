@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VeterinariaMvc.Areas.Admin.Models;
+using VeterinariaMvc.Enums;
 using VeterinariaMvc.Models;
 using VeterinariaMvc.Services.Clinica;
+using VeterinariaMvc.Services.Imagenes;
 
 namespace VeterinariaMvc.Areas.Admin.Controllers
 {
@@ -11,10 +13,12 @@ namespace VeterinariaMvc.Areas.Admin.Controllers
     public class ClinicasController : Controller
     {
         private readonly IClinicaService _clinicaService;
+        private readonly IImagenService _imagenService;
 
-        public ClinicasController(IClinicaService clinicaService)
+        public ClinicasController(IClinicaService clinicaService, IImagenService imagenService)
         {
             _clinicaService = clinicaService;
+            _imagenService = imagenService;
         }
 
         public async Task<IActionResult> Index()
@@ -28,18 +32,44 @@ namespace VeterinariaMvc.Areas.Admin.Controllers
         {
             var model = new RegistroClinicaViewModel
             {
-                HoraApertura = new TimeSpan(9, 0, 0),
-                HoraCierre = new TimeSpan(18, 0, 0),
+                HoraAperturaStr = "09:00",
+                HoraCierreStr = "18:00",
                 DuracionCita = 30
             };
             return View(model);
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(RegistroClinicaViewModel model)
         {
-            if (!ModelState.IsValid) return View(model);
+            ViewData["DEBUG"] = ""; // Inicializamos la variable de debug
+
+            
+
+            var claim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+           
+
+            int dueño = int.Parse(claim.Value);
+            ViewData["DEBUG"] = $"Id del dueño: {dueño}";
+
+      
+
+         
+
+            var idClinicaExistente = await _clinicaService.ObtenerIdClinicaDeUsuarioAsync(dueño);
+            ViewData["DEBUG"] += $" | IdClinicaExistente: {idClinicaExistente}";
+          
+
+            string rutaFoto = "/images/usuarios/default-avatar.png";
+            if (model.Logo != null)
+            {
+                rutaFoto = await _imagenService.SubirImagenAsync(model.Logo, CarpetaDestino.Clinica, 500);
+                ViewData["DEBUG"] += $" | Logo subido a: {rutaFoto}";
+            }
+            else
+            {
+                ViewData["DEBUG"] += " | No se subió logo, se usará default";
+            }
 
             try
             {
@@ -50,7 +80,9 @@ namespace VeterinariaMvc.Areas.Admin.Controllers
                     Telefono = model.Telefono,
                     Email = model.Email,
                     Activo = true,
-                    Estado = true
+                    Estado = true,
+                    IdUsuario = dueño,
+                    Imagen = rutaFoto
                 };
 
                 int id = await _clinicaService.RegistrarNuevaClinicaAsync(
@@ -62,6 +94,7 @@ namespace VeterinariaMvc.Areas.Admin.Controllers
                     model.DuracionCita
                 );
 
+                ViewData["DEBUG"] += $" | Clínica creada con Id: {id}";
                 TempData["ToastMessage"] = "Clínica y agenda creadas con éxito.";
                 TempData["ToastType"] = "success";
 
@@ -70,6 +103,7 @@ namespace VeterinariaMvc.Areas.Admin.Controllers
             catch (Exception ex)
             {
                 ViewData["ERROR"] = "No se pudo registrar la clínica: " + ex.Message;
+                ViewData["DEBUG"] += " | Excepción: " + ex.ToString();
                 return View(model);
             }
         }

@@ -1,0 +1,186 @@
+﻿@model VeterinariaMvc.Areas.Admin.Models.RegistroClinicaViewModel
+
+@{
+    Layout = "~/Views/Shared/_LayoutAuth.cshtml";
+    ViewData["Title"] = "Registrar Clínica";
+}
+
+<div class="flex flex-col items-center mb-6">
+    <div class="h-14 w-14 bg-teal-500 rounded-full flex items-center justify-center shadow-md mb-3 transition hover:scale-105">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 8v4m0 0v4m0-4h4m-4 0H8M3 20h18v-2a6 6 0 00-6-6H9a6 6 0 00-6 6v2z" />
+        </svg>
+    </div>
+    <p class="text-center text-sm text-slate-500">
+        Registra tu clínica en <span class="font-bold text-teal-600">VetCare</span> y comienza a gestionar tus citas.
+    </p>
+</div>
+<!-- Mostrar errores de validación -->
+<div asp-validation-summary="ModelOnly"
+     class="text-sm text-red-600 bg-red-50 p-3 rounded-lg mb-4"
+     style="display: @(ViewData.ModelState.IsValid ? "none" : "block")">
+</div>
+
+<!-- Mostrar DEBUG y errores desde el controlador -->
+@if (ViewData["DEBUG"] != null)
+{
+    <div class="bg-yellow-100 text-yellow-800 p-2 rounded mb-4">
+        <strong>DEBUG:</strong> @ViewData["DEBUG"]
+    </div>
+}
+
+@if (ViewData["ERROR"] != null)
+{
+    <div class="bg-red-100 text-red-800 p-2 rounded mb-4">
+        <strong>ERROR:</strong> @ViewData["ERROR"]
+    </div>
+}
+
+<div asp-validation-summary="ModelOnly"
+     class="text-sm text-red-600 bg-red-50 p-3 rounded-lg mb-4"
+     style="display: @(ViewData.ModelState.IsValid ? "none" : "block")">
+</div>
+
+<form class="space-y-4" asp-action="Create" asp-controller="Clinicas" method="POST" enctype="multipart/form-data">
+
+    <div>
+        <label asp-for="NombreClinica" class="block text-sm font-medium text-slate-700 mb-1">Nombre de la clínica</label>
+        <input asp-for="NombreClinica" type="text"
+               placeholder="Ej: VetCare Central"
+               class="block w-full px-4 py-2.5 border border-slate-300 rounded-lg shadow-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 sm:text-sm">
+        <span asp-validation-for="NombreClinica" class="text-xs text-red-500 mt-1 block"></span>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+            <label asp-for="Email" class="block text-sm font-medium text-slate-700 mb-1">Correo electrónico</label>
+            <input asp-for="Email" type="email" placeholder="ejemplo@correo.com"
+                   class="block w-full px-4 py-2.5 border border-slate-300 rounded-lg shadow-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 sm:text-sm">
+            <span asp-validation-for="Email" class="text-xs text-red-500 mt-1 block"></span>
+        </div>
+
+        <div>
+            <label asp-for="Telefono" class="block text-sm font-medium text-slate-700 mb-1">
+                Teléfono <span class="text-slate-400 font-normal">(Opcional)</span>
+            </label>
+            <input asp-for="Telefono" type="tel" placeholder="+34 600 000 000"
+                   class="block w-full px-4 py-2.5 border border-slate-300 rounded-lg shadow-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 sm:text-sm">
+            <span asp-validation-for="Telefono" class="text-xs text-red-500 mt-1 block"></span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+            <label asp-for="HoraApertura" class="block text-sm font-medium text-slate-700 mb-1">Hora de apertura</label>
+            <input asp-for="HoraApertura" type="time"
+                   class="block w-full px-4 py-2.5 border border-slate-300 rounded-lg shadow-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 sm:text-sm">
+            <span asp-validation-for="HoraApertura" class="text-xs text-red-500 mt-1 block"></span>
+        </div>
+        <div>
+            <label asp-for="HoraCierre" class="block text-sm font-medium text-slate-700 mb-1">Hora de cierre</label>
+            <input asp-for="HoraCierre" type="time"
+                   class="block w-full px-4 py-2.5 border border-slate-300 rounded-lg shadow-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 sm:text-sm">
+            <span asp-validation-for="HoraCierre" class="text-xs text-red-500 mt-1 block"></span>
+        </div>
+    </div>
+
+    <div>
+        <label asp-for="DuracionCita" class="block text-sm font-medium text-slate-700 mb-1">Duración de la cita (min)</label>
+        <input asp-for="DuracionCita" type="number"
+               class="block w-full px-4 py-2.5 border border-slate-300 rounded-lg shadow-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 sm:text-sm">
+        <span asp-validation-for="DuracionCita" class="text-xs text-red-500 mt-1 block"></span>
+    </div>
+
+    <div>
+        <label asp-for="Logo" class="block text-sm font-medium text-slate-700 mb-1">Logo de la clínica <span class="text-slate-400">(Opcional)</span></label>
+
+        <div id="dropzone"
+             class="flex items-center gap-4 p-4 border-2 border-dashed border-slate-300 rounded-xl hover:border-teal-500 transition-all duration-200 cursor-pointer group">
+
+            <div class="h-20 w-20 shrink-0 rounded-full border border-slate-200 shadow-sm bg-slate-100 flex items-center justify-center overflow-hidden">
+                <img id="preview" src="" class="h-full w-full object-cover hidden" />
+                <div id="cameraIcon" class="text-slate-400 group-hover:text-teal-500 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 7h3l2-2h8l2 2h3v12H3V7z" />
+                        <circle cx="12" cy="13" r="4" stroke-width="1.8" />
+                    </svg>
+                </div>
+            </div>
+
+            <div class="flex flex-col text-sm text-slate-600 overflow-hidden w-full">
+                <span class="font-medium text-teal-600 group-hover:text-teal-500">Subir logo</span>
+                <span class="text-xs text-slate-400">Arrastra o haz clic</span>
+                <span id="file-name" class="text-xs text-slate-400 mt-1 truncate">Ningún archivo seleccionado</span>
+            </div>
+
+            <input asp-for="Logo" id="Logo" type="file" accept="image/*" class="hidden">
+        </div>
+
+        <span asp-validation-for="Logo" class="text-xs text-red-500 mt-1 block"></span>
+    </div>
+
+    <div class="pt-4">
+        <button type="submit"
+                class="w-full hover:cursor-pointer py-3 rounded-lg shadow-md text-sm font-bold text-white bg-teal-600 hover:bg-teal-700 focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition uppercase tracking-wider">
+            Registrar clínica
+        </button>
+    </div>
+</form>
+
+<div class="mt-6 text-center">
+    <a asp-action="Index" asp-controller="Home" class="text-sm text-slate-600 hover:text-teal-600 transition">
+        Volver al inicio
+    </a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('Logo');
+        const preview = document.getElementById('preview');
+        const cameraIcon = document.getElementById('cameraIcon');
+        const fileNameDisplay = document.getElementById('file-name');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(ev => {
+            dropzone.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); });
+        });
+
+        ['dragenter', 'dragover'].forEach(ev => {
+            dropzone.addEventListener(ev, () => dropzone.classList.add('border-teal-500', 'bg-teal-50'));
+        });
+        ['dragleave', 'drop'].forEach(ev => {
+            dropzone.addEventListener(ev, () => dropzone.classList.remove('border-teal-500', 'bg-teal-50'));
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                updatePreview(files[0]);
+            }
+        });
+
+        dropzone.addEventListener('click', () => fileInput.click());
+
+        fileInput.addEventListener('change', function () {
+            if (this.files.length > 0) updatePreview(this.files[0]);
+        });
+
+        function updatePreview(file) {
+            fileNameDisplay.textContent = file.name;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                preview.classList.remove('hidden');
+                preview.style.display = 'block';
+                cameraIcon.classList.add('hidden');
+            }
+            reader.readAsDataURL(file);
+        }
+    </script>
+}

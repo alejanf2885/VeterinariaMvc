@@ -2,16 +2,19 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
 using VeterinariaMvc.Dtos.Session;
+using VeterinariaMvc.Services.Clinica;
 
 namespace VeterinariaMvc.Services.Estado
 {
     public class ClaimsUsuarioService : IEstadoUsuarioService
     {
         private readonly IHttpContextAccessor _contextAccessor;
+        private readonly IClinicaService _clinicaService;
 
-        public ClaimsUsuarioService(IHttpContextAccessor contextAccessor)
+        public ClaimsUsuarioService(IHttpContextAccessor contextAccessor, IClinicaService clinicaService)
         {
             _contextAccessor = contextAccessor;
+            _clinicaService = clinicaService;
         }
 
         public async Task DestruirSesionAsync()
@@ -20,6 +23,11 @@ namespace VeterinariaMvc.Services.Estado
             {
                 await _contextAccessor.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             }
+        }
+
+        public Task<bool> EsClinicaConfiguradaAsync(int idUsuario)
+        {
+            return _clinicaService.EsClinicaConfiguradaAsync(idUsuario);
         }
 
         public async Task GuardarSesionAsync(UsuarioSessionDto usuario)

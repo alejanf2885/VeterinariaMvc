@@ -1,6 +1,7 @@
 ﻿using MvcCoreSession.Extensions;
 using VeterinariaMvc.Dtos.Session;
 using VeterinariaMvc.Models;
+using VeterinariaMvc.Services.Clinica;
 
 namespace VeterinariaMvc.Services.Estado
 {
@@ -8,15 +9,22 @@ namespace VeterinariaMvc.Services.Estado
     {
 
         private IHttpContextAccessor contextAccessor;
+        private IClinicaService clinicaService;
 
-        public SessionUsuarioService(IHttpContextAccessor contextAccessor)
+        public SessionUsuarioService(IHttpContextAccessor contextAccessor, IClinicaService clinicaService)
         {
             this.contextAccessor = contextAccessor;
+            this.clinicaService = clinicaService;
         }
 
         public async Task DestruirSesionAsync()
         {
             this.contextAccessor.HttpContext.Session.Remove("USUARIOACTUAL");
+        }
+
+        public Task<bool> EsClinicaConfiguradaAsync(int idUsuario)
+        {
+            return clinicaService.EsClinicaConfiguradaAsync(idUsuario);
         }
 
         public async Task GuardarSesionAsync(UsuarioSessionDto usuario)

@@ -8,5 +8,8 @@ namespace VeterinariaMvc.Services.Estado
         Task GuardarSesionAsync(UsuarioSessionDto usuario);
         Task DestruirSesionAsync();
         Task<UsuarioSessionDto?> ObtenerUsuarioActualAsync();
+
+        Task<bool> EsClinicaConfiguradaAsync(int idUsuario);
+
     }
 }

@@ -1,33 +1,58 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using VeterinariaMvc.Data;
-using VeterinariaMvc.Dtos.Clinica;
 using ModelClinica = VeterinariaMvc.Models.Clinica;
-
 
 namespace VeterinariaMvc.Repositories.Clinica
 {
     public class ClinicaRepository : IClinicaRepository
     {
-        private Context _context;
+        private readonly Context _context;
 
         public ClinicaRepository(Context context)
         {
             _context = context;
         }
 
-        public Task<ModelClinica?> GetClinicaPorIdAsync(int idClinica)
+        public async Task<ModelClinica?> GetClinicaPorIdAsync(int idClinica)
         {
-            throw new NotImplementedException();
+            return await _context.Clinicas
+                .FirstOrDefaultAsync(c => c.Id == idClinica);
+        }
+
+        public async Task<int> InsertarClinicaAsync(ModelClinica clinica)
+        {
+            _context.Clinicas.Add(clinica);
+            await _context.SaveChangesAsync();
+            return clinica.Id;
+        }
+
+        public async Task<bool> ConfigurarAgendaAsync(int idClinica, TimeSpan apertura, TimeSpan cierre, int duracionCita)
+        {
+            string sql = "EXEC SP_ConfigurarAgendaParaSiempre @IdClinica, @HoraApertura, @HoraCierre, @MinutosPorCita";
+
+            var parameters = new[]
+            {
+                new SqlParameter("@IdClinica", idClinica),
+                new SqlParameter("@HoraApertura", apertura),
+                new SqlParameter("@HoraCierre", cierre),
+                new SqlParameter("@MinutosPorCita", duracionCita)
+            };
+
+            try
+            {
+                await _context.Database.ExecuteSqlRawAsync(sql, parameters);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         public async Task<List<ModelClinica>> GetClinicasAsync()
         {
-            var consulta = from datos in this._context.Clinicas
-                           select datos;
-
-            List<ModelClinica> clinicas = await consulta.ToListAsync();
-            return clinicas;
-
+            return await _context.Clinicas.ToListAsync();
         }
     }
 }

@@ -6,5 +6,8 @@ namespace VeterinariaMvc.Repositories.Clinica
     {
         Task<List<ModelClinica>> GetClinicasAsync();
         Task<ModelClinica?> GetClinicaPorIdAsync(int idClinica);
+
+        Task<int> InsertarClinicaAsync(ModelClinica clinica);
+        Task<bool> ConfigurarAgendaAsync(int idClinica, TimeSpan apertura, TimeSpan cierre, int duracionCita);
     }
 }

@@ -26,7 +26,7 @@ namespace VeterinariaMvc.Controllers
                 return RedirectToAction("Login", "Auth");
             }
 
-            if (usuario.IdRol == (int)Roles.Admin)
+            if (usuario.IdRol == (int)Roles.AdminClinica)
             {
                 return RedirectToAction("Index", "Admin", new { area = "Admin" });
             }

@@ -2,8 +2,8 @@
 {
     public enum Roles
     {
-        Admin = 1,
+        AdminClinica = 1,
         Usuario = 2,
-        Veterinario = 3
+        Veterinario = 3,
     }
 }

@@ -31,15 +31,12 @@ namespace VeterinariaMvc.Areas.Admin.Controllers
                 CitasPorVeterinario = await _consultaService.GetCitasPorVeterinarioDashboardAsync(idClinica)
             };
 
-            // Estadísticas
             modelo.TotalCitasSinVeterinario = modelo.CitasSinVeterinario.Count;
             modelo.TotalConsultasHoy = modelo.CitasPorVeterinario
                 .Count(c => c.FechaHoraConsulta.Date == DateTime.Today);
 
-            // Total de mascotas registradas en esta clínica
             modelo.TotalMascotasRegistradas = await _mascotasService.ObtenerTotalMascotasPorClinicaAsync(idClinica);
 
-            // Veterinarios disponibles en esta clínica para asignar a las citas
             ViewBag.Veterinarios = await _veterinarioService.ObtenerVeterinariosPorClinicaAsync(idClinica);
 
             return View(modelo);

@@ -23,7 +23,6 @@ namespace VeterinariaMvc.Areas.Admin.Controllers
         {
             int idClinica = int.Parse(User.FindFirst("IdClinica")?.Value ?? "0");
 
-            // Traducimos el id de usuario al id de la tabla VETERINARIO para esta clínica
             int? idVeterinario = await _veterinarioService.ObtenerIdVeterinarioAsync(idUsuarioVeterinario, idClinica);
 
             if (idVeterinario == null)

@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.SignalR;
 using VeterinariaMvc.Models.Chats;
 using VeterinariaMvc.Services.Chats;
 
 namespace VeterinariaMvc.Hubs
 {
+    [Authorize]
     public class ChatHub : Hub
     {
         private readonly IChatService _chatService;
@@ -29,7 +31,6 @@ namespace VeterinariaMvc.Hubs
             var (mensaje, idUsuarioDestino) =
                 await _chatService.EnviarMensajeAsync(idConversacion, idRemitente, texto);
 
-            // 1. Mensaje al área de chat (solo quienes están viendo la conversación)
             await Clients.Group($"conv-{idConversacion}").SendAsync("RecibirMensaje", new
             {
                 mensaje.Id,
@@ -40,7 +41,6 @@ namespace VeterinariaMvc.Hubs
                 mensaje.Leido
             });
 
-            // 2. Actualizar sidebar de ambos usuarios
             var sidebarData = new
             {
                 IdConversacion = idConversacion,

@@ -26,9 +26,8 @@ namespace VeterinariaMvc.Areas.Veterinario.Controllers
         public IActionResult Create(int idConsulta, int idMascota, string nombreMascota, int idVeterinario)
         {
             int idUsuario = ObtenerIdUsuarioActual();
-            // Aquí podrías validar que idUsuario corresponde al usuario del veterinario idVeterinario si lo necesitas
 
-            var model = new CrearTratamientoViewModel
+            CrearTratamientoViewModel model = new CrearTratamientoViewModel
             {
                 IdConsulta = idConsulta,
                 IdMascota = idMascota,

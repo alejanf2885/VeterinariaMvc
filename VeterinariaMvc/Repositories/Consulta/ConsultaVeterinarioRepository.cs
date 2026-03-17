@@ -18,7 +18,6 @@ namespace VeterinariaMvc.Repositories.Consulta
 
         public async Task<List<ConsultaVeterinarioDto>> GetCitasPorVeterinarioAsync(int idUsuarioVeterinario)
         {
-            // Usamos la vista mapeada DashboardCitaVeterinario y filtramos por el usuario del veterinario
             var query = from c in _context.CitasVeterinarioDashboard
                         where c.IdVeterinario == idUsuarioVeterinario
                         orderby c.FechaHoraConsulta

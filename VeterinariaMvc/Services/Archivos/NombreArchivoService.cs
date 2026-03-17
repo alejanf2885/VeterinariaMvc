@@ -10,7 +10,6 @@
                     "El nombre original es obligatorio.");
             }
 
-            // Determinar extensión
             string extension = string.IsNullOrEmpty(extensionDeseada)
                 ? Path.GetExtension(nombreOriginal)
                 : extensionDeseada;

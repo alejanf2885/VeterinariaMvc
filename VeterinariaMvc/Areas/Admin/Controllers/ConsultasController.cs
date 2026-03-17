@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using VeterinariaMvc.Services.Consulta;
@@ -6,6 +7,7 @@ using VeterinariaMvc.Services.Veterinarios;
 namespace VeterinariaMvc.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = "1")]
     public class ConsultasController : Controller
     {
         private readonly IConsultaService _consultaService;

@@ -82,8 +82,7 @@ builder.Services.AddTransient<IPlantillaService, PlantillaService>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/Auth/Login";
-        options.AccessDeniedPath = "/Home/Error";
+        options.LoginPath = "/Auth/Login";// <-- aquí el cambio
         options.ExpireTimeSpan = TimeSpan.FromDays(7);
     });
 

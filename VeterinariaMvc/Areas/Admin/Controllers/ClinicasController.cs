@@ -9,7 +9,7 @@ using VeterinariaMvc.Services.Imagenes;
 namespace VeterinariaMvc.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "1")]
+   [Authorize(Roles = "AdminClinica")]
     public class ClinicasController : Controller
     {
         private readonly IClinicaService _clinicaService;

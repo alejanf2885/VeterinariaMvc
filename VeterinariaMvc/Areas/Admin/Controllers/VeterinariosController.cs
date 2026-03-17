@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using VeterinariaMvc.Dtos.Auth;
@@ -9,6 +10,7 @@ using VeterinariaMvc.Services.Auth;
 namespace VeterinariaMvc.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = "1")]
     public class VeterinariosController : Controller
     {
         private readonly IAuthService _authService;

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ using VeterinariaMvc.Services.Plantillas;
 namespace VeterinariaMvc.Areas.Veterinario.Controllers
 {
     [Area("Veterinario")]
+    [Authorize(Roles = "3")]
     public class PlantillasController : Controller
     {
         private readonly IPlantillaService _plantillaService;

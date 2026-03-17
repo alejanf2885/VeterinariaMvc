@@ -20,5 +20,10 @@ namespace VeterinariaMvc.Repositories.Plantillas
 
         Task<bool> UpdatePlantillaAsync(Plantilla plantilla);
         Task<bool> DeletePlantillaCompletaAsync(int idPlantilla, int idClinica);
+
+        Task<FichaConsulta?> GetFichaConsultaPorConsultaAsync(int idConsulta);
+        Task<int> CrearFichaConsultaAsync(FichaConsulta ficha);
+        Task<bool> ReemplazarValoresFichaAsync(int idFicha, List<FichaValor> valores);
+        Task<List<FichaValor>> GetValoresFichaAsync(int idFicha);
     }
 }

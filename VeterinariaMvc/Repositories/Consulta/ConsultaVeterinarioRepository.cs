@@ -21,6 +21,7 @@ namespace VeterinariaMvc.Repositories.Consulta
             var query = from c in _context.CitasVeterinarioDashboard
                         where c.IdVeterinario == idUsuarioVeterinario
                         orderby c.FechaHoraConsulta
+                        let idPlantillaFicha = _context.FichasConsulta.Where(f => f.IdConsulta == c.IdConsulta).Select(f => (int?)f.IdPlantilla).FirstOrDefault()
                         select new ConsultaVeterinarioDto
                         {
                             IdConsulta = c.IdConsulta,
@@ -37,7 +38,8 @@ namespace VeterinariaMvc.Repositories.Consulta
                             FechaHoraConsulta = c.FechaHoraConsulta,
                             Turno = c.Turno ?? string.Empty,
                             Motivo = c.Motivo ?? string.Empty,
-                            Estado = c.Estado ?? string.Empty
+                            Estado = c.Estado ?? string.Empty,
+                            IdPlantillaFicha = idPlantillaFicha
                         };
 
             return await query.ToListAsync();

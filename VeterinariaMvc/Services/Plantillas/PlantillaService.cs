@@ -168,6 +168,107 @@ namespace VeterinariaMvc.Services.Plantillas
         {
             return _repo.DeletePlantillaCompletaAsync(idPlantilla, idClinica);
         }
+
+		public async Task<int> CrearOActualizarFichaConsultaDesdePlantillaAsync(
+			int idConsulta,
+			int idPlantilla,
+			IDictionary<int, string?> valoresTexto,
+			IDictionary<int, decimal?> valoresNumero,
+			IDictionary<int, System.DateTime?> valoresFecha,
+			IDictionary<int, bool?> valoresBooleano)
+		{
+			// buscamos si ya hay ficha para esa consulta
+			var ficha = await _repo.GetFichaConsultaPorConsultaAsync(idConsulta);
+			if (ficha == null)
+			{
+				ficha = new FichaConsulta
+				{
+					IdConsulta = idConsulta,
+					IdPlantilla = idPlantilla
+				};
+				await _repo.CrearFichaConsultaAsync(ficha);
+			}
+			else
+			{
+				ficha.IdPlantilla = idPlantilla;
+			}
+
+			var lst = new List<FichaValor>();
+
+			if (valoresTexto != null)
+			{
+				foreach (var kv in valoresTexto)
+				{
+					if (!string.IsNullOrWhiteSpace(kv.Value))
+					{
+						lst.Add(new FichaValor
+						{
+							IdCampo = kv.Key,
+							ValorTexto = kv.Value
+						});
+					}
+				}
+			}
+
+			if (valoresNumero != null)
+			{
+				foreach (var kv in valoresNumero)
+				{
+					if (kv.Value.HasValue)
+					{
+						lst.Add(new FichaValor
+						{
+							IdCampo = kv.Key,
+							ValorNumero = kv.Value
+						});
+					}
+				}
+			}
+
+			if (valoresFecha != null)
+			{
+				foreach (var kv in valoresFecha)
+				{
+					if (kv.Value.HasValue)
+					{
+						lst.Add(new FichaValor
+						{
+							IdCampo = kv.Key,
+							ValorFecha = kv.Value
+						});
+					}
+				}
+			}
+
+			if (valoresBooleano != null)
+			{
+				foreach (var kv in valoresBooleano)
+				{
+					if (kv.Value.HasValue)
+					{
+						lst.Add(new FichaValor
+						{
+							IdCampo = kv.Key,
+							ValorBooleano = kv.Value
+						});
+					}
+				}
+			}
+
+			await _repo.ReemplazarValoresFichaAsync(ficha.Id, lst);
+			return ficha.Id;
+		}
+
+		public async Task<List<FichaValor>> GetValoresFichaPorConsultaAsync(int idConsulta)
+		{
+			var ficha = await _repo.GetFichaConsultaPorConsultaAsync(idConsulta);
+			if (ficha == null)
+			{
+				return new List<FichaValor>();
+			}
+
+			return await _repo.GetValoresFichaAsync(ficha.Id);
+		}
     }
 }
 

@@ -13,6 +13,9 @@ namespace VeterinariaMvc.Services.Plantillas
         Task<PlantillaDetalleViewModel?> GetPlantillaDetalleAsync(int idPlantilla, int idClinica);
         Task<bool> UpdatePlantillaBasicaAsync(int idPlantilla, int idClinica, string nombre, bool activa);
         Task<bool> DeletePlantillaAsync(int idPlantilla, int idClinica);
+
+        Task<int> CrearOActualizarFichaConsultaDesdePlantillaAsync(int idConsulta, int idPlantilla, IDictionary<int, string?> valoresTexto, IDictionary<int, decimal?> valoresNumero, IDictionary<int, System.DateTime?> valoresFecha, IDictionary<int, bool?> valoresBooleano);
+        Task<List<FichaValor>> GetValoresFichaPorConsultaAsync(int idConsulta);
     }
 }
 

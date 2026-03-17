@@ -117,5 +117,46 @@ namespace VeterinariaMvc.Repositories.Plantillas
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<FichaConsulta?> GetFichaConsultaPorConsultaAsync(int idConsulta)
+        {
+            return await _context.FichasConsulta
+                .FirstOrDefaultAsync(f => f.IdConsulta == idConsulta);
+        }
+
+        public async Task<int> CrearFichaConsultaAsync(FichaConsulta ficha)
+        {
+            _context.FichasConsulta.Add(ficha);
+            await _context.SaveChangesAsync();
+            return ficha.Id;
+        }
+
+        public async Task<bool> ReemplazarValoresFichaAsync(int idFicha, List<FichaValor> valores)
+        {
+            var existentes = await _context.FichasValores
+                .Where(v => v.IdFicha == idFicha)
+                .ToListAsync();
+
+            _context.FichasValores.RemoveRange(existentes);
+
+            if (valores != null && valores.Count > 0)
+            {
+                foreach (var v in valores)
+                {
+                    v.IdFicha = idFicha;
+                }
+                _context.FichasValores.AddRange(valores);
+            }
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<List<FichaValor>> GetValoresFichaAsync(int idFicha)
+        {
+            return await _context.FichasValores
+                .Where(v => v.IdFicha == idFicha)
+                .ToListAsync();
+        }
     }
 }

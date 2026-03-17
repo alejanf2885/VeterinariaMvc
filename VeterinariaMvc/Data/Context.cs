@@ -34,6 +34,8 @@ namespace VeterinariaMvc.Data
         public DbSet<ChatConversacion> ChatConversaciones { get; set; }
         public DbSet<ChatMensaje> ChatMensajes { get; set; }
         public DbSet<Cliente> Clientes { get; set; }
+        public DbSet<DashboardCitaSinVeterinario> CitasSinVeterinarioDashboard { get; set; }
+        public DbSet<DashboardCitaVeterinario> CitasVeterinarioDashboard { get; set; }
 
 
     }

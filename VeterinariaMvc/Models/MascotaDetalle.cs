@@ -25,13 +25,21 @@ namespace VeterinariaMvc.Models
         [Column("PESO")]
         public decimal? Peso { get; set; }
 
-
         [Column("IDUSUARIO")]
         public int IdUsuario { get; set; }
 
+        // --- NUEVOS DATOS DEL DUEÑO ---
+        [Column("NOMBREDUEÑO")]
+        public string? NombreDueno { get; set; }
+
+        [Column("TELEFONODUEÑO")]
+        public string? TelefonoDueno { get; set; }
+
+        [Column("EMAILDUEÑO")]
+        public string? EmailDueno { get; set; }
+
         [Column("IDCLINICA")]
         public int? IdClinica { get; set; }
-
 
         [Column("NOMBRECLINICA")]
         public string? NombreClinica { get; set; }

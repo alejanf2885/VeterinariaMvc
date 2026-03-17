@@ -8,7 +8,7 @@ using VeterinariaMvc.Services.Chats;
 
 namespace VeterinariaMvc.Controllers
 {
-    [Authorize] 
+    [Authorize]
     public class ChatController : Controller
     {
         private readonly IChatService _chatService;
@@ -101,6 +101,7 @@ namespace VeterinariaMvc.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = "2")]
         public async Task<IActionResult> NuevoChat()
         {
             int idUsuario = ObtenerIdUsuarioActual();
@@ -109,7 +110,8 @@ namespace VeterinariaMvc.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken] 
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "2")]
         public async Task<IActionResult> CrearChat(int idVeterinario)
         {
             int idUsuario = ObtenerIdUsuarioActual();

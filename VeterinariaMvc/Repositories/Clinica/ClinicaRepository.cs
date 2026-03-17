@@ -61,5 +61,13 @@ namespace VeterinariaMvc.Repositories.Clinica
             return await _context.Clinicas.AnyAsync(c => c.IdUsuario == idUsuario);
 
         }
+
+        public async Task<int?> ObtenerIdPorUsuarioAdminAsync(int idUsuario)
+        {
+            var clinica = await this._context.Clinicas
+                .FirstOrDefaultAsync(c => c.IdUsuario == idUsuario);
+
+            return clinica?.Id;
+        }
     }
 }

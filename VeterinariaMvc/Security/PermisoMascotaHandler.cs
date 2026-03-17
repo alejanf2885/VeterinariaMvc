@@ -36,7 +36,7 @@ namespace VeterinariaMvc.Security
 
             if (idRol == (int)Roles.Veterinario)
             {
-                int? idClinicaVeterinario = await _clinicaService.ObtenerIdClinicaDeUsuarioAsync(idUsuario);
+                int? idClinicaVeterinario = await _clinicaService.ObtenerIdClinicaDeUsuarioAsync(idUsuario, (int)Roles.Veterinario);
                 if (idClinicaVeterinario.HasValue && idClinicaVeterinario.Value == mascota.IdClinica)
                 {
                     context.Succeed(requirement);

@@ -11,13 +11,18 @@
     <div class="w-80 border-r border-slate-200 flex flex-col">
         <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
             <h2 class="text-lg font-bold text-slate-800">Mensajes</h2>
-            <a asp-controller="Chat" asp-action="NuevoChat" asp-area=""
-               class="bg-teal-500 hover:bg-teal-600 text-white rounded-full p-1.5 transition shadow-sm"
-               title="Nuevo chat">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
-                </svg>
-            </a>
+
+            @* Solo los clientes (rol 2) pueden crear nuevos chats *@
+            @if (User.IsInRole("2"))
+            {
+                <a asp-controller="Chat" asp-action="NuevoChat" asp-area=""
+                   class="bg-teal-500 hover:bg-teal-600 text-white rounded-full p-1.5 transition shadow-sm"
+                   title="Nuevo chat">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+                    </svg>
+                </a>
+            }
         </div>
         <div id="convList" class="flex-1 overflow-y-auto">
             @if (Model.Conversaciones.Count == 0)

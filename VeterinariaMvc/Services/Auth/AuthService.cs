@@ -1,6 +1,8 @@
 ﻿using System;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using VeterinariaMvc.Dtos.Auth;
+using VeterinariaMvc.Dtos.Veterinarios;
 using VeterinariaMvc.Enums;
 using VeterinariaMvc.Models;
 using VeterinariaMvc.Models.Auth;
@@ -10,6 +12,7 @@ using VeterinariaMvc.Repositories.UsuarioRepository;
 using VeterinariaMvc.Services.Criptografia;
 using VeterinariaMvc.Services.Imagenes;
 using VeterinariaMvc.Services.UsuarioService;
+using VeterinariaMvc.Services.Veterinarios;
 
 namespace VeterinariaMvc.Services.Auth
 {
@@ -20,19 +23,23 @@ namespace VeterinariaMvc.Services.Auth
         private readonly IUsuarioService _usuarioService;
         private readonly IImagenService _imagenService;
         private readonly IUsuarioRepository _usuarioRepo;
+        private readonly IVeterinarioService _veterinarioService;
 
         public AuthService(
             IAuthUsuarioRepository authRepo,
             IPasswordHasher passwordHasher,
             IUsuarioService usuarioService,
             IImagenService imagenService,
-            IUsuarioRepository usuarioRepo)
+            IUsuarioRepository usuarioRepo,
+            IVeterinarioService veterinarioService)
         {
             _authRepo = authRepo;
             _passwordHasher = passwordHasher;
             _usuarioService = usuarioService;
             _imagenService = imagenService;
             _usuarioRepo = usuarioRepo;
+            _veterinarioService = veterinarioService;
+
         }
 
         public async Task<Usuario?> LoginAsync(string email, string password)
@@ -43,6 +50,8 @@ namespace VeterinariaMvc.Services.Auth
             if (!_passwordHasher.VerificarPassword(password, auth.PasswordHash))
                 return null;
 
+
+
             return await _usuarioService.ObtenerPorEmailAsync(email);
         }
 
@@ -50,6 +59,42 @@ namespace VeterinariaMvc.Services.Auth
         {
             // Ahora le pasamos el dto.Rol a RegistrarCoreAsync
             return RegistrarCoreAsync(dto.Email, dto.Password, dto.Nombre, dto.Telefono, dto.Imagen, dto.Rol);
+        }
+
+        [Authorize(Roles = "Admin")]
+        public async Task<Usuario?> RegistrarVeterinarioAsync(RegisterVeterinarioDto dto)
+        {
+
+            //Primer paso crear usuario
+            RegisterDto registerDto = new RegisterDto
+            {
+                Email = dto.Email,
+                Password = dto.Password,
+                Nombre = dto.Nombre,
+                Telefono = dto.Telefono,
+                Imagen = dto.Imagen,
+                Rol = dto.Rol
+            };
+
+            Usuario? usuario = await RegistrarCoreAsync(registerDto.Email, registerDto.Password, registerDto.Nombre, registerDto.Telefono, registerDto.Imagen, registerDto.Rol);
+
+            if (usuario == null)
+                throw new Exception("Error al registrar el usuario.");
+
+
+            //Segundo paso crear veterinario
+
+            bool veterinarioCreado = await _veterinarioService.RegistrarVeterinarioAsync(
+                usuario.Id,
+                dto.IdClinica,
+                dto.NumeroColegiado);
+
+            if (!veterinarioCreado)
+                throw new Exception("Error al registrar el veterinario.");
+
+            return usuario;
+
+
         }
 
         private async Task<Usuario?> RegistrarCoreAsync(

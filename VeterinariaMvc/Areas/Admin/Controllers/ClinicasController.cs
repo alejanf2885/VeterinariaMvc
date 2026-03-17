@@ -82,7 +82,7 @@ namespace VeterinariaMvc.Areas.Admin.Controllers
                     model.DuracionCita
                 );
 
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Login", "Auth", new { area = "" });
             }
             catch (Exception ex)
             {

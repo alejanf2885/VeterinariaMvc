@@ -41,6 +41,12 @@ namespace VeterinariaMvc.Services.Estado
                 new Claim("Imagen", usuario.Imagen ?? "")
             };
 
+            // ¡AÑADIMOS EL ID DE LA CLÍNICA SI EXISTE!
+            if (usuario.IdClinica.HasValue)
+            {
+                claims.Add(new Claim("IdClinica", usuario.IdClinica.Value.ToString()));
+            }
+
             ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
             AuthenticationProperties authProperties = new AuthenticationProperties
@@ -67,13 +73,18 @@ namespace VeterinariaMvc.Services.Estado
                 return null;
             }
 
+            // Recuperamos el claim de la clínica
+            var idClinicaClaim = user.FindFirst("IdClinica")?.Value;
+
             UsuarioSessionDto usuarioDto = new UsuarioSessionDto
             {
                 Id = int.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0"),
                 Nombre = user.FindFirst(ClaimTypes.Name)?.Value,
                 Email = user.FindFirst(ClaimTypes.Email)?.Value,
                 IdRol = int.Parse(user.FindFirst(ClaimTypes.Role)?.Value ?? "1"),
-                Imagen = user.FindFirst("Imagen")?.Value
+                Imagen = user.FindFirst("Imagen")?.Value,
+                // Parseamos el IdClinica si existe en la cookie
+                IdClinica = string.IsNullOrEmpty(idClinicaClaim) ? null : int.Parse(idClinicaClaim)
             };
 
             return usuarioDto;

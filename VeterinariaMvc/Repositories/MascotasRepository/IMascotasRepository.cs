@@ -26,5 +26,10 @@ namespace VeterinariaMvc.Repositories.MascotasRepository
         Task<bool> EliminarMascotaAsync(int idMascota);
 
         Task<bool> AsignarClinicaAMascotaAsync(int idMascota, int idClinica);
+
+        Task<List<MascotaDetalle>> ObtenerMascotasPorClinicaAsync(int idClinica);
+
+        Task<int> ObtenerTotalMascotasPorClinicaAsync(int idClinica);
+
     }
 }

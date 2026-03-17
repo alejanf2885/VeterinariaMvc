@@ -16,10 +16,9 @@
 
   <ItemGroup>
     <Folder Include="Areas\Cliente\Views\Reserva\" />
-    <Folder Include="Areas\Veterinario\" />
-    <Folder Include="Dtos\Consultas\" />
     <Folder Include="Dtos\Especie\" />
     <Folder Include="Dtos\Raza\" />
+    <Folder Include="Services\ConsultaVeterinario\" />
   </ItemGroup>
 
 </Project>

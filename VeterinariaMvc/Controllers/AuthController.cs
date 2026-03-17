@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using VeterinariaMvc.Dtos.Auth;
+using VeterinariaMvc.Dtos.Session;
 using VeterinariaMvc.Enums;
 using VeterinariaMvc.Mappers;
 using VeterinariaMvc.Models;
 using VeterinariaMvc.Models.Enums;
 using VeterinariaMvc.Services.Auth;
+using VeterinariaMvc.Services.Clinica;
 using VeterinariaMvc.Services.Estado;
 using VeterinariaMvc.Services.Imagenes;
 using VeterinariaMvc.Services.UsuarioService;
@@ -17,15 +19,19 @@ namespace VeterinariaMvc.Controllers
         private IAuthService authService;
         private IUsuarioService usuarioService;
         private IEstadoUsuarioService estadoUsuarioService;
+        private IClinicaService _clinicaService;
 
         public AuthController
             (IAuthService authService,
             IEstadoUsuarioService estadoUsuarioService,
-            IUsuarioService usuarioService)
+            IUsuarioService usuarioService,
+            IClinicaService clinicaService
+            )
         {
             this.authService = authService;
             this.estadoUsuarioService = estadoUsuarioService;
             this.usuarioService = usuarioService;
+            this._clinicaService = clinicaService;
         }
 
         public IActionResult Login()
@@ -36,14 +42,26 @@ namespace VeterinariaMvc.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginDto request)
         {
-            Usuario usuario = await this.authService
-                .LoginAsync(request.Email, request.Password);
+            Usuario usuario = await this.authService.LoginAsync(request.Email, request.Password);
 
             if (usuario != null)
             {
-                //Guardar usuario IEstadoUsuario
-                await this.estadoUsuarioService.GuardarSesionAsync(usuario.ToSessionDto());
-                return RedirectToAction("Index", "Home");   
+                UsuarioSessionDto sessionDto = usuario.ToSessionDto();
+
+                sessionDto.IdClinica = await this._clinicaService.ObtenerIdClinicaDeUsuarioAsync(usuario.Id, usuario.IdRol);
+
+                await this.estadoUsuarioService.GuardarSesionAsync(sessionDto);
+
+                if (usuario.IdRol == (int)Roles.AdminClinica)
+                {
+                    return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
+                }
+                else if (usuario.IdRol == (int)Roles.Veterinario)
+                {
+                    return RedirectToAction("Index", "Dashboard", new { area = "Veterinario" });
+                }
+
+                return RedirectToAction("Index", "Home");
             }
             else
             {

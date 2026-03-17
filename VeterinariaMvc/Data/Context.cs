@@ -9,6 +9,7 @@ using VeterinariaMvc.Models.Chats;
 using VeterinariaMvc.Models.Clientes;
 using VeterinariaMvc.Models.Seguimientos;
 using VeterinariaMvc.Models.Tratamientos;
+using VeterinariaMvc.Models.Plantillas;
 
 namespace VeterinariaMvc.Data
 {
@@ -36,7 +37,11 @@ namespace VeterinariaMvc.Data
         public DbSet<Cliente> Clientes { get; set; }
         public DbSet<DashboardCitaSinVeterinario> CitasSinVeterinarioDashboard { get; set; }
         public DbSet<DashboardCitaVeterinario> CitasVeterinarioDashboard { get; set; }
-
+        
+        public DbSet<Plantilla> Plantillas { get; set; }
+        public DbSet<PlantillaSeccion> PlantillasSecciones { get; set; }
+        public DbSet<PlantillaCampo> PlantillasCampos { get; set; }
+        public DbSet<PlantillaOpcion> PlantillasOpciones { get; set; }
 
     }
 }

@@ -1,0 +1,105 @@
+@model VeterinariaMvc.Areas.Veterinario.Models.PlantillaDetalleViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Vista previa plantilla";
+}
+
+<div class="max-w-5xl mx-auto mt-6">
+    <div class="bg-white rounded-2xl shadow border border-slate-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+            <div>
+                <h1 class="text-xl font-bold text-slate-800">@Model.Nombre</h1>
+                <p class="text-sm text-slate-500 mt-1">
+                    Vista previa de cómo se vería esta plantilla en una ficha de consulta.
+                </p>
+            </div>
+            <div class="flex gap-2">
+                <a asp-action="Edit" asp-route-id="@Model.Id"
+                   class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-900 text-slate-50 hover:bg-black">
+                    Editar
+                </a>
+                <a asp-action="Index"
+                   class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50">
+                    Volver
+                </a>
+            </div>
+        </div>
+
+        <div class="px-6 py-5 space-y-5">
+            @if (Model.Secciones == null || !Model.Secciones.Any())
+            {
+                <p class="text-sm text-slate-500">
+                    Esta plantilla no tiene secciones configuradas.
+                </p>
+            }
+            else
+            {
+                foreach (var sec in Model.Secciones)
+                {
+                    <section class="border border-slate-200 rounded-xl overflow-hidden">
+                        <header class="px-4 py-2 bg-slate-900 text-slate-50 text-sm font-semibold">
+                            @sec.Nombre
+                        </header>
+                        <div class="px-4 py-3 space-y-3 bg-slate-50">
+                            @if (sec.Campos == null || !sec.Campos.Any())
+                            {
+                                <p class="text-xs text-slate-500">Sin campos en esta sección.</p>
+                            }
+                            else
+                            {
+                                foreach (var campo in sec.Campos)
+                                {
+                                    <div class="space-y-1">
+                                        <label class="text-xs font-medium text-slate-700 block">
+                                            @campo.Nombre
+                                            @if (campo.Obligatorio == true)
+                                            {
+                                                <span class="text-red-500">*</span>
+                                            }
+                                        </label>
+
+                                        @switch (campo.TipoDato)
+                                        {
+                                            case "Texto":
+                                                <input class="w-full text-xs border border-slate-300 rounded px-2 py-1 bg-white" disabled />
+                                                break;
+                                            case "Parrafo":
+                                                <textarea class="w-full text-xs border border-slate-300 rounded px-2 py-1 bg-white" rows="3" disabled></textarea>
+                                                break;
+                                            case "Numero":
+                                                <input type="number" class="w-full text-xs border border-slate-300 rounded px-2 py-1 bg-white" disabled />
+                                                break;
+                                            case "Fecha":
+                                                <input type="date" class="w-full text-xs border border-slate-300 rounded px-2 py-1 bg-white" disabled />
+                                                break;
+                                            case "Booleano":
+                                                <label class="inline-flex items-center gap-1 text-xs text-slate-700">
+                                                    <input type="checkbox" class="h-3.5 w-3.5 border-slate-300 rounded" disabled />
+                                                    <span>Sí / No</span>
+                                                </label>
+                                                break;
+                                            case "Seleccion":
+                                                <select class="w-full text-xs border border-slate-300 rounded px-2 py-1 bg-white" disabled>
+                                                    @if (campo.Opciones != null)
+                                                    {
+                                                        foreach (var op in campo.Opciones)
+                                                        {
+                                                            <option>@op</option>
+                                                        }
+                                                    }
+                                                </select>
+                                                break;
+                                            default:
+                                                <input class="w-full text-xs border border-slate-300 rounded px-2 py-1 bg-white" disabled />
+                                                break;
+                                        }
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </section>
+                }
+            }
+        </div>
+    </div>
+</div>

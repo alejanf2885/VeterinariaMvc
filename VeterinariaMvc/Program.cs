@@ -29,6 +29,8 @@ using VeterinariaMvc.Services.Tratamientos;
 using VeterinariaMvc.Repositories.Tratamientos;
 using VeterinariaMvc.Services.UsuarioService;
 using VeterinariaMvc.Services.Veterinarios;
+using VeterinariaMvc.Repositories.Plantillas;
+using VeterinariaMvc.Services.Plantillas;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,6 +50,7 @@ builder.Services.AddTransient<IConsultaRepository, ConsultaRepository>();
 builder.Services.AddTransient<ITratamientoRepository, TratamientoRepository>();
 builder.Services.AddTransient<IChatRepository, ChatRepository>();
 builder.Services.AddScoped<IConsultaVeterinarioRepository, ConsultaVeterinarioRepository>();
+builder.Services.AddTransient<IPlantillaRepository, PlantillaRepository>();
 
 
 // ==========================================
@@ -71,6 +74,7 @@ builder.Services.AddTransient<ITratamientoService, TratamientoService>();
 builder.Services.AddTransient<IChatService, ChatService>();
 builder.Services.AddTransient<IVeterinarioService, VeterinarioService>();
 builder.Services.AddScoped<IConsultaVeterinarioService, ConsultaVeterinarioService>();
+builder.Services.AddTransient<IPlantillaService, PlantillaService>();
 
 // ==========================================
 // SEGURIDAD: AUTENTICACIÓN Y AUTORIZACIÓN

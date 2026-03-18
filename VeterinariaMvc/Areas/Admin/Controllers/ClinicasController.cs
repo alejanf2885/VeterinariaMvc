@@ -9,7 +9,7 @@ using VeterinariaMvc.Services.Imagenes;
 namespace VeterinariaMvc.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "1")]
+   [Authorize(Roles = "AdminClinica")]
     public class ClinicasController : Controller
     {
         private readonly IClinicaService _clinicaService;
@@ -43,7 +43,6 @@ namespace VeterinariaMvc.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(RegistroClinicaViewModel model)
         {
-            // Si el modelo falla, recuperamos los errores para verlos en pantalla
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -69,11 +68,10 @@ namespace VeterinariaMvc.Areas.Admin.Controllers
                     Email = model.Email,
                     Activo = true,
                     Estado = true,
-                    IdUsuario = dueñoId, // Lo vinculamos al usuario actual
+                    IdUsuario = dueñoId, 
                     Imagen = rutaFoto
                 };
 
-                // LLAMADA AL SERVICIO: Aquí quité el parámetro Password si ya no lo usas
                 await _clinicaService.RegistrarNuevaClinicaAsync(
                     nuevaClinica,
                     model.Email,

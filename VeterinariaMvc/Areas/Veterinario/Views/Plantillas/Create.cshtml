@@ -1,0 +1,283 @@
+@model VeterinariaMvc.Areas.Veterinario.Models.CrearPlantillaViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Nueva Plantilla";
+}
+
+<div class="max-w-5xl mx-auto mt-6">
+    <div class="bg-white rounded-2xl shadow border border-slate-200 overflow-hidden">
+        <!-- Cabecera -->
+        <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+            <div>
+                <h1 class="text-xl font-bold text-slate-800">Nueva plantilla clínica</h1>
+                <p class="text-sm text-slate-500 mt-1">
+                    Define secciones y campos que luego usarás en las fichas de consulta.
+                </p>
+            </div>
+            <a asp-action="Index"
+               class="hidden sm:inline-flex items-center gap-1 text-sm font-medium text-slate-600 hover:text-slate-900">
+                Volver al listado
+            </a>
+        </div>
+
+        <form asp-action="Create" method="post" id="frmPlantilla" onsubmit="prepararJson()">
+            <div class="px-6 py-5 space-y-8">
+
+                <!-- Datos básicos -->
+                <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="md:col-span-2">
+                        <label asp-for="Nombre" class="block text-sm font-medium text-slate-700 mb-1">
+                            Nombre de la plantilla
+                        </label>
+                        <input asp-for="Nombre"
+                               class="block w-full border border-slate-300 rounded-lg px-3 py-2 text-sm
+                                      focus:ring-teal-500 focus:border-teal-500"
+                               placeholder="Ej. Historia clínica general" />
+                        <span asp-validation-for="Nombre" class="text-xs text-red-500 mt-1 block"></span>
+                    </div>
+                    <div class="flex items-center">
+                        <input asp-for="Activa"
+                               type="checkbox"
+                               class="h-4 w-4 text-teal-600 focus:ring-teal-500 border-slate-300 rounded" />
+                        <label asp-for="Activa" class="ml-2 block text-sm font-medium text-slate-700">
+                            Plantilla activa
+                        </label>
+                    </div>
+                </section>
+
+                <input type="hidden" asp-for="SeccionesJson" id="SeccionesJson" />
+
+                <!-- Constructor de secciones -->
+                <section>
+                    <div class="flex items-center justify-between mb-3">
+                        <h2 class="text-sm font-semibold text-slate-700 uppercase tracking-wide">
+                            Secciones de la plantilla
+                        </h2>
+                        <button type="button"
+                                onclick="agregarSeccion()"
+                                class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold
+                                       rounded-full bg-slate-900 text-slate-50 hover:bg-black transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd"
+                                      d="M10 3a1 1 0 0 1 1 1v5h5a1 1 0 1 1 0 2h-5v5a1 1 0 1 1-2 0v-5H4a1 1 0 0 1 0-2h5V4a1 1 0 0 1 1-1z"
+                                      clip-rule="evenodd" />
+                            </svg>
+                            Añadir sección
+                        </button>
+                    </div>
+
+                    <div id="seccionesContainer" class="space-y-4">
+                        <!-- JS inyecta las secciones aquí -->
+                    </div>
+
+                    <p class="mt-3 text-xs text-slate-500">
+                        Consejo: crea secciones como <span class="font-semibold">"Motivo de consulta"</span>,
+                        <span class="font-semibold">"Exploración física"</span>, <span class="font-semibold">"Diagnóstico"</span>, etc.
+                    </p>
+                </section>
+            </div>
+
+            <!-- Pie del formulario -->
+            <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex items-center justify-end gap-3">
+                <a asp-action="Index"
+                   class="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-900">
+                    Cancelar
+                </a>
+                <button type="submit"
+                        class="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold
+                               rounded-lg shadow-sm">
+                    Guardar plantilla
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // Modelo en memoria
+        let dataSecciones = [];
+
+        function renderizarUI() {
+            const container = document.getElementById('seccionesContainer');
+            container.innerHTML = '';
+
+            dataSecciones.forEach((sec, sIdx) => {
+                const secDiv = document.createElement('div');
+                secDiv.className = "rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden";
+
+                let camposHtml = '';
+                sec.campos.forEach((camp, cIdx) => {
+                    let opcionesHtml = '';
+                    if (camp.tipoDato === 'Seleccion') {
+                        opcionesHtml = `
+                            <div class="mt-3">
+                                <label class="text-xs font-medium text-slate-500 block mb-1">
+                                    Opciones (separadas por coma)
+                                </label>
+                                <input type="text"
+                                       class="w-full text-xs border border-slate-300 rounded px-2 py-1
+                                              focus:ring-teal-500 focus:border-teal-500"
+                                       value="${camp.opciones.join(', ')}"
+                                       onchange="actualizarOpciones(${sIdx}, ${cIdx}, this.value)"
+                                       placeholder="Ej. Sí, No, Tal vez" />
+                            </div>`;
+                    }
+
+                    camposHtml += `
+                        <div class="rounded-lg border border-slate-100 bg-slate-50 px-3 py-3 mb-2 relative">
+                            <button type="button"
+                                    onclick="eliminarCampo(${sIdx}, ${cIdx})"
+                                    class="absolute top-2 right-2 text-slate-400 hover:text-red-500"
+                                    title="Eliminar campo">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="none">
+                                    <path d="M5 5l10 10M15 5L5 15"
+                                          stroke="currentColor" stroke-width="1.5"
+                                          stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </button>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div>
+                                    <label class="text-xs font-medium text-slate-600 block mb-1">
+                                        Nombre del campo
+                                    </label>
+                                    <input type="text"
+                                           class="w-full text-xs border border-slate-300 rounded px-2 py-1
+                                                  focus:ring-teal-500 focus:border-teal-500"
+                                           value="${camp.nombre}"
+                                           onchange="actualizarCampo(${sIdx}, ${cIdx}, 'nombre', this.value)"
+                                           placeholder="Ej. Ritmo cardiaco" />
+                                </div>
+                                <div>
+                                    <label class="text-xs font-medium text-slate-600 block mb-1">
+                                        Tipo de dato
+                                    </label>
+                                    <select class="w-full text-xs border border-slate-300 rounded px-2 py-1
+                                                   focus:ring-teal-500 focus:border-teal-500"
+                                            onchange="actualizarTipoDato(${sIdx}, ${cIdx}, this.value)">
+                                        <option value="Texto"    ${camp.tipoDato === 'Texto'    ? 'selected' : ''}>Texto corto</option>
+                                        <option value="Parrafo"  ${camp.tipoDato === 'Parrafo'  ? 'selected' : ''}>Párrafo</option>
+                                        <option value="Numero"   ${camp.tipoDato === 'Numero'   ? 'selected' : ''}>Número</option>
+                                        <option value="Fecha"    ${camp.tipoDato === 'Fecha'    ? 'selected' : ''}>Fecha</option>
+                                        <option value="Booleano" ${camp.tipoDato === 'Booleano' ? 'selected' : ''}>Sí/No</option>
+                                        <option value="Seleccion"${camp.tipoDato === 'Seleccion'? 'selected' : ''}>Lista selección</option>
+                                    </select>
+                                </div>
+                                <div class="flex items-center mt-5 sm:mt-6">
+                                    <input type="checkbox"
+                                           class="h-4 w-4 text-teal-600 border-slate-300 rounded"
+                                           ${camp.obligatorio ? 'checked' : ''}
+                                           onchange="actualizarCampo(${sIdx}, ${cIdx}, 'obligatorio', this.checked)" />
+                                    <span class="ml-2 text-xs text-slate-700">Obligatorio</span>
+                                </div>
+                            </div>
+
+                            ${opcionesHtml}
+                        </div>`;
+                });
+
+                secDiv.innerHTML = `
+                    <div class="px-4 py-3 bg-slate-900 text-slate-50 flex items-center justify-between">
+                        <input type="text"
+                               value="${sec.nombre}"
+                               onchange="actualizarSeccion(${sIdx}, this.value)"
+                               class="flex-1 bg-transparent border-0 border-b border-slate-500 focus:border-teal-300
+                                      focus:ring-0 text-sm font-semibold px-0 py-1 mr-3"
+                               placeholder="Nombre de la sección (Ej. Exploración física)" />
+                        <button type="button"
+                                onclick="eliminarSeccion(${sIdx})"
+                                class="text-xs font-semibold text-red-100 hover:text-red-300">
+                            Quitar sección
+                        </button>
+                    </div>
+                    <div class="px-4 py-3 bg-white">
+                        ${camposHtml || `
+                            <p class="text-xs text-slate-500 mb-2">
+                                Esta sección aún no tiene campos.
+                            </p>`}
+                        <button type="button"
+                                onclick="agregarCampo(${sIdx})"
+                                class="inline-flex items-center gap-1 mt-1 px-2 py-1 text-xs font-semibold
+                                       rounded border border-dashed border-slate-300 text-slate-700
+                                       hover:border-teal-500 hover:text-teal-700">
+                            <span>+ Añadir campo</span>
+                        </button>
+                    </div>
+                `;
+
+                container.appendChild(secDiv);
+            });
+        }
+
+        function agregarSeccion() {
+            dataSecciones.push({
+                nombre: '',
+                orden: dataSecciones.length,
+                campos: []
+            });
+            renderizarUI();
+        }
+
+        function eliminarSeccion(sIdx) {
+            if (confirm('¿Eliminar esta sección y todos sus campos?')) {
+                dataSecciones.splice(sIdx, 1);
+                // Recalcular órdenes
+                dataSecciones.forEach((s, i) => s.orden = i);
+                renderizarUI();
+            }
+        }
+
+        function actualizarSeccion(sIdx, val) {
+            dataSecciones[sIdx].nombre = val;
+        }
+
+        function agregarCampo(sIdx) {
+            dataSecciones[sIdx].campos.push({
+                nombre: '',
+                tipoDato: 'Texto',
+                obligatorio: false,
+                orden: dataSecciones[sIdx].campos.length,
+                opciones: []
+            });
+            renderizarUI();
+        }
+
+        function eliminarCampo(sIdx, cIdx) {
+            dataSecciones[sIdx].campos.splice(cIdx, 1);
+            dataSecciones[sIdx].campos.forEach((c, i) => c.orden = i);
+            renderizarUI();
+        }
+
+        function actualizarCampo(sIdx, cIdx, prop, val) {
+            dataSecciones[sIdx].campos[cIdx][prop] = val;
+        }
+
+        function actualizarTipoDato(sIdx, cIdx, val) {
+            dataSecciones[sIdx].campos[cIdx].tipoDato = val;
+            if (val !== 'Seleccion') {
+                dataSecciones[sIdx].campos[cIdx].opciones = [];
+            }
+            renderizarUI();
+        }
+
+        function actualizarOpciones(sIdx, cIdx, strVal) {
+            dataSecciones[sIdx].campos[cIdx].opciones =
+                strVal.split(',').map(s => s.trim()).filter(s => s);
+        }
+
+        function prepararJson() {
+            document.getElementById('SeccionesJson').value = JSON.stringify(dataSecciones);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (dataSecciones.length === 0) {
+                agregarSeccion();
+            }
+        });
+    </script>
+}

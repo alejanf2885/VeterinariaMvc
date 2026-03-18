@@ -123,5 +123,11 @@ namespace VeterinariaMvc.Controllers
             await this.estadoUsuarioService.DestruirSesionAsync();
             return RedirectToAction("Index", "Home", new { area = "" });
         }
+
+        [HttpGet]
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
     }
 }

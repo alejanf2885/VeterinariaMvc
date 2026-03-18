@@ -93,8 +93,7 @@ namespace VeterinariaMvc.Repositories.Consulta
 
         public async Task<bool> AsignarVeterinarioAsync(int idConsulta, int idVeterinario)
         {
-            // Actualizamos directamente la tabla CONSULTA para guardar el ID del VETERINARIO
-            string sql = "UPDATE dbo.CONSULTA SET ID_VETERINARIO = @IdVeterinario WHERE ID = @IdConsulta";
+            string sql = "UPDATE CONSULTA SET ID_VETERINARIO = @IdVeterinario WHERE ID = @IdConsulta";
 
             var pamIdConsulta = new SqlParameter("@IdConsulta", idConsulta);
             var pamIdVeterinario = new SqlParameter("@IdVeterinario", idVeterinario);
@@ -105,7 +104,7 @@ namespace VeterinariaMvc.Repositories.Consulta
 
         public async Task<bool> ActualizarEstadoConsultaAsync(int idConsulta, string estado)
         {
-            string sql = "UPDATE dbo.CONSULTA SET ESTADO = @Estado WHERE ID = @IdConsulta";
+            string sql = "UPDATE CONSULTA SET ESTADO = @Estado WHERE ID = @IdConsulta";
             var pamEstado = new SqlParameter("@Estado", estado);
             var pamIdConsulta = new SqlParameter("@IdConsulta", idConsulta);
 

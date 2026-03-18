@@ -1,0 +1,146 @@
+@model VeterinariaMvc.Areas.Veterinario.Models.FichaConsultaViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Ficha de consulta";
+}
+
+<div class="max-w-4xl mx-auto mt-6">
+    <div class="bg-white rounded-2xl shadow border border-slate-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+            <div>
+                <h1 class="text-xl font-bold text-slate-800">Ficha de consulta</h1>
+                <p class="text-sm text-slate-500 mt-1">
+                    Plantilla: @Model.NombrePlantilla
+                </p>
+            </div>
+        </div>
+
+        <form asp-action="Ficha" method="post">
+            <input type="hidden" asp-for="IdConsulta" />
+            <input type="hidden" asp-for="IdPlantilla" />
+
+            <div class="px-6 py-5 space-y-6">
+                @for (int i = 0; i < Model.Secciones.Count; i++)
+                {
+                    <section class="border border-slate-200 rounded-xl overflow-hidden">
+                        <header class="px-4 py-2 bg-slate-900 text-slate-50 text-sm font-semibold">
+                            @Model.Secciones[i].NombreSeccion
+                        </header>
+                        <div class="px-4 py-3 space-y-3 bg-slate-50">
+                            @for (int j = 0; j < Model.Secciones[i].Campos.Count; j++)
+                            {
+                                var campo = Model.Secciones[i].Campos[j];
+                                <div class="space-y-1">
+                                    <label class="text-xs font-medium text-slate-700 block">
+                                        @campo.NombreCampo
+                                        @if (campo.Obligatorio)
+                                        {
+                                            <span class="text-red-500">*</span>
+                                        }
+                                    </label>
+
+                                    <input type="hidden" asp-for="Secciones[@i].Campos[@j].IdCampo" />
+                                    <input type="hidden" asp-for="Secciones[@i].Campos[@j].TipoDato" />
+
+                                    @switch (campo.TipoDato)
+                                    {
+                                        case "Texto":
+                                            {
+                                                <input asp-for="Secciones[@i].Campos[@j].ValorTexto"
+                                                       class="w-full text-xs border border-slate-300 rounded px-2 py-1 bg-white" />
+                                                break;
+                                            }
+                                        case "Parrafo":
+                                            {
+                                                <textarea asp-for="Secciones[@i].Campos[@j].ValorTexto"
+                                                          class="w-full text-xs border border-slate-300 rounded px-2 py-1 bg-white"
+                                                          rows="3"></textarea>
+                                                break;
+                                            }
+                                        case "Seleccion":
+                                            {
+                                                <select asp-for="Secciones[@i].Campos[@j].ValorTexto"
+                                                        class="w-full text-xs border border-slate-300 rounded px-2 py-1 bg-white">
+                                                    <option value="">Seleccione una opción</option>
+                                                    @if (campo.Opciones != null)
+                                                    {
+                                                        foreach (var opc in campo.Opciones)
+                                                        {
+                                                            if (campo.ValorTexto == opc)
+                                                            {
+                                                                <option value="@opc" selected>@opc</option>
+                                                            }
+                                                            else
+                                                            {
+                                                                <option value="@opc">@opc</option>
+                                                            }
+                                                        }
+                                                    }
+                                                </select>
+                                                break;
+                                            }
+                                        case "Numero":
+                                            {
+                                                <input asp-for="Secciones[@i].Campos[@j].ValorNumero"
+                                                       class="w-full text-xs border border-slate-300 rounded px-2 py-1 bg-white"
+                                                       type="number" />
+                                                break;
+                                            }
+                                        case "Fecha":
+                                            {
+                                                <input asp-for="Secciones[@i].Campos[@j].ValorFecha"
+                                                       class="w-full text-xs border border-slate-300 rounded px-2 py-1 bg-white"
+                                                       type="date" asp-format="{0:yyyy-MM-dd}" />
+                                                break;
+                                            }
+                                        case "Booleano":
+                                            {
+                                                <label class="inline-flex items-center gap-1 text-xs text-slate-700">
+                                                    @if (campo.ValorBooleano == true)
+                                                    {
+                                                        <input name="Secciones[@i].Campos[@j].ValorBooleano"
+                                                               type="checkbox"
+                                                               value="true"
+                                                               checked
+                                                               class="h-3.5 w-3.5 border-slate-300 rounded" />
+                                                    }
+                                                    else
+                                                    {
+                                                        <input name="Secciones[@i].Campos[@j].ValorBooleano"
+                                                               type="checkbox"
+                                                               value="true"
+                                                               class="h-3.5 w-3.5 border-slate-300 rounded" />
+                                                    }
+                                                    <input type="hidden" name="Secciones[@i].Campos[@j].ValorBooleano" value="false" />
+                                                    <span>Sí / No</span>
+                                                </label>
+                                                break;
+                                            }
+                                        default:
+                                            {
+                                                <input asp-for="Secciones[@i].Campos[@j].ValorTexto"
+                                                       class="w-full text-xs border border-slate-300 rounded px-2 py-1 bg-white" />
+                                                break;
+                                            }
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </section>
+                }
+            </div>
+
+            <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end gap-3">
+                <a asp-action="Index" asp-controller="Citas" asp-area="Veterinario"
+                   class="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-900">
+                    Cancelar
+                </a>
+                <button type="submit"
+                        class="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold
+                               rounded-lg shadow-sm">
+                    Guardar ficha
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

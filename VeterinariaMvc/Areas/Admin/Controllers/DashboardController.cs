@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using VeterinariaMvc.Areas.Admin.Models;
 using VeterinariaMvc.Services.Consulta;
@@ -8,6 +9,7 @@ using VeterinariaMvc.Services.Mascotas;
 namespace VeterinariaMvc.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = "1")]
     public class DashboardController : Controller
     {
         private readonly IConsultaService _consultaService;
@@ -31,15 +33,12 @@ namespace VeterinariaMvc.Areas.Admin.Controllers
                 CitasPorVeterinario = await _consultaService.GetCitasPorVeterinarioDashboardAsync(idClinica)
             };
 
-            // Estadísticas
             modelo.TotalCitasSinVeterinario = modelo.CitasSinVeterinario.Count;
             modelo.TotalConsultasHoy = modelo.CitasPorVeterinario
                 .Count(c => c.FechaHoraConsulta.Date == DateTime.Today);
 
-            // Total de mascotas registradas en esta clínica
             modelo.TotalMascotasRegistradas = await _mascotasService.ObtenerTotalMascotasPorClinicaAsync(idClinica);
 
-            // Veterinarios disponibles en esta clínica para asignar a las citas
             ViewBag.Veterinarios = await _veterinarioService.ObtenerVeterinariosPorClinicaAsync(idClinica);
 
             return View(modelo);

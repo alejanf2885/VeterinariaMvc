@@ -9,7 +9,6 @@ namespace VeterinariaMvc.Repositories.MascotasRepository
 
         Task<MascotaDetalle?> GetMascotaPorIdAsync(int idMascota);
 
-        // Permitimos nulos en Especie, Raza, Sexo, Fecha y Peso
         Task<int> RegistrarMascotaAsync(
             string nombre,
             int? idEspecie,

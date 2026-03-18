@@ -31,7 +31,6 @@ namespace VeterinariaMvc.Services.Tratamientos
 
         public async Task<TratamientoDto?> GetTratamientoDetalleAsync(int idTratamiento)
         {
-            // ⚠️ ATENCIÓN: Fíjate que le quité el idUsuario a la llamada del repositorio también
             TratamientoView tratamiento = await _tratamientoRepository.GetTratamientoDetalleAsync(idTratamiento);
 
             if (tratamiento == null) return null;

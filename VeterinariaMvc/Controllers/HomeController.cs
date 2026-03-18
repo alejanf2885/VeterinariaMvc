@@ -42,7 +42,7 @@ namespace VeterinariaMvc.Controllers
                     return RedirectToAction("Index", "Home", new { area = "Cliente" });
 
                 case Roles.Veterinario:
-                    return RedirectToAction("Index", "Home", new { area = "Veterinarios" });
+                    return RedirectToAction("Index", "Dashboard", new { area = "Veterinario" });
 
                 default:
                     return RedirectToAction("Login", "Auth");

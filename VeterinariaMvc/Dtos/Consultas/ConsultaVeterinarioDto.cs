@@ -19,5 +19,6 @@ namespace VeterinariaMvc.Dtos.Consultas
         public string Turno { get; set; }
         public string Motivo { get; set; }
         public string Estado { get; set; }
+        public int? IdPlantillaFicha { get; set; }
     }
 }

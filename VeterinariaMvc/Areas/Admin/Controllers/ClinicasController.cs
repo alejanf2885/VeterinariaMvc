@@ -9,7 +9,6 @@ using VeterinariaMvc.Services.Imagenes;
 namespace VeterinariaMvc.Areas.Admin.Controllers
 {
     [Area("Admin")]
-   [Authorize(Roles = "AdminClinica")]
     public class ClinicasController : Controller
     {
         private readonly IClinicaService _clinicaService;
@@ -20,6 +19,7 @@ namespace VeterinariaMvc.Areas.Admin.Controllers
             _clinicaService = clinicaService;
             _imagenService = imagenService;
         }
+        [Authorize(Roles = "AdminClinica")]
 
         public async Task<IActionResult> Index()
         {

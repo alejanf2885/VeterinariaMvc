@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using System.Security.Claims;
 using VeterinariaMvc.Hubs;
 using VeterinariaMvc.Models.Chats;
 using VeterinariaMvc.Services.Chats;
+using VeterinariaMvc.Services.Estado;
 
 namespace VeterinariaMvc.Controllers
 {
@@ -12,27 +12,35 @@ namespace VeterinariaMvc.Controllers
     public class ChatController : Controller
     {
         private readonly IChatService _chatService;
-        private readonly IAuthorizationService _authService; 
+        private readonly IAuthorizationService _authService;
         private readonly IHubContext<ChatHub> _hubContext;
+        private readonly IEstadoUsuarioService _estadoUsuarioService;
 
         public ChatController(
             IChatService chatService,
             IAuthorizationService authService,
-            IHubContext<ChatHub> hubContext)
+            IHubContext<ChatHub> hubContext,
+            IEstadoUsuarioService estadoUsuarioService)
         {
             _chatService = chatService;
             _authService = authService;
             _hubContext = hubContext;
+            _estadoUsuarioService = estadoUsuarioService;
         }
 
-        private int ObtenerIdUsuarioActual()
+        private async Task<(int Id, string Nombre, string Imagen)> ObtenerDatosUsuarioActualAsync()
         {
-            return int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var usuario = await _estadoUsuarioService.ObtenerUsuarioActualAsync();
+            return (
+                usuario?.Id ?? 0,
+                usuario?.Nombre ?? "Usuario",
+                usuario?.Imagen ?? ""
+            );
         }
 
         public async Task<IActionResult> Index(int? idConversacion)
         {
-            int idUsuario = ObtenerIdUsuarioActual();
+            var (idUsuario, nombreUsuario, _) = await ObtenerDatosUsuarioActualAsync();
 
             List<ChatConversacion> conversaciones =
                 await _chatService.ObtenerConversacionesPorUsuarioAsync(idUsuario);
@@ -90,7 +98,7 @@ namespace VeterinariaMvc.Controllers
             var model = new ChatPageViewModel
             {
                 IdUsuarioActual = idUsuario,
-                NombreUsuarioActual = User.Identity?.Name ?? "Usuario",
+                NombreUsuarioActual = nombreUsuario,
                 Conversaciones = listaConv,
                 IdConversacionActiva = idConversacion,
                 HistorialActivo = historial,
@@ -104,7 +112,7 @@ namespace VeterinariaMvc.Controllers
         [Authorize(Roles = "2")]
         public async Task<IActionResult> NuevoChat()
         {
-            int idUsuario = ObtenerIdUsuarioActual();
+            var (idUsuario, _, _) = await ObtenerDatosUsuarioActualAsync();
             var veterinarios = await _chatService.ObtenerVeterinariosDisponiblesAsync(idUsuario);
             return View(veterinarios);
         }
@@ -114,7 +122,7 @@ namespace VeterinariaMvc.Controllers
         [Authorize(Roles = "2")]
         public async Task<IActionResult> CrearChat(int idVeterinario)
         {
-            int idUsuario = ObtenerIdUsuarioActual();
+            var (idUsuario, nombreUsuario, imagenUsuario) = await ObtenerDatosUsuarioActualAsync();
 
             int? idCliente = await _chatService.ObtenerIdClientePorUsuarioAsync(idUsuario);
             if (!idCliente.HasValue) return RedirectToAction("Index");
@@ -124,10 +132,9 @@ namespace VeterinariaMvc.Controllers
             var (idUsuarioCliente, idUsuarioVeterinario) = await _chatService.ObtenerUsuariosConversacionAsync(conversacion.Id);
             string nombreVet = await _chatService.ObtenerNombreUsuarioAsync(idUsuarioVeterinario);
             string? imagenVet = await _chatService.ObtenerImagenUsuarioAsync(idUsuarioVeterinario);
-            string imagenUsuario = User.FindFirstValue("Imagen") ?? ""; 
 
             await _hubContext.Clients.Group($"user-{idUsuarioVeterinario}")
-                .SendAsync("NuevaConversacion", new { IdConversacion = conversacion.Id, NombreOtroUsuario = User.Identity?.Name, ImagenOtroUsuario = imagenUsuario });
+                .SendAsync("NuevaConversacion", new { IdConversacion = conversacion.Id, NombreOtroUsuario = nombreUsuario, ImagenOtroUsuario = imagenUsuario });
 
             await _hubContext.Clients.Group($"user-{idUsuarioCliente}")
                 .SendAsync("NuevaConversacion", new { IdConversacion = conversacion.Id, NombreOtroUsuario = nombreVet, ImagenOtroUsuario = imagenVet });

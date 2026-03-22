@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using VeterinariaMvc.Areas.Veterinario.Models;
 using VeterinariaMvc.Models.Plantillas;
 using VeterinariaMvc.Services.Plantillas;
+using VeterinariaMvc.Services.Estado;
 
 namespace VeterinariaMvc.Areas.Veterinario.Controllers
 {
@@ -13,22 +13,27 @@ namespace VeterinariaMvc.Areas.Veterinario.Controllers
     public class PlantillasController : Controller
     {
         private readonly IPlantillaService _plantillaService;
+        private readonly IEstadoUsuarioService _estadoUsuarioService;
 
-        public PlantillasController(IPlantillaService plantillaService)
+        public PlantillasController(
+            IPlantillaService plantillaService,
+            IEstadoUsuarioService estadoUsuarioService)
         {
             _plantillaService = plantillaService;
+            _estadoUsuarioService = estadoUsuarioService;
         }
 
-        private int ObtenerIdClinica()
+        private async Task<int> ObtenerIdClinicaAsync()
         {
-            return int.Parse(User.FindFirst("IdClinica")?.Value ?? "0");
+            var usuario = await _estadoUsuarioService.ObtenerUsuarioActualAsync();
+            return usuario?.IdClinica ?? 0;
         }
 
         public async Task<IActionResult> Index()
         {
-            int idClinica = ObtenerIdClinica();
-            
-            if(idClinica == 0)
+            int idClinica = await ObtenerIdClinicaAsync();
+
+            if (idClinica == 0)
             {
                 return View(new List<Plantilla>());
             }
@@ -46,8 +51,8 @@ namespace VeterinariaMvc.Areas.Veterinario.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CrearPlantillaViewModel model)
         {
-            int idClinica = ObtenerIdClinica();
-            
+            int idClinica = await ObtenerIdClinicaAsync();
+
             if (idClinica == 0)
             {
                 ModelState.AddModelError("", "No se pudo identificar la clínica a la que perteneces.");
@@ -65,7 +70,7 @@ namespace VeterinariaMvc.Areas.Veterinario.Controllers
 
         public async Task<IActionResult> Details(int id)
         {
-            int idClinica = ObtenerIdClinica();
+            int idClinica = await ObtenerIdClinicaAsync();
             var modelo = await _plantillaService.GetPlantillaDetalleAsync(id, idClinica);
             if (modelo == null)
             {
@@ -77,7 +82,7 @@ namespace VeterinariaMvc.Areas.Veterinario.Controllers
 
         public async Task<IActionResult> Edit(int id)
         {
-            int idClinica = ObtenerIdClinica();
+            int idClinica = await ObtenerIdClinicaAsync();
             var detalle = await _plantillaService.GetPlantillaDetalleAsync(id, idClinica);
             if (detalle == null)
             {
@@ -98,7 +103,7 @@ namespace VeterinariaMvc.Areas.Veterinario.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, CrearPlantillaViewModel model)
         {
-            int idClinica = ObtenerIdClinica();
+            int idClinica = await ObtenerIdClinicaAsync();
 
             if (!ModelState.IsValid)
             {
@@ -117,7 +122,7 @@ namespace VeterinariaMvc.Areas.Veterinario.Controllers
 
         public async Task<IActionResult> Delete(int id)
         {
-            int idClinica = ObtenerIdClinica();
+            int idClinica = await ObtenerIdClinicaAsync();
             var detalle = await _plantillaService.GetPlantillaDetalleAsync(id, idClinica);
             if (detalle == null)
             {
@@ -131,7 +136,7 @@ namespace VeterinariaMvc.Areas.Veterinario.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            int idClinica = ObtenerIdClinica();
+            int idClinica = await ObtenerIdClinicaAsync();
             await _plantillaService.DeletePlantillaAsync(id, idClinica);
             return RedirectToAction("Index");
         }

@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using VeterinariaMvc.Dtos.Auth;
 using VeterinariaMvc.Dtos.Veterinarios;
 using VeterinariaMvc.Models;
 using VeterinariaMvc.Services.Auth;
+using VeterinariaMvc.Services.Estado;
+using VeterinariaMvc.Services.Veterinarios;
 
 namespace VeterinariaMvc.Areas.Admin.Controllers
 {
@@ -14,18 +15,31 @@ namespace VeterinariaMvc.Areas.Admin.Controllers
     public class VeterinariosController : Controller
     {
         private readonly IAuthService _authService;
-        private readonly VeterinariaMvc.Services.Veterinarios.IVeterinarioService _veterinarioService;
+        private readonly IVeterinarioService _veterinarioService;
+        private readonly IEstadoUsuarioService _estadoUsuarioService;
 
-        public VeterinariosController(IAuthService authService, VeterinariaMvc.Services.Veterinarios.IVeterinarioService veterinarioService)
+        public VeterinariosController(
+            IAuthService authService,
+            IVeterinarioService veterinarioService,
+            IEstadoUsuarioService estadoUsuarioService)
         {
             _authService = authService;
             _veterinarioService = veterinarioService;
+            _estadoUsuarioService = estadoUsuarioService;
         }
 
         public async Task<IActionResult> Index()
         {
-            int idClinica = int.Parse(User.FindFirst("IdClinica")?.Value ?? "0");
-            var veterinarios = await _veterinarioService.ObtenerVeterinariosPorClinicaAsync(idClinica);
+            var usuario = await _estadoUsuarioService.ObtenerUsuarioActualAsync();
+
+            if (usuario == null || usuario.IdClinica == null)
+                return RedirectToAction("Login", "Auth", new { area = "" });
+
+            int idClinica = usuario.IdClinica.Value;
+
+            var veterinarios = await _veterinarioService
+                .ObtenerVeterinariosPorClinicaAsync(idClinica);
+
             return View(veterinarios);
         }
 
@@ -44,10 +58,15 @@ namespace VeterinariaMvc.Areas.Admin.Controllers
                 return View(model);
             }
 
-            int idClinica = int.Parse(User.FindFirst("IdClinica")?.Value ?? "0");
-            model.IdClinica = idClinica;
+            var usuario = await _estadoUsuarioService.ObtenerUsuarioActualAsync();
 
-            Usuario usuario = await this._authService.RegistrarVeterinarioAsync(model);
+            if (usuario == null || usuario.IdClinica == null)
+                return RedirectToAction("Login", "Auth", new { area = "" });
+
+            model.IdClinica = usuario.IdClinica.Value;
+
+            Usuario usuarioCreado = await _authService
+                .RegistrarVeterinarioAsync(model);
 
             return RedirectToAction("Index");
         }
@@ -55,8 +74,16 @@ namespace VeterinariaMvc.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int idUsuario)
         {
-            int idClinica = int.Parse(User.FindFirst("IdClinica")?.Value ?? "0");
-            await _veterinarioService.EliminarVeterinarioAsync(idUsuario, idClinica);
+            var usuario = await _estadoUsuarioService.ObtenerUsuarioActualAsync();
+
+            if (usuario == null || usuario.IdClinica == null)
+                return RedirectToAction("Login", "Auth", new { area = "" });
+
+            int idClinica = usuario.IdClinica.Value;
+
+            await _veterinarioService
+                .EliminarVeterinarioAsync(idUsuario, idClinica);
+
             return RedirectToAction("Index");
         }
     }

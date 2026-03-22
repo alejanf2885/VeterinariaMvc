@@ -5,20 +5,26 @@ using VeterinariaMvc.Enums;
 using VeterinariaMvc.Models;
 using VeterinariaMvc.Services.Clinica;
 using VeterinariaMvc.Services.Imagenes;
+using VeterinariaMvc.Services.Estado;
 
 namespace VeterinariaMvc.Areas.Admin.Controllers
 {
     [Area("Admin")]
-   [Authorize(Roles = "AdminClinica")]
+    [Authorize(Roles = "AdminClinica")]
     public class ClinicasController : Controller
     {
         private readonly IClinicaService _clinicaService;
         private readonly IImagenService _imagenService;
+        private readonly IEstadoUsuarioService _estadoUsuarioService;
 
-        public ClinicasController(IClinicaService clinicaService, IImagenService imagenService)
+        public ClinicasController(
+            IClinicaService clinicaService,
+            IImagenService imagenService,
+            IEstadoUsuarioService estadoUsuarioService)
         {
             _clinicaService = clinicaService;
             _imagenService = imagenService;
+            _estadoUsuarioService = estadoUsuarioService;
         }
 
         public async Task<IActionResult> Index()
@@ -50,14 +56,21 @@ namespace VeterinariaMvc.Areas.Admin.Controllers
 
             try
             {
-                var claim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
-                if (claim == null) return RedirectToAction("Login", "Auth");
-                int dueñoId = int.Parse(claim.Value);
+                var usuario = await _estadoUsuarioService.ObtenerUsuarioActualAsync();
+
+                if (usuario == null)
+                    return RedirectToAction("Login", "Auth");
+
+                int dueñoId = usuario.Id;
 
                 string rutaFoto = "/images/usuarios/default-avatar.png";
                 if (model.Logo != null)
                 {
-                    rutaFoto = await _imagenService.SubirImagenAsync(model.Logo, CarpetaDestino.Clinica, 500);
+                    rutaFoto = await _imagenService.SubirImagenAsync(
+                        model.Logo,
+                        CarpetaDestino.Clinica,
+                        500
+                    );
                 }
 
                 Clinica nuevaClinica = new Clinica
@@ -68,7 +81,7 @@ namespace VeterinariaMvc.Areas.Admin.Controllers
                     Email = model.Email,
                     Activo = true,
                     Estado = true,
-                    IdUsuario = dueñoId, 
+                    IdUsuario = dueñoId,
                     Imagen = rutaFoto
                 };
 

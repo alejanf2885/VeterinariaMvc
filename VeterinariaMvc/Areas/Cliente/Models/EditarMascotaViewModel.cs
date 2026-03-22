@@ -5,7 +5,7 @@ namespace VeterinariaMvc.Areas.Cliente.Models
 {
     public class EditarMascotaViewModel
     {
-        [ValidateNever] // No validar este campo, ya que se llenará con datos del servidor
+        [ValidateNever] 
         public CatalogosMascotaViewModels Catalogos { get; set; }
 
         public MascotaEditDto Formulario { get; set; }

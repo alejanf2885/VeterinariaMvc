@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using VeterinariaMvc.Services.Consulta;
 using VeterinariaMvc.Services.Veterinarios;
+using VeterinariaMvc.Services.Estado;
 
 namespace VeterinariaMvc.Areas.Admin.Controllers
 {
@@ -12,20 +13,34 @@ namespace VeterinariaMvc.Areas.Admin.Controllers
     {
         private readonly IConsultaService _consultaService;
         private readonly IVeterinarioService _veterinarioService;
+        private readonly IEstadoUsuarioService _estadoUsuarioService;
 
-        public ConsultasController(IConsultaService consultaService, IVeterinarioService veterinarioService)
+        public ConsultasController(
+            IConsultaService consultaService,
+            IVeterinarioService veterinarioService,
+            IEstadoUsuarioService estadoUsuarioService)
         {
             _consultaService = consultaService;
             _veterinarioService = veterinarioService;
+            _estadoUsuarioService = estadoUsuarioService;
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AsignarVeterinario(int idConsulta, int idUsuarioVeterinario)
         {
-            int idClinica = int.Parse(User.FindFirst("IdClinica")?.Value ?? "0");
+            var usuario = await _estadoUsuarioService.ObtenerUsuarioActualAsync();
 
-            int? idVeterinario = await _veterinarioService.ObtenerIdVeterinarioAsync(idUsuarioVeterinario, idClinica);
+            if (usuario == null || usuario.IdClinica == null)
+            {
+                TempData["ERROR"] = "No se pudo obtener la clínica del usuario.";
+                return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
+            }
+
+            int idClinica = usuario.IdClinica.Value;
+
+            int? idVeterinario = await _veterinarioService
+                .ObtenerIdVeterinarioAsync(idUsuarioVeterinario, idClinica);
 
             if (idVeterinario == null)
             {
@@ -33,7 +48,8 @@ namespace VeterinariaMvc.Areas.Admin.Controllers
                 return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
             }
 
-            bool ok = await _consultaService.AsignarVeterinarioAsync(idConsulta, idVeterinario.Value);
+            bool ok = await _consultaService
+                .AsignarVeterinarioAsync(idConsulta, idVeterinario.Value);
 
             if (!ok)
             {

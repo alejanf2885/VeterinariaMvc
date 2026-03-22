@@ -91,8 +91,8 @@
                                         <div class="flex items-center gap-3">
                                             <div class="h-9 w-9 rounded-full bg-slate-200 overflow-hidden border border-slate-100 shrink-0">
                                                 <img src="@(string.IsNullOrEmpty(cita.ImagenMascota)
-                                                                                                             ? $"https://ui-avatars.com/api/?name={cita.NombreMascota}&background=random"
-                                                                                                             : cita.ImagenMascota)"
+                                                                                                                                                                  ? $"https://ui-avatars.com/api/?name={cita.NombreMascota}&background=random"
+                                                                                                                                                                  : cita.ImagenMascota)"
                                                      alt="@cita.NombreMascota"
                                                      loading="lazy"
                                                      class="h-full w-full object-cover" />
@@ -103,11 +103,11 @@
                                     <td class="px-6 py-4 text-slate-600">@cita.NombreVeterinario</td>
                                     <td class="px-6 py-4">
                                         <span class="px-2.5 py-1 text-xs font-semibold rounded-full border
-                                                    @(cita.Estado?.ToUpper() == "CONFIRMADA"
-                                                                                              ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                                                                                              : cita.Estado?.ToUpper() == "CANCELADA"
-                                                                                                  ? "bg-rose-50 text-rose-700 border-rose-200"
-                                                                                                  : "bg-amber-50 text-amber-700 border-amber-200")">
+                                                            @(cita.Estado?.ToUpper() == "CONFIRMADA"
+                                                                                                                                            ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                                                                                                                            : cita.Estado?.ToUpper() == "CANCELADA"
+                                                                                                                                                ? "bg-rose-50 text-rose-700 border-rose-200"
+                                                                                                                                                : "bg-amber-50 text-amber-700 border-amber-200")">
                                             @cita.Estado
                                         </span>
                                     </td>
@@ -160,8 +160,8 @@
                                         <div class="flex items-center gap-3">
                                             <div class="h-9 w-9 rounded-full bg-slate-200 overflow-hidden shrink-0">
                                                 <img src="@(string.IsNullOrEmpty(cita.ImagenMascota)
-                                                                                                             ? $"https://ui-avatars.com/api/?name={cita.NombreMascota}&background=random"
-                                                                                                             : cita.ImagenMascota)"
+                                                                                                                                                                  ? $"https://ui-avatars.com/api/?name={cita.NombreMascota}&background=random"
+                                                                                                                                                                  : cita.ImagenMascota)"
                                                      alt="@cita.NombreMascota"
                                                      loading="lazy"
                                                      class="h-full w-full object-cover" />

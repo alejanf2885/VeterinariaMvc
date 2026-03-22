@@ -1,11 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using VeterinariaMvc.Areas.Cliente.Models;
 using VeterinariaMvc.Dtos.Consultas.VeterinariaMvc.Dtos.Consulta;
 using VeterinariaMvc.Dtos.Mascota;
 using VeterinariaMvc.Services.Consulta;
 using VeterinariaMvc.Services.Mascotas;
+using VeterinariaMvc.Services.Estado;
 
 namespace VeterinariaMvc.Areas.Cliente.Controllers
 {
@@ -16,20 +19,27 @@ namespace VeterinariaMvc.Areas.Cliente.Controllers
         private readonly IConsultaService _consultaService;
         private readonly IMascotasService _mascotasService;
         private readonly IAuthorizationService _authService;
+        private readonly IEstadoUsuarioService _estadoUsuarioService;
 
         public ConsultasController(
             IConsultaService consultaService,
             IMascotasService mascotasService,
-            IAuthorizationService authService)
+            IAuthorizationService authService,
+            IEstadoUsuarioService estadoUsuarioService)
         {
             _consultaService = consultaService;
             _mascotasService = mascotasService;
             _authService = authService;
+            _estadoUsuarioService = estadoUsuarioService;
         }
 
-        private int ObtenerIdUsuarioActual()
+        private async Task<int> ObtenerIdUsuarioActualAsync()
         {
-            return int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            var usuario = await _estadoUsuarioService.ObtenerUsuarioActualAsync();
+            if (usuario == null)
+                throw new UnauthorizedAccessException("Usuario no autenticado");
+
+            return usuario.Id;
         }
 
         [HttpGet]
@@ -82,7 +92,12 @@ namespace VeterinariaMvc.Areas.Cliente.Controllers
                 return View("Reservar", model);
             }
 
-            bool exito = await _consultaService.CrearReservaAsync(model.IdMascota, model.IdClinica, model.IdBloque.Value, model.Motivo);
+            bool exito = await _consultaService.CrearReservaAsync(
+                model.IdMascota,
+                model.IdClinica,
+                model.IdBloque.Value,
+                model.Motivo
+            );
 
             if (exito)
             {
@@ -98,7 +113,7 @@ namespace VeterinariaMvc.Areas.Cliente.Controllers
 
         public async Task<IActionResult> Consultas()
         {
-            int idUsuario = ObtenerIdUsuarioActual();
+            int idUsuario = await ObtenerIdUsuarioActualAsync();
             List<ConsultaResumen> consultas = await _consultaService.GetHistorialCompletoAsync(idUsuario);
 
             return View(consultas);
@@ -127,12 +142,11 @@ namespace VeterinariaMvc.Areas.Cliente.Controllers
             return View(consulta);
         }
 
-        [HttpPost] 
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Cancelar(int id)
         {
             ConsultaResumen consulta = await _consultaService.GetConsultaDetalleAsync(id);
-
             if (consulta == null) return RedirectToAction("Consultas");
 
             var autorizacion = await _authService.AuthorizeAsync(User, consulta, "PoliticaPermisoConsulta");

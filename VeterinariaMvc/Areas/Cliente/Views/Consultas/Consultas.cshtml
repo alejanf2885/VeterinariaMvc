@@ -72,8 +72,6 @@
                                 </td>
                                 <td class="p-4 text-center">
                                     @{
-                                        // LÓGICA DE CANCELACIÓN:
-                                        // Solo mostramos el botón si la cita es en el futuro Y no está ya cancelada o finalizada
                                         bool esCancelable = cita.Fecha > DateTime.Now
                                         && cita.Estado?.ToUpper() != "CANCELADA"
                                         && cita.Estado?.ToUpper() != "COMPLETADA"

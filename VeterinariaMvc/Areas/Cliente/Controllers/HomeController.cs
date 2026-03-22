@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
+using System.Threading.Tasks;
 using VeterinariaMvc.Services.Estado;
 using VeterinariaMvc.Dtos.Session;
 using VeterinariaMvc.Services.Mascotas;
@@ -14,26 +14,38 @@ using VeterinariaMvc.Models.Chats;
 namespace VeterinariaMvc.Areas.Cliente.Controllers
 {
     [Area("Cliente")]
-    [Authorize] // Garantiza que solo usuarios autenticados ejecuten estas acciones
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly IMascotasService _mascotasService;
         private readonly IConsultaService _consultaService;
         private readonly IChatService _chatService;
+        private readonly IEstadoUsuarioService _estadoUsuarioService;
 
         public HomeController(
             IMascotasService mascotasService,
             IConsultaService consultaService,
-            IChatService chatService)
+            IChatService chatService,
+            IEstadoUsuarioService estadoUsuarioService)
         {
             _mascotasService = mascotasService;
             _consultaService = consultaService;
             _chatService = chatService;
+            _estadoUsuarioService = estadoUsuarioService;
+        }
+
+        private async Task<UsuarioSessionDto> ObtenerUsuarioActualAsync()
+        {
+            var usuario = await _estadoUsuarioService.ObtenerUsuarioActualAsync();
+            if (usuario == null)
+                throw new UnauthorizedAccessException("Usuario no autenticado");
+            return usuario;
         }
 
         public async Task<IActionResult> Index()
         {
-            int idUsuario = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var usuarioActual = await ObtenerUsuarioActualAsync();
+            int idUsuario = usuarioActual.Id;
 
             List<MascotaResumenDto> mascotas = await _mascotasService.GetMascotasByUserAsync(idUsuario);
             List<ConsultaResumen> consultas = await _consultaService.GetConsultasDashboardAsync(idUsuario);
@@ -70,12 +82,7 @@ namespace VeterinariaMvc.Areas.Cliente.Controllers
 
             DashboardViewModel model = new DashboardViewModel
             {
-                usuario = new UsuarioSessionDto
-                {
-                    Id = idUsuario,
-                    Nombre = User.Identity?.Name ?? "Usuario",
-                    Imagen = User.FindFirst("Imagen")?.Value
-                },
+                usuario = usuarioActual,
                 Mascotas = mascotas,
                 Consultas = consultas,
                 Conversaciones = listaConv,

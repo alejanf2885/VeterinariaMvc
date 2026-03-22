@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VeterinariaMvc.Areas.Cliente.Models;
@@ -6,36 +5,41 @@ using VeterinariaMvc.Dtos.Tratamiento;
 using VeterinariaMvc.Services.Tratamientos;
 using VeterinariaMvc.Services.Mascotas;
 using VeterinariaMvc.Dtos.Mascota;
+using VeterinariaMvc.Services.Estado;
 
 namespace VeterinariaMvc.Areas.Cliente.Controllers
 {
     [Area("Cliente")]
-    [Authorize] 
+    [Authorize]
     public class TratamientosController : Controller
     {
         private readonly ITratamientoService _tratamientoService;
         private readonly IMascotasService _mascotasService;
         private readonly IAuthorizationService _authService;
+        private readonly IEstadoUsuarioService _estadoUsuarioService;
 
         public TratamientosController(
             ITratamientoService tratamientoService,
             IMascotasService mascotasService,
-            IAuthorizationService authService)
+            IAuthorizationService authService,
+            IEstadoUsuarioService estadoUsuarioService)
         {
             _tratamientoService = tratamientoService;
             _mascotasService = mascotasService;
             _authService = authService;
+            _estadoUsuarioService = estadoUsuarioService;
         }
 
-        private int ObtenerIdUsuarioActual()
+        private async Task<int> ObtenerIdUsuarioActualAsync()
         {
-            return int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var usuario = await _estadoUsuarioService.ObtenerUsuarioActualAsync();
+            return usuario?.Id ?? 0;
         }
 
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            int idUsuario = ObtenerIdUsuarioActual();
+            int idUsuario = await ObtenerIdUsuarioActualAsync();
 
             List<TratamientoDto> tratamientosDto = await _tratamientoService.GetTratamientosPorUsuarioAsync(idUsuario);
 
@@ -83,7 +87,7 @@ namespace VeterinariaMvc.Areas.Cliente.Controllers
                 return RedirectToAction(nameof(Detalle), new { id });
             }
 
-            TratamientoDto tratamiento = await _tratamientoService.GetTratamientoDetalleAsync(id);
+            TratamientoDto? tratamiento = await _tratamientoService.GetTratamientoDetalleAsync(id);
             if (tratamiento == null) return RedirectToAction(nameof(Index));
 
             var autorizacion = await _authService.AuthorizeAsync(User, tratamiento, "PoliticaPermisoTratamiento");
@@ -93,7 +97,7 @@ namespace VeterinariaMvc.Areas.Cliente.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            int idUsuario = ObtenerIdUsuarioActual();
+            int idUsuario = await ObtenerIdUsuarioActualAsync();
             bool resultado = await _tratamientoService.AgregarSeguimientoAsync(id, idUsuario, comentario);
 
             TempData[resultado ? "Success" : "Error"] =
@@ -104,7 +108,7 @@ namespace VeterinariaMvc.Areas.Cliente.Controllers
 
         public async Task<IActionResult> TratamientosMascota(int idmascota)
         {
-            MascotaDetalleDto mascota = await _mascotasService.GetMascotaPorIdAsync(idmascota);
+            MascotaDetalleDto? mascota = await _mascotasService.GetMascotaPorIdAsync(idmascota);
             if (mascota == null) return RedirectToAction("Index", "Home");
 
             var autorizacion = await _authService.AuthorizeAsync(User, mascota, "PoliticaPermisoMascota");

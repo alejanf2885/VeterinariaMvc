@@ -22,7 +22,6 @@ namespace VeterinariaMvc.Areas.Cliente.Models
         [StringLength(255)]
         public string? Motivo { get; set; }
 
-        // La lista que rellenaremos desde la base de datos
         public List<BloqueDisponibleDto> HorariosDisponibles { get; set; } = new List<BloqueDisponibleDto>();
     }
 }

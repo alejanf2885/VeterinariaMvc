@@ -10,7 +10,6 @@ using VeterinariaMvc.Services.Estado;
 namespace VeterinariaMvc.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "AdminClinica")]
     public class ClinicasController : Controller
     {
         private readonly IClinicaService _clinicaService;
@@ -26,6 +25,7 @@ namespace VeterinariaMvc.Areas.Admin.Controllers
             _imagenService = imagenService;
             _estadoUsuarioService = estadoUsuarioService;
         }
+        [Authorize(Roles = "AdminClinica")]
 
         public async Task<IActionResult> Index()
         {
